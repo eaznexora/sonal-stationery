@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SONAL Stationary | Linen & Leather Mini Crossbody</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons for minimalist SVG icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <!-- Desktop Header -->
+    <header class="top-header">
+        <nav class="desktop-nav">
+            <div class="nav-left">
+                <a href="index.html" class="nav-link">Home</a>
+                
+                <div class="dropdown-wrapper">
+                    <a href="categories.html" class="nav-link dropdown-toggle">Categories <i data-lucide="chevron-down" style="width: 14px; margin-left: 4px;"></i></a>
+                    <div class="mega-menu">
+                        <div class="mega-column">
+                            <h4>Gifts</h4>
+                            <a href="category-products.html?cat=Personalized Hampers">Personalized Hampers</a>
+                            <a href="category-products.html?cat=Eco-Friendly Cards">Eco-Friendly Cards</a>
+                            <a href="category-products.html?cat=Luxury Candles">Luxury Candles</a>
+                            <a href="category-products.html?cat=Mini Keepsakes">Mini Keepsakes</a>
+                        </div>
+                        <div class="mega-column">
+                            <h4>Purses</h4>
+                            <a href="category-products.html?cat=Leather Crossbody">Leather Crossbody</a>
+                            <a href="category-products.html?cat=Tote Bags">Tote Bags</a>
+                            <a href="category-products.html?cat=Minimal Clutches">Minimal Clutches</a>
+                            <a href="category-products.html?cat=Handcrafted Wallets">Handcrafted Wallets</a>
+                        </div>
+                        <div class="mega-column">
+                            <h4>Toys</h4>
+                            <a href="category-products.html?cat=Plush Teddy Bears">Plush Teddy Bears</a>
+                            <a href="category-products.html?cat=Soft Animal Companions">Soft Animal Companions</a>
+                            <a href="category-products.html?cat=Knit Stuffed Toys">Knit Stuffed Toys</a>
+                            <a href="category-products.html?cat=Nursery Plushies">Nursery Plushies</a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="category-products.html?cat=Gifts" class="nav-link">Gifts</a>
+                <a href="category-products.html?cat=Purses" class="nav-link">Purses</a>
+                <a href="category-products.html?cat=Toys" class="nav-link">Toys</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+
+            <div class="logo-container">
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="SONAL Stationary Logo" class="brand-logo">
+                    <span class="logo-text">SONAL Stationary</span>
+                </a>
+            </div>
+
+            <div class="nav-right">
+                <button class="icon-btn" aria-label="Search"><i data-lucide="search"></i></button>
+                <a href="profile.html" class="icon-btn" aria-label="Account"><i data-lucide="user"></i></a>
+                <button class="icon-btn" aria-label="Cart">
+                    <i data-lucide="shopping-bag"></i>
+                    <span class="cart-count">0</span>
+                </button>
+                <button class="icon-btn mobile-only-menu" aria-label="Menu" onclick="toggleMobileMenu()" style="display: none;"><i data-lucide="menu"></i></button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Sticky Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="profile.html#tab-orders" class="nav-item">
+            <i data-lucide="package"></i>
+            <span>Orders</span>
+        </a>
+        <a href="categories.html" class="nav-item">
+            <i data-lucide="grid"></i>
+            <span>Categories</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i data-lucide="user"></i>
+            <span>Profile</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <div style="position:relative; display:inline-flex;">
+                <i data-lucide="shopping-bag"></i>
+                <span class="cart-count" style="position:absolute; top:-5px; right:-10px; background:var(--accent-sage-dark); color:white; font-size:0.7rem; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center;">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+    <main class="pdp-main">
+        <div class="breadcrumbs">
+            <a href="index.html">Home</a> / <a href="#">Purses & Bags</a> / <span>Linen & Leather Mini Crossbody</span>
+        </div>
+        
+        <div class="pdp-container">
+            <!-- Left Side: Product Gallery -->
+            <div class="pdp-gallery">
+                <div class="main-image-container">
+                    <img id="mainProductImage" src="https://picsum.photos/800/1000?random=11" alt="Linen & Leather Mini Crossbody">
+                </div>
+                <div class="thumbnail-row">
+                    <img class="thumbnail active" src="https://picsum.photos/800/1000?random=11" alt="View 1" onclick="changeImage(this)">
+                    <img class="thumbnail" src="https://picsum.photos/800/1000?random=12" alt="View 2" onclick="changeImage(this)">
+                    <img class="thumbnail" src="https://picsum.photos/800/1000?random=13" alt="View 3" onclick="changeImage(this)">
+                    <img class="thumbnail" src="https://picsum.photos/800/1000?random=14" alt="View 4" onclick="changeImage(this)">
+                </div>
+            </div>
+
+            <!-- Right Side: Product Info & Actions -->
+            <div class="pdp-details">
+                <span class="category-tag">Handcrafted Purse</span>
+                <h1 class="product-title">Linen & Leather Mini Crossbody</h1>
+                <div class="price-container">
+                    <span class="product-price">$120.00</span>
+                    <span class="stock-indicator"><i data-lucide="check-circle" style="width: 14px;"></i> In Stock</span>
+                </div>
+                
+                <p class="product-description">
+                    Thoughtfully crafted with sustainable linen and supple leather details. This minimalist crossbody offers effortless style and enough space for your daily essentials, all wrapped in a soothing, earthy aesthetic perfect for everyday wear.
+                </p>
+
+                <!-- Variant Selector -->
+                <div class="variant-selector">
+                    <h4>Color: <span id="selectedColorName">Sage Green</span></h4>
+                    <div class="color-swatches">
+                        <button class="swatch active" style="background-color: #aebcb2;" aria-label="Sage Green" onclick="selectColor(this, 'Sage Green')"></button>
+                        <button class="swatch" style="background-color: #f5f0e6;" aria-label="Warm Cream" onclick="selectColor(this, 'Warm Cream')"></button>
+                        <button class="swatch" style="background-color: #d1bfae;" aria-label="Desert Sand" onclick="selectColor(this, 'Desert Sand')"></button>
+                    </div>
+                </div>
+
+                <!-- Gifting Options -->
+                <div class="gifting-options">
+                    <label class="gift-wrap-toggle">
+                        <input type="checkbox" id="giftWrapCheckbox" onchange="toggleGiftMessage()">
+                        <span class="custom-checkbox"></span>
+                        Add Complimentary Gift Wrap & Ribbon
+                    </label>
+                    <div class="gift-message-container" id="giftMessageContainer">
+                        <label for="giftMessage">Personalized Note</label>
+                        <textarea id="giftMessage" rows="2" placeholder="Write a custom message for the recipient..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="product-actions">
+                    <div class="quantity-selector">
+                        <button onclick="updateQty(-1)" aria-label="Decrease Quantity"><i data-lucide="minus"></i></button>
+                        <input type="number" id="qtyInput" value="1" min="1" max="99" readonly aria-label="Quantity">
+                        <button onclick="updateQty(1)" aria-label="Increase Quantity"><i data-lucide="plus"></i></button>
+                    </div>
+                    <button class="btn-pdp-primary" data-id="p1" data-title="Minimalist Purse" data-price="120.00" data-image="https://picsum.photos/600/600?random=11">Add to Bag</button>
+                    <button class="btn-pdp-secondary">Buy It Now</button>
+                </div>
+
+                <!-- Accordion -->
+                <div class="pdp-accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Details & Dimensions</span>
+                            <i data-lucide="chevron-down" class="chevron"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <p><strong>Size:</strong> 8" W x 6" H x 2.5" D<br>
+                            <strong>Weight:</strong> 0.8 lbs<br>
+                            <strong>Material:</strong> 100% Organic Linen body, vegetable-tanned leather strap and trim.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Care Instructions</span>
+                            <i data-lucide="chevron-down" class="chevron"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <p>Spot clean the linen with a damp cloth and mild soap. Condition the leather strap every 6 months to maintain suppleness. Avoid prolonged exposure to direct sunlight and moisture.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Shipping & Free Returns</span>
+                            <i data-lucide="chevron-down" class="chevron"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <p>Standard delivery takes 3-5 business days. Expedited shipping is available at checkout. Enjoy hassle-free free returns within 30 days of purchase.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cross-sell Section -->
+        <section class="cross-sell-section">
+            <div class="section-header">
+                <h2>Pairs Well With</h2>
+                <div class="divider"></div>
+            </div>
+            <div class="product-grid">
+                <!-- Product Card 1 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=21" alt="Matching Linen Wallet">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="s1" data-title="Leather Key Fob" data-price="25.00" data-image="https://picsum.photos/400/500?random=14" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Matching Linen Wallet</h3>
+                        <p class="price">$45.00</p>
+                    </div>
+                </article>
+                <!-- Product Card 2 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=22" alt="Soft Teddy Bear">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="s2" data-title="Linen Dust Bag" data-price="15.00" data-image="https://picsum.photos/400/500?random=15" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Plush Bear Companion</h3>
+                        <p class="price">$30.00</p>
+                    </div>
+                </article>
+                <!-- Product Card 3 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=23" alt="Leather Key Fob">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="s3" data-title="Leather Care Kit" data-price="35.00" data-image="https://picsum.photos/400/500?random=16" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Leather Key Fob</h3>
+                        <p class="price">$25.00</p>
+                    </div>
+                </article>
+                <!-- Product Card 4 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=24" alt="SONAL Stationary Gift Card">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="s4" data-title="Minimalist Cardholder" data-price="45.00" data-image="https://picsum.photos/400/500?random=17" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Digital Gift Card</h3>
+                        <p class="price">$50.00</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+
+                <!-- Column 1: Brand -->
+                <div class="footer-col brand-col">
+                    <a href="index.html" class="footer-logo">
+                        <img src="logo.png" alt="SONAL Stationary Logo" class="brand-logo footer-brand-logo">
+                        <span class="logo-text">SONAL Stationary</span>
+                    </a>
+                    <p class="tagline">Elevating everyday writing, gifting, and living with soothing aesthetic designs.</p>
+                </div>
+
+                <!-- Column 2: Newsletter -->
+                <div class="footer-col newsletter-col">
+                    <h4>Stay Connected</h4>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Email address" aria-label="Email address" required>
+                        <button type="submit" aria-label="Subscribe"><i data-lucide="arrow-right"></i></button>
+                    </form>
+                </div>
+
+                <!-- Column 3: Links -->
+                <div class="footer-col links-col">
+                    <a href="#">FAQs</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Returns</a>
+                </div>
+
+                <!-- Column 4: Socials & Copyright -->
+                <div class="footer-col social-col">
+                    <div class="social-icons">
+                        <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+                        <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                    </div>
+                    <p class="copyright">&copy; 2026 SONAL Stationary.<br>All rights reserved.</p>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Mobile Sticky Cart Bar -->
+    <div class="mobile-sticky-cart">
+        <div class="sticky-cart-info">
+            <span class="sticky-title">Mini Crossbody</span>
+            <span class="sticky-price">$120.00</span>
+        </div>
+        <button class="btn-pdp-primary sticky-btn" data-id="p1" data-title="Minimalist Purse" data-price="120.00" data-image="https://picsum.photos/600/600?random=11">Add to Bag</button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenu">
+        <button class="close-menu-btn" onclick="toggleMobileMenu()"><i data-lucide="x" style="width: 24px; height: 24px;"></i></button>
+        <div class="mobile-menu-content">
+            <a href="index.html">Home</a>
+            <a href="categories.html">Categories & Collections</a>
+            <div class="mobile-menu-sub">
+                <a href="#gifts">Gifts</a>
+                <a href="#purses">Purses</a>
+                <a href="#toys">Toys</a>
+            </div>
+            <a href="#about">About</a>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-modal" id="searchModal">
+        <div class="search-modal-content">
+            <div class="search-header">
+                <i data-lucide="search"></i>
+                <input type="text" id="searchInput" placeholder="Search gifts, purses, soft toys..." autocomplete="off">
+                <button class="close-search" id="closeSearchBtn" aria-label="Close Search"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="search-body">
+                <div class="popular-searches" id="popularSearches">
+                    <h3>Popular Searches</h3>
+                    <div class="search-chips">
+                        <a href="category-products.html?cat=Plush Teddy Bears" class="search-chip">Plush Teddy</a>
+                        <a href="category-products.html?cat=Leather Crossbody" class="search-chip">Leather Tote</a>
+                        <a href="category-products.html?cat=Personalized Hampers" class="search-chip">Gift Sets</a>
+                    </div>
+                </div>
+                
+                <div class="search-results" id="searchResults" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-drawer-header">
+            <h3>Your Bag</h3>
+            <button class="close-cart" id="closeCartBtn" aria-label="Close Cart"><i data-lucide="x"></i></button>
+        </div>
+        
+        <div class="cart-drawer-body" id="cartDrawerBody">
+            <div class="cart-item">
+                <img src="https://picsum.photos/100/100?random=101" alt="Product">
+                <div class="cart-item-details">
+                    <h4>Sleepy Bear Companion</h4>
+                    <span class="cart-item-variant">Variant: Sage Green</span>
+                    <span class="cart-item-gift">Gift Note Included</span>
+                    <div class="cart-item-price">$38.00</div>
+                    <div class="cart-qty-control">
+                        <button class="qty-btn">-</button>
+                        <span class="qty-num">1</span>
+                        <button class="qty-btn">+</button>
+                    </div>
+                </div>
+                <button class="remove-cart-item" aria-label="Remove"><i data-lucide="x"></i></button>
+            </div>
+            <div class="cart-item">
+                <img src="https://picsum.photos/100/100?random=102" alt="Product">
+                <div class="cart-item-details">
+                    <h4>Minimalist Purse</h4>
+                    <span class="cart-item-variant">Variant: Blush</span>
+                    <div class="cart-item-price">$120.00</div>
+                    <div class="cart-qty-control">
+                        <button class="qty-btn">-</button>
+                        <span class="qty-num">1</span>
+                        <button class="qty-btn">+</button>
+                    </div>
+                </div>
+                <button class="remove-cart-item" aria-label="Remove"><i data-lucide="x"></i></button>
+            </div>
+        </div>
+        
+        <div class="cart-drawer-footer">
+            <div class="free-shipping-progress">
+                <p>Add <strong>$15.00</strong> more for Free Shipping!</p>
+                <div class="progress-bar-container"><div class="progress-bar-fill" style="width: 85%;"></div></div>
+            </div>
+            <div class="cart-subtotal">
+                <span>Subtotal</span>
+                <span id="cartDrawerSubtotal">$158.00</span>
+            </div>
+            <a href="cart.html" class="btn-view-cart">View Full Cart</a>
+            <a href="#" class="btn-checkout">Proceed to Checkout</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="main.js"></script>
+    <script>
+        // Image Gallery Swapping
+        function changeImage(element) {
+            document.getElementById('mainProductImage').src = element.src;
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Color Swatches Selection
+        function selectColor(element, colorName) {
+            document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('selectedColorName').innerText = colorName;
+        }
+
+        // Gifting Message Toggle
+        function toggleGiftMessage() {
+            const checkbox = document.getElementById('giftWrapCheckbox');
+            const container = document.getElementById('giftMessageContainer');
+            if (checkbox.checked) {
+                container.classList.add('expanded');
+            } else {
+                container.classList.remove('expanded');
+            }
+        }
+
+        // Quantity Increment/Decrement
+        function updateQty(change) {
+            const input = document.getElementById('qtyInput');
+            let val = parseInt(input.value) + change;
+            if (val < 1) val = 1;
+            if (val > 99) val = 99;
+            input.value = val;
+        }
+
+        // Accordion functionality
+        function toggleAccordion(button) {
+            const item = button.parentElement;
+            item.classList.toggle('active');
+        }
+        
+        // Sticky Cart Logic for Mobile
+        window.addEventListener('scroll', () => {
+            const actions = document.querySelector('.product-actions');
+            const stickyCart = document.querySelector('.mobile-sticky-cart');
+            
+            if (actions && stickyCart) {
+                const actionsRect = actions.getBoundingClientRect();
+                // Show sticky cart if we scroll past the actions and we are on mobile viewport
+                if (window.innerWidth <= 768 && actionsRect.bottom < 0) {
+                    stickyCart.classList.add('visible');
+                } else {
+                    stickyCart.classList.remove('visible');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

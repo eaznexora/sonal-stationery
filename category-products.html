@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SONAL Stationary | Product Listing</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <!-- Desktop Header -->
+    <header class="top-header">
+        <nav class="desktop-nav">
+            <div class="nav-left">
+                <a href="index.html" class="nav-link">Home</a>
+                <div class="dropdown-wrapper">
+                    <a href="categories.html" class="nav-link dropdown-toggle">Categories <i data-lucide="chevron-down" style="width: 14px; margin-left: 4px;"></i></a>
+                    <div class="mega-menu">
+                        <div class="mega-column">
+                            <h4>Gifts</h4>
+                            <a href="category-products.html?cat=Personalized Hampers">Personalized Hampers</a>
+                            <a href="category-products.html?cat=Eco-Friendly Cards">Eco-Friendly Cards</a>
+                            <a href="category-products.html?cat=Luxury Candles">Luxury Candles</a>
+                            <a href="category-products.html?cat=Mini Keepsakes">Mini Keepsakes</a>
+                        </div>
+                        <div class="mega-column">
+                            <h4>Purses</h4>
+                            <a href="category-products.html?cat=Leather Crossbody">Leather Crossbody</a>
+                            <a href="category-products.html?cat=Tote Bags">Tote Bags</a>
+                            <a href="category-products.html?cat=Minimal Clutches">Minimal Clutches</a>
+                            <a href="category-products.html?cat=Handcrafted Wallets">Handcrafted Wallets</a>
+                        </div>
+                        <div class="mega-column">
+                            <h4>Toys</h4>
+                            <a href="category-products.html?cat=Plush Teddy Bears">Plush Teddy Bears</a>
+                            <a href="category-products.html?cat=Soft Animal Companions">Soft Animal Companions</a>
+                            <a href="category-products.html?cat=Knit Stuffed Toys">Knit Stuffed Toys</a>
+                            <a href="category-products.html?cat=Nursery Plushies">Nursery Plushies</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="category-products.html?cat=Gifts" class="nav-link">Gifts</a>
+                <a href="category-products.html?cat=Purses" class="nav-link">Purses</a>
+                <a href="category-products.html?cat=Toys" class="nav-link">Toys</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+
+            <div class="logo-container">
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="SONAL Stationary Logo" class="brand-logo">
+                    <span class="logo-text">SONAL Stationary</span>
+                </a>
+            </div>
+
+            <div class="nav-right">
+                <button class="icon-btn" aria-label="Search"><i data-lucide="search"></i></button>
+                <a href="profile.html" class="icon-btn" aria-label="Account"><i data-lucide="user"></i></a>
+                <button class="icon-btn" aria-label="Cart">
+                    <i data-lucide="shopping-bag"></i>
+                    <span class="cart-count">0</span>
+                </button>
+                <button class="icon-btn mobile-only-menu" aria-label="Menu" onclick="toggleMobileMenu()" style="display: none;"><i data-lucide="menu"></i></button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Sticky Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="profile.html#tab-orders" class="nav-item">
+            <i data-lucide="package"></i>
+            <span>Orders</span>
+        </a>
+        <a href="categories.html" class="nav-item">
+            <i data-lucide="grid"></i>
+            <span>Categories</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i data-lucide="user"></i>
+            <span>Profile</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <div style="position:relative; display:inline-flex;">
+                <i data-lucide="shopping-bag"></i>
+                <span class="cart-count" style="position:absolute; top:-5px; right:-10px; background:var(--accent-sage-dark); color:white; font-size:0.7rem; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center;">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+
+    <main class="plp-main">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs" style="padding-top: 100px; padding-left: 2rem; max-width: var(--max-width); margin: 0 auto;">
+            <a href="index.html">Home</a> / <a href="categories.html">Categories</a> / <span id="dynamicBreadcrumb">All</span>
+        </div>
+        
+        <!-- Category Hero -->
+        <section class="plp-hero">
+            <h1 id="dynamicTitle">All Products</h1>
+            <p id="dynamicDesc">Discover our full curated collection, crafted with care and intention.</p>
+            <span class="product-count" id="dynamicCount">Showing 12 Products</span>
+        </section>
+
+        <!-- Filter & Sort Bar -->
+        <section class="filter-sort-bar">
+            <!-- Mobile Toggle -->
+            <button class="mobile-filter-btn" onclick="toggleFilterSidebar()">
+                <i data-lucide="sliders-horizontal"></i> Filters & Sort
+            </button>
+            
+            <div class="desktop-filters">
+                <div class="filter-left">
+                    <div class="filter-dropdown">
+                        <select aria-label="Price Range">
+                            <option value="">Price Range</option>
+                            <option value="25">Under $25</option>
+                            <option value="50">$25 - $50</option>
+                            <option value="100">$50 - $100</option>
+                            <option value="101">$100+</option>
+                        </select>
+                    </div>
+                    
+                    <div class="sub-cat-pills" id="dynamicPills">
+                        <!-- Filled by JS -->
+                        <button class="filter-pill active">All</button>
+                    </div>
+
+                    <label class="stock-toggle">
+                        <input type="checkbox">
+                        <span class="custom-checkbox"></span>
+                        In Stock Only
+                    </label>
+                </div>
+
+                <div class="filter-right">
+                    <span class="sort-label">Sort By:</span>
+                    <select aria-label="Sort options" class="sort-select">
+                        <option>Featured</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Newest Arrivals</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Grid -->
+        <section class="plp-grid-container">
+            <div class="product-grid">
+                <!-- Product Card 1 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=1" alt="Product Image">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="c1" data-title="Sleepy Bear Companion" data-price="38.00" data-image="https://picsum.photos/400/500?random=1" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Sleepy Bear Companion</h3>
+                        <p class="price">$38.00</p>
+                    </div>
+                </article>
+
+                <!-- Product Card 2 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=3" alt="Product Image">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="c2" data-title="Organic Linen Tote" data-price="85.00" data-image="https://picsum.photos/400/500?random=3" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Organic Linen Tote</h3>
+                        <p class="price">$85.00</p>
+                    </div>
+                </article>
+
+                <!-- Product Card 3 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=5" alt="Product Image">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="c3" data-title="Personalized Spa Hamper" data-price="120.00" data-image="https://picsum.photos/400/500?random=5" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Personalized Spa Hamper</h3>
+                        <p class="price">$120.00</p>
+                    </div>
+                </article>
+
+                <!-- Product Card 4 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=7" alt="Product Image">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="c4" data-title="Leather Crossbody Mini" data-price="95.00" data-image="https://picsum.photos/400/500?random=7" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Leather Crossbody Mini</h3>
+                        <p class="price">$95.00</p>
+                    </div>
+                </article>
+
+                <!-- Product Card 5 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=9" alt="Product Image">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="c5" data-title="Knit Bunny Toy" data-price="28.00" data-image="https://picsum.photos/400/500?random=9" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Knit Bunny Toy</h3>
+                        <p class="price">$28.00</p>
+                    </div>
+                </article>
+                
+                <!-- Product Card 6 -->
+                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
+                    <div class="img-wrapper">
+                        <img src="https://picsum.photos/400/500?random=11" alt="Product Image">
+                        <div class="product-hover">
+                            <button class="btn-quick-add" data-id="c6" data-title="Lavender Soy Candle" data-price="45.00" data-image="https://picsum.photos/400/500?random=11" data-variant="Default">Quick Add</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Lavender Soy Candle</h3>
+                        <p class="price">$45.00</p>
+                    </div>
+                </article>
+            </div>
+            
+            <div class="load-more-container">
+                <button class="btn-load-more">Load More Products</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col brand-col">
+                    <a href="index.html" class="footer-logo">
+                        <img src="logo.png" alt="SONAL Stationary Logo" class="brand-logo footer-brand-logo">
+                        <span class="logo-text">SONAL Stationary</span>
+                    </a>
+                    <p class="tagline">Elevating everyday writing, gifting, and living with soothing aesthetic designs.</p>
+                </div>
+                <div class="footer-col newsletter-col">
+                    <h4>Stay Connected</h4>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Email address" aria-label="Email address" required>
+                        <button type="submit" aria-label="Subscribe"><i data-lucide="arrow-right"></i></button>
+                    </form>
+                </div>
+                <div class="footer-col links-col">
+                    <a href="#">FAQs</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Returns</a>
+                </div>
+                <div class="footer-col social-col">
+                    <div class="social-icons">
+                        <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+                        <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                    </div>
+                    <p class="copyright">&copy; 2026 SONAL Stationary.<br>All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenu">
+        <button class="close-menu-btn" onclick="toggleMobileMenu()"><i data-lucide="x" style="width: 24px; height: 24px;"></i></button>
+        <div class="mobile-menu-content">
+            <a href="index.html">Home</a>
+            <a href="categories.html">Categories & Collections</a>
+            <div class="mobile-menu-sub">
+                <a href="category-products.html?cat=Gifts">Gifts</a>
+                <a href="category-products.html?cat=Purses">Purses</a>
+                <a href="category-products.html?cat=Toys">Toys</a>
+            </div>
+            <a href="#about">About</a>
+        </div>
+    </div>
+
+    <!-- Mobile Filter Sidebar Drawer -->
+    <div class="filter-sidebar-overlay" id="filterSidebar">
+        <div class="filter-sidebar-content">
+            <div class="sidebar-header">
+                <h3>Filters & Sort</h3>
+                <button class="close-sidebar-btn" onclick="toggleFilterSidebar()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="sidebar-body">
+                <div class="sidebar-section">
+                    <h4>Sort By</h4>
+                    <select aria-label="Sort options" class="sort-select-mobile">
+                        <option>Featured</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Newest Arrivals</option>
+                    </select>
+                </div>
+                <div class="sidebar-section">
+                    <h4>Price Range</h4>
+                    <select aria-label="Price Range">
+                        <option value="">Any Price</option>
+                        <option value="25">Under $25</option>
+                        <option value="50">$25 - $50</option>
+                        <option value="100">$50 - $100</option>
+                        <option value="101">$100+</option>
+                    </select>
+                </div>
+                <div class="sidebar-section">
+                    <h4>Availability</h4>
+                    <label class="stock-toggle">
+                        <input type="checkbox">
+                        <span class="custom-checkbox"></span>
+                        In Stock Only
+                    </label>
+                </div>
+                <div class="sidebar-section">
+                    <h4>Sub-Categories</h4>
+                    <div class="mobile-sub-pills" id="mobileDynamicPills">
+                        <button class="filter-pill active">All</button>
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <button class="btn-primary" style="width: 100%;" onclick="toggleFilterSidebar()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-modal" id="searchModal">
+        <div class="search-modal-content">
+            <div class="search-header">
+                <i data-lucide="search"></i>
+                <input type="text" id="searchInput" placeholder="Search gifts, purses, soft toys..." autocomplete="off">
+                <button class="close-search" id="closeSearchBtn" aria-label="Close Search"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="search-body">
+                <div class="popular-searches" id="popularSearches">
+                    <h3>Popular Searches</h3>
+                    <div class="search-chips">
+                        <a href="category-products.html?cat=Plush Teddy Bears" class="search-chip">Plush Teddy</a>
+                        <a href="category-products.html?cat=Leather Crossbody" class="search-chip">Leather Tote</a>
+                        <a href="category-products.html?cat=Personalized Hampers" class="search-chip">Gift Sets</a>
+                    </div>
+                </div>
+                
+                <div class="search-results" id="searchResults" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-drawer-header">
+            <h3>Your Bag</h3>
+            <button class="close-cart" id="closeCartBtn" aria-label="Close Cart"><i data-lucide="x"></i></button>
+        </div>
+        
+        <div class="cart-drawer-body" id="cartDrawerBody">
+            <div class="cart-item">
+                <img src="https://picsum.photos/100/100?random=101" alt="Product">
+                <div class="cart-item-details">
+                    <h4>Sleepy Bear Companion</h4>
+                    <span class="cart-item-variant">Variant: Sage Green</span>
+                    <span class="cart-item-gift">Gift Note Included</span>
+                    <div class="cart-item-price">$38.00</div>
+                    <div class="cart-qty-control">
+                        <button class="qty-btn">-</button>
+                        <span class="qty-num">1</span>
+                        <button class="qty-btn">+</button>
+                    </div>
+                </div>
+                <button class="remove-cart-item" aria-label="Remove"><i data-lucide="x"></i></button>
+            </div>
+            <div class="cart-item">
+                <img src="https://picsum.photos/100/100?random=102" alt="Product">
+                <div class="cart-item-details">
+                    <h4>Minimalist Purse</h4>
+                    <span class="cart-item-variant">Variant: Blush</span>
+                    <div class="cart-item-price">$120.00</div>
+                    <div class="cart-qty-control">
+                        <button class="qty-btn">-</button>
+                        <span class="qty-num">1</span>
+                        <button class="qty-btn">+</button>
+                    </div>
+                </div>
+                <button class="remove-cart-item" aria-label="Remove"><i data-lucide="x"></i></button>
+            </div>
+        </div>
+        
+        <div class="cart-drawer-footer">
+            <div class="free-shipping-progress">
+                <p>Add <strong>$15.00</strong> more for Free Shipping!</p>
+                <div class="progress-bar-container"><div class="progress-bar-fill" style="width: 85%;"></div></div>
+            </div>
+            <div class="cart-subtotal">
+                <span>Subtotal</span>
+                <span id="cartDrawerSubtotal">$158.00</span>
+            </div>
+            <a href="cart.html" class="btn-view-cart">View Full Cart</a>
+            <a href="#" class="btn-checkout">Proceed to Checkout</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="main.js"></script>
+    <script>
+        function toggleFilterSidebar() {
+            const sidebar = document.getElementById('filterSidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Dynamic PLP Logic based on URL params
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const rawCat = params.get('cat') || 'All Collections';
+            
+            // Format title
+            const catTitle = decodeURIComponent(rawCat).replace(/-/g, ' ');
+            document.getElementById('dynamicTitle').innerText = catTitle;
+            document.getElementById('dynamicBreadcrumb').innerText = catTitle;
+            document.title = `SONAL Stationary | ${catTitle}`;
+
+            // Provide custom descriptions and sub-categories based on main categories
+            const descriptions = {
+                'Gifts': 'Thoughtful curations and personalized hampers to celebrate every special moment.',
+                'Purses': 'Handcrafted leather and linen essentials, blending minimalist design with everyday function.',
+                'Toys': 'Comforting companions crafted with organic fabrics and child-safe finishes.',
+                'Personalized Hampers': 'Custom gift baskets filled with hand-selected treasures.',
+                'Leather Crossbody': 'Sleek, minimalist hands-free bags for effortless daily carry.',
+                'Plush Teddy Bears': 'Classic soft bears made from ultra-soft, eco-friendly materials.',
+                'All Collections': 'Discover our full curated collection, crafted with care and intention.'
+            };
+            
+            document.getElementById('dynamicDesc').innerText = descriptions[catTitle] || descriptions['All Collections'];
+            
+            // Mock subcategories if it's a main category
+            const subCategories = {
+                'Gifts': ['Personalized Hampers', 'Eco-Friendly Cards', 'Luxury Candles', 'Mini Keepsakes'],
+                'Purses': ['Leather Crossbody', 'Tote Bags', 'Minimal Clutches', 'Handcrafted Wallets'],
+                'Toys': ['Plush Teddy Bears', 'Soft Animal Companions', 'Knit Stuffed Toys', 'Nursery Plushies']
+            };
+
+            const targetPills = subCategories[catTitle] || [];
+            
+            if(targetPills.length > 0) {
+                let desktopPillsHTML = `<button class="filter-pill active">All</button>`;
+                let mobilePillsHTML = `<button class="filter-pill active">All</button>`;
+                targetPills.forEach(pill => {
+                    desktopPillsHTML += `<button class="filter-pill">${pill}</button>`;
+                    mobilePillsHTML += `<button class="filter-pill">${pill}</button>`;
+                });
+                document.getElementById('dynamicPills').innerHTML = desktopPillsHTML;
+                document.getElementById('mobileDynamicPills').innerHTML = mobilePillsHTML;
+            } else {
+                document.getElementById('dynamicPills').innerHTML = `<button class="filter-pill active">All</button>`;
+                document.getElementById('mobileDynamicPills').innerHTML = `<button class="filter-pill active">All</button>`;
+            }
+
+            // Handle pill clicks (visual only)
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    let siblingPills = e.target.parentElement.querySelectorAll('.filter-pill');
+                    siblingPills.forEach(p => p.classList.remove('active'));
+                    e.target.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

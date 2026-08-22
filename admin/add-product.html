@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonal Stationary | Add New Product</title>
+    
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        :root {
+            /* Sonal Stationary Color Palette */
+            --bg-primary: #fbf9f6;
+            --bg-secondary: #f2eee8;
+            --bg-white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #6e6b66;
+            --accent-sage: #9caf9f;
+            --accent-sage-dark: #829586;
+            --border-color: #e2dfd8;
+            --danger-color: #d9534f;
+            
+            /* Typography */
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            /* Layout */
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header img {
+            height: 36px;
+            width: auto;
+        }
+
+        .sidebar-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            margin: 0 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .nav-item:hover {
+            background-color: var(--border-color);
+        }
+
+        .nav-item.active {
+            background-color: #efeadf;
+            color: var(--text-primary);
+            border: 1px solid #e1dbcf;
+        }
+        
+        .nav-item .dropdown-icon {
+            margin-left: auto;
+            font-size: 1rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--danger-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+            margin: 0 0.5rem;
+        }
+        
+        .logout-btn:hover {
+            background-color: #fde8e8;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Top Header */
+        .top-header {
+            background-color: var(--bg-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-title h1 {
+            font-family: var(--font-body);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-body);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-sage-dark);
+            color: white;
+            border: 1px solid var(--accent-sage-dark);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-sage);
+            border-color: var(--accent-sage);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--border-color);
+        }
+        
+        .btn-outline.danger {
+            color: var(--danger-color);
+            border-color: #f5c2c1;
+        }
+        
+        .btn-outline.danger:hover {
+            background-color: #fde8e8;
+        }
+
+        /* Dashboard Body */
+        .dashboard-body {
+            padding: 1.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Form Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 65% calc(35% - 1.5rem);
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        /* Form Sections (Cards) */
+        .form-card {
+            background-color: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background-color: var(--bg-white);
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent-sage-dark);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .input-icon-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .input-icon-wrapper input {
+            padding-left: 2.5rem;
+        }
+
+        /* Media Upload Dropzone */
+        .dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+            background-color: var(--bg-primary);
+            position: relative;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--accent-sage-dark);
+            background-color: #f0f4f1;
+        }
+
+        .dropzone i {
+            font-size: 2.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .dropzone p {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+        
+        .dropzone span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .dropzone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .image-preview {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview .delete-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--danger-color);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .image-preview:hover .delete-btn {
+            opacity: 1;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .slider {
+            width: 44px;
+            height: 24px;
+            background-color: var(--border-color);
+            border-radius: 24px;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: white;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked + .slider {
+            background-color: var(--accent-sage-dark);
+        }
+
+        .toggle-switch input:checked + .slider::before {
+            transform: translateX(20px);
+        }
+        
+        .toggle-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Dynamic Lists */
+        .dynamic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .dynamic-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .dynamic-row-inputs {
+            flex: 1;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .remove-row-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+
+        .remove-row-btn:hover {
+            color: var(--danger-color);
+            background-color: #fde8e8;
+        }
+
+        .add-row-btn {
+            align-self: flex-start;
+            background: none;
+            border: none;
+            color: var(--accent-sage-dark);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 0.5rem;
+        }
+
+        .add-row-btn:hover {
+            color: var(--accent-sage);
+        }
+
+        /* FAQ Builder */
+        .faq-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: var(--bg-primary);
+        }
+        
+        .faq-item .form-group {
+            margin-bottom: 0.75rem;
+        }
+        
+        .faq-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq-item-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* SEO Preview */
+        .seo-preview {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-primary);
+        }
+        
+        .seo-title {
+            color: #1a0dab;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+            text-decoration: none;
+        }
+        
+        .seo-title:hover {
+            text-decoration: underline;
+        }
+        
+        .seo-url {
+            color: #006621;
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+        }
+        
+        .seo-desc {
+            font-size: 0.85rem;
+            color: #545454;
+            line-height: 1.4;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-bottom: 80px; /* Space for sticky actions */
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-actions {
+                display: none; /* Hide top buttons on mobile to move them to bottom */
+            }
+            
+            /* Sticky Mobile Actions */
+            .mobile-actions {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background-color: var(--bg-white);
+                padding: 1rem;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+                border-top: 1px solid var(--border-color);
+                z-index: 90;
+                gap: 1rem;
+            }
+            
+            .mobile-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+            
+            .dynamic-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .dynamic-row-inputs {
+                flex-direction: column;
+            }
+            
+            .remove-row-btn {
+                align-self: flex-end;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-actions {
+                display: none;
+            }
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.open {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../logo.png" alt="Sonal Stationary Logo">
+            <h2>Sonal<br>Stationary</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ph ph-squares-four"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-list-dashes"></i> Categories
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="ph ph-package"></i> Products
+                <i class="ph ph-caret-down dropdown-icon"></i>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-shopping-cart"></i> Orders
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-users"></i> Users
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chat-circle-dots"></i> Inquiries
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-archive-box"></i> Inventory
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chart-bar"></i> Analytics
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-image"></i> Banners
+                <i class="ph ph-caret-down dropdown-icon"></i>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-gear"></i> Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="logout-btn">
+                <i class="ph ph-sign-out"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-title">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ph ph-list"></i>
+                </button>
+                <h1>Add New Product</h1>
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn btn-outline danger">Discard</button>
+                <button class="btn btn-primary">
+                    <i class="ph ph-check"></i> Save & Publish
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Body -->
+        <div class="dashboard-body">
+            <div class="form-grid">
+                
+                <!-- LEFT COLUMN -->
+                <div class="left-col">
+                    
+                    <!-- Basic Information -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Basic Information</h3>
+                        <div class="form-group">
+                            <label for="productTitle">Product Title / Name *</label>
+                            <input type="text" id="productTitle" placeholder="e.g. Sonal Premium Leather Notebook">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="productSku">SKU (Product Code)</label>
+                                <input type="text" id="productSku" placeholder="e.g. SNL-NB-001">
+                            </div>
+                            <div class="form-col">
+                                <label for="productBarcode">Barcode (ISBN, UPC, GTIN, etc.)</label>
+                                <input type="text" id="productBarcode" placeholder="e.g. 0123456789">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="shortDesc">Short Description</label>
+                            <textarea id="shortDesc" rows="2" placeholder="Brief summary for product cards and quick views..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="longDesc">Product Description</label>
+                            <textarea id="longDesc" rows="6" placeholder="Detailed description of the product, its features, and benefits..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Media Upload -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Media</h3>
+                        <div class="dropzone" id="imageDropzone">
+                            <i class="ph ph-cloud-arrow-up"></i>
+                            <p>Drag and drop images here, or click to browse</p>
+                            <span>Support JPG, PNG, WEBP (Max 5MB each)</span>
+                            <input type="file" id="imageInput" multiple accept="image/jpeg, image/png, image/webp">
+                        </div>
+                        <div class="image-preview-container" id="imagePreviewContainer">
+                            <!-- JS will populate image previews here -->
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Inventory -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Pricing & Inventory</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="regPrice">Regular Price</label>
+                                <div class="input-icon-wrapper">
+                                    <i>₹</i>
+                                    <input type="number" id="regPrice" placeholder="0.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <label for="salePrice">Sale / Discounted Price</label>
+                                <div class="input-icon-wrapper">
+                                    <i>₹</i>
+                                    <input type="number" id="salePrice" placeholder="0.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <label for="costPrice">Cost per item</label>
+                                <div class="input-icon-wrapper">
+                                    <i>₹</i>
+                                    <input type="number" id="costPrice" placeholder="0.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="stockQty">Stock Quantity</label>
+                                <input type="number" id="stockQty" placeholder="0" min="0">
+                            </div>
+                            <div class="form-col">
+                                <label for="lowStock">Low Stock Threshold</label>
+                                <input type="number" id="lowStock" placeholder="0" min="0">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="stockStatus" checked>
+                                <div class="slider"></div>
+                                <span class="toggle-label">In Stock</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Physical Attributes & Shipping -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Physical Attributes & Shipping</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="weight">Weight</label>
+                                <div class="input-icon-wrapper">
+                                    <input type="number" id="weight" placeholder="0.00" min="0" step="0.01" style="padding-left: 1rem; padding-right: 2.5rem;">
+                                    <i style="left: auto; right: 1rem; font-style: normal; font-size: 0.9rem;">kg</i>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <label>Dimensions (L × W × H)</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input type="number" placeholder="L" min="0" style="width: 33%;"> ×
+                                    <input type="number" placeholder="W" min="0" style="width: 33%;"> ×
+                                    <input type="number" placeholder="H" min="0" style="width: 33%;">
+                                    <span style="color: var(--text-secondary); font-size: 0.9rem;">cm</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="variants">Variants (Size, Color, Material)</label>
+                            <input type="text" id="variants" placeholder="e.g. Red, Blue, A4, A5 (Separate with commas)">
+                        </div>
+                    </div>
+
+                    <!-- Key Features & Specifications -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Key Features</h3>
+                        <div class="dynamic-list" id="featuresList">
+                            <div class="dynamic-row">
+                                <div class="dynamic-row-inputs">
+                                    <input type="text" placeholder="e.g. 120 GSM Acid-Free Paper">
+                                </div>
+                                <button type="button" class="remove-row-btn"><i class="ph ph-trash"></i></button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-row-btn" id="addFeatureBtn">
+                            <i class="ph ph-plus-circle"></i> Add Feature
+                        </button>
+                    </div>
+
+                    <!-- Product FAQs -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Product FAQs</h3>
+                        <div id="faqList">
+                            <div class="faq-item">
+                                <div class="faq-item-header">
+                                    <span class="faq-item-title">FAQ #1</span>
+                                    <button type="button" class="remove-row-btn" onclick="this.closest('.faq-item').remove()"><i class="ph ph-trash"></i></button>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" placeholder="Question">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <textarea rows="2" placeholder="Answer"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="add-row-btn" id="addFaqBtn">
+                            <i class="ph ph-plus-circle"></i> Add Another FAQ
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div class="right-col">
+                    
+                    <!-- Visibility Status -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Status</h3>
+                        <div class="form-group">
+                            <select id="productStatus">
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                                <option value="scheduled">Scheduled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Organization -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Organization</h3>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category">
+                                <option value="">Select Category...</option>
+                                <option value="notebooks">Notebooks & Journals</option>
+                                <option value="fine-pens">Fine Pens</option>
+                                <option value="desk-accessories">Desk Accessories</option>
+                                <option value="gifts">Gifts & Sets</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subcategory">Subcategory</label>
+                            <select id="subcategory">
+                                <option value="">Select Subcategory...</option>
+                                <option value="fountain-pens">Fountain Pens</option>
+                                <option value="rollerball">Rollerball Pens</option>
+                                <option value="leather-journals">Leather Journals</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">Tags</label>
+                            <input type="text" id="tags" placeholder="e.g. premium, gift, fountain pen">
+                            <span style="display: block; margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);">Separate tags with commas</span>
+                        </div>
+                    </div>
+
+                    <!-- Search Engine Preview -->
+                    <div class="form-card">
+                        <h3 class="form-card-title">Search Engine Listing</h3>
+                        <div class="form-group">
+                            <label for="metaTitle">Meta Title</label>
+                            <input type="text" id="metaTitle" placeholder="Product title for search engines" oninput="updateSeoPreview()">
+                        </div>
+                        <div class="form-group">
+                            <label for="metaDesc">Meta Description</label>
+                            <textarea id="metaDesc" rows="3" placeholder="Summary for search engines" oninput="updateSeoPreview()"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="urlHandle">URL Handle</label>
+                            <div style="display: flex; align-items: center;">
+                                <span style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-right: none; padding: 0.75rem; border-radius: 6px 0 0 6px; font-size: 0.9rem; color: var(--text-secondary);">/products/</span>
+                                <input type="text" id="urlHandle" placeholder="product-handle" style="border-radius: 0 6px 6px 0;" oninput="updateSeoPreview()">
+                            </div>
+                        </div>
+                        
+                        <div class="seo-preview" style="margin-top: 1.5rem;">
+                            <a href="#" class="seo-title" id="previewTitle">Product Title - Sonal Stationary</a>
+                            <div class="seo-url" id="previewUrl">https://sonalstationary.com/products/product-handle</div>
+                            <div class="seo-desc" id="previewDesc">This is how your product will appear in search engine results. Enter a descriptive meta title and description to improve click-through rates.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Sticky Actions -->
+    <div class="mobile-actions">
+        <button class="btn btn-outline danger">Discard</button>
+        <button class="btn btn-primary"><i class="ph ph-check"></i> Save</button>
+    </div>
+
+    <script>
+        // Mobile Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('open');
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Dynamic Features List
+        const featuresList = document.getElementById('featuresList');
+        const addFeatureBtn = document.getElementById('addFeatureBtn');
+
+        addFeatureBtn.addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'dynamic-row';
+            row.innerHTML = `
+                <div class="dynamic-row-inputs">
+                    <input type="text" placeholder="Feature description">
+                </div>
+                <button type="button" class="remove-row-btn" onclick="this.parentElement.remove()"><i class="ph ph-trash"></i></button>
+            `;
+            featuresList.appendChild(row);
+        });
+
+        // Dynamic FAQ Builder
+        const faqList = document.getElementById('faqList');
+        const addFaqBtn = document.getElementById('addFaqBtn');
+        let faqCount = 1;
+
+        addFaqBtn.addEventListener('click', () => {
+            faqCount++;
+            const item = document.createElement('div');
+            item.className = 'faq-item';
+            item.innerHTML = `
+                <div class="faq-item-header">
+                    <span class="faq-item-title">FAQ #${faqCount}</span>
+                    <button type="button" class="remove-row-btn" onclick="this.closest('.faq-item').remove()"><i class="ph ph-trash"></i></button>
+                </div>
+                <div class="form-group">
+                    <input type="text" placeholder="Question">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <textarea rows="2" placeholder="Answer"></textarea>
+                </div>
+            `;
+            faqList.appendChild(item);
+        });
+
+        // Image Dropzone Logic
+        const dropzone = document.getElementById('imageDropzone');
+        const imageInput = document.getElementById('imageInput');
+        const previewContainer = document.getElementById('imagePreviewContainer');
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFiles(e.target.files);
+            }
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) {
+                    alert('Please upload only image files.');
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size exceeds 5MB limit.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview';
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <button type="button" class="delete-btn" onclick="this.parentElement.remove()">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    `;
+                    previewContainer.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            });
+            // Reset input so same file can be selected again if removed
+            imageInput.value = '';
+        }
+        
+        // Stock toggle label update
+        const stockStatus = document.getElementById('stockStatus');
+        const toggleLabel = document.querySelector('.toggle-label');
+        stockStatus.addEventListener('change', function() {
+            if(this.checked) {
+                toggleLabel.textContent = "In Stock";
+            } else {
+                toggleLabel.textContent = "Out of Stock";
+            }
+        });
+        
+        // SEO Preview Update
+        function updateSeoPreview() {
+            const titleInput = document.getElementById('metaTitle').value;
+            const descInput = document.getElementById('metaDesc').value;
+            const urlInput = document.getElementById('urlHandle').value;
+            
+            document.getElementById('previewTitle').textContent = titleInput ? `${titleInput} - Sonal Stationary` : 'Product Title - Sonal Stationary';
+            document.getElementById('previewDesc').textContent = descInput || 'This is how your product will appear in search engine results. Enter a descriptive meta title and description to improve click-through rates.';
+            
+            let handle = urlInput ? urlInput.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : 'product-handle';
+            document.getElementById('previewUrl').textContent = `https://sonalstationary.com/products/${handle}`;
+        }
+    </script>
+</body>
+</html>

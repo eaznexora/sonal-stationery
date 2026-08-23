@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sonal Stationary | Admin Orders</title>
+    <title>Sonal Stationary | Admin Users</title>
     
     <!-- Favicons -->
     <link rel="shortcut icon" href="/favicon.ico">
@@ -391,82 +391,146 @@
             color: var(--text-primary);
         }
 
-        /* Table */
-        .table-container {
+        /* Users Page Specific Styles */
+        .content-box {
             background: var(--bg-white);
             border-radius: 10px;
             border: 1px solid var(--border-color);
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            min-width: 900px;
-        }
-        
-        th, td {
-            padding: 1.25rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
-        }
-        
-        th {
-            color: var(--text-secondary);
-            font-weight: 500;
-            background-color: var(--bg-primary);
-        }
-        
-        tbody tr:hover {
-            background-color: #fcfbfa;
-        }
-        
-        /* Pill Styles */
-        .status-pill {
-            display: inline-block;
-            padding: 0.35rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .status-pending { background-color: #fef0c7; color: #b54708; }
-        .status-processing { background-color: #e0f2fe; color: #026aa7; }
-        .status-manifested { background-color: #f3e8ff; color: #6b21a8; }
-        .status-completed, .status-paid { background-color: #d1fadf; color: #027a48; }
-        .status-cancelled, .status-failed { background-color: #fee4e2; color: #b42318; }
-        
-        .tracking-ref {
-            display: block;
-            font-size: 0.7rem;
-            color: #1a73e8;
-            margin-top: 6px;
-            font-weight: 500;
-        }
-        
-        .action-links {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+            padding: 1.5rem;
         }
 
-        .action-link {
+        .tabs {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 0.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            font-family: var(--font-body);
+        }
+        
+        .tab-btn:hover {
             color: var(--text-primary);
-            text-decoration: none;
-            font-size: 0.8rem;
+        }
+        
+        .tab-btn.active {
+            color: var(--text-primary);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--text-primary);
+        }
+
+        /* User Cards List */
+        .users-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-width: 900px;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 100px 2fr 2.5fr 2fr 1.5fr 120px;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-card {
+            display: grid;
+            grid-template-columns: 100px 2fr 2.5fr 2fr 1.5fr 120px;
+            align-items: center;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: box-shadow 0.2s, background-color 0.2s;
+        }
+        
+        .user-card:hover {
+            background-color: #fcfbfa;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .avatar {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: white;
             font-weight: 500;
+            border-radius: 4px;
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .user-email, .user-phone, .user-date {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            transition: transform 0.2s;
         }
         
-        .action-link:hover {
-            text-decoration: underline;
+        .action-btn i {
+            background: #1a1a1a;
+            color: white;
+            border-radius: 50%;
+            padding: 4px;
+            font-size: 1rem;
         }
         
-        .track-order-link {
-            color: #d32f2f;
+        .action-btn:hover {
+            transform: scale(1.1);
         }
 
         /* Responsive Styles */
@@ -572,10 +636,10 @@
                 <i class="ph ph-package"></i> Products
                 <i class="ph ph-caret-down dropdown-icon"></i>
             </a>
-            <a href="orders.html" class="nav-item active">
+            <a href="orders.html" class="nav-item">
                 <i class="ph ph-shopping-cart"></i> Orders
             </a>
-            <a href="users.html" class="nav-item">
+            <a href="users.html" class="nav-item active">
                 <i class="ph ph-users"></i> Users
             </a>
             <a href="#" class="nav-item">
@@ -611,7 +675,7 @@
                     <i class="ph ph-list"></i>
                 </button>
                 <a href="dashboard.html" class="back-btn"><i class="ph ph-caret-left"></i></a>
-                <h1>Orders</h1>
+                <h1>Users</h1>
             </div>
             
             <div class="header-actions">
@@ -620,11 +684,11 @@
                     <input type="text" placeholder="Search orders, products, customers...">
                 </div>
                 
-                <a href="add-product.html" class="btn btn-primary">
-                    <i class="ph ph-plus"></i> Add Product
+                <a href="#" class="btn btn-primary">
+                    <i class="ph ph-plus"></i> Add User
                 </a>
                 <a href="#" class="btn btn-outline">
-                    Export Orders
+                    Export Users CSV
                 </a>
                 
                 <div class="header-icons">
@@ -641,47 +705,45 @@
             <!-- Overview Cards -->
             <div class="overview-cards">
                 <div class="card">
-                    <div class="card-title">Total Orders</div>
-                    <div class="card-value" id="cardTotalOrders">27</div>
+                    <div class="card-title">Total Users</div>
+                    <div class="card-value">14</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Orders this Month</div>
-                    <div class="card-value">12</div>
+                    <div class="card-title">Active Users</div>
+                    <div class="card-value">14</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Orders Pending</div>
-                    <div class="card-value" id="cardPendingOrders">5</div>
+                    <div class="card-title">Blocked Users</div>
+                    <div class="card-value">0</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Orders Completed</div>
-                    <div class="card-value" id="cardCompletedOrders">22</div>
+                    <div class="card-title">New Users (Last Week)</div>
+                    <div class="card-value">3</div>
                 </div>
             </div>
             
             <!-- Filter & Search Toolbar -->
             <div class="toolbar">
                 <div class="toolbar-group">
-                    <label for="searchOrder">Search Order</label>
-                    <input type="text" id="searchOrder" class="toolbar-input" placeholder="Enter Order ID / Product Name / Date">
+                    <label for="searchUser">Search User</label>
+                    <input type="text" id="searchUser" class="toolbar-input" placeholder="Enter Username / email / phone number">
                 </div>
                 <div class="toolbar-group">
                     <label for="statusFilter">Status</label>
                     <select id="statusFilter" class="toolbar-select">
                         <option value="all">Select Status (All)</option>
-                        <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="manifested">Manifested</option>
-                        <option value="completed">Completed / Delivered</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="active">Active</option>
+                        <option value="blocked">Blocked</option>
+                        <option value="unverified">Unverified</option>
                     </select>
                 </div>
                 <div class="toolbar-group">
                     <label for="sortFilter">Sort By</label>
                     <select id="sortFilter" class="toolbar-select">
-                        <option value="date_desc">Date: Newest to Oldest</option>
-                        <option value="date_asc">Date: Oldest to Newest</option>
-                        <option value="amount_desc">Amount: High to Low</option>
-                        <option value="amount_asc">Amount: Low to High</option>
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="name_az">Name (A-Z)</option>
+                        <option value="orders">Orders Count</option>
                     </select>
                 </div>
                 <button class="toolbar-reset" id="resetFilters" title="Reset Filters">
@@ -689,144 +751,100 @@
                 </button>
             </div>
 
-            <!-- Orders Table -->
-            <div class="table-container">
-                <table id="ordersTable">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer Name</th>
-                            <th>Date</th>
-                            <th>Product</th>
-                            <th>Status</th>
-                            <th>Payment Status</th>
-                            <th>Amount</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ordersBody">
-                        <!-- Dummy Data Row 1 -->
-                        <tr data-status="pending" data-date="2026-08-23" data-amount="1250" data-phone="9876543210">
-                            <td>#SN-1024</td>
-                            <td>Aarav Sharma</td>
-                            <td>23 Aug 2026</td>
-                            <td>Leather Journal (x2)</td>
-                            <td>
-                                <span class="status-pill status-pending">Pending</span>
-                                <span class="tracking-ref">REF: SN-TRK-1024</span>
-                            </td>
-                            <td><span class="status-pill status-paid">Paid</span></td>
-                            <td>₹1,250.00</td>
-                            <td>
-                                <div class="action-links">
-                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
-                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
-                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Dummy Data Row 2 -->
-                        <tr data-status="processing" data-date="2026-08-22" data-amount="890" data-phone="9876543211">
-                            <td>#SN-1025</td>
-                            <td>Priya Patel</td>
-                            <td>22 Aug 2026</td>
-                            <td>Calligraphy Pen Set</td>
-                            <td>
-                                <span class="status-pill status-processing">Processing</span>
-                                <span class="tracking-ref">REF: SN-TRK-1025</span>
-                            </td>
-                            <td><span class="status-pill status-paid">Paid</span></td>
-                            <td>₹890.00</td>
-                            <td>
-                                <div class="action-links">
-                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
-                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
-                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Dummy Data Row 3 -->
-                        <tr data-status="manifested" data-date="2026-08-21" data-amount="450" data-phone="9876543212">
-                            <td>#SN-1026</td>
-                            <td>Rahul Desai</td>
-                            <td>21 Aug 2026</td>
-                            <td>Pastel Highlighters</td>
-                            <td>
-                                <span class="status-pill status-manifested">Manifested</span>
-                                <span class="tracking-ref">REF: SN-TRK-1026</span>
-                            </td>
-                            <td><span class="status-pill status-pending">Pending</span></td>
-                            <td>₹450.00</td>
-                            <td>
-                                <div class="action-links">
-                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
-                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
-                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Dummy Data Row 4 -->
-                        <tr data-status="completed" data-date="2026-08-20" data-amount="1500" data-phone="9876543213">
-                            <td>#SN-1027</td>
-                            <td>Ananya Singh</td>
-                            <td>20 Aug 2026</td>
-                            <td>Desk Organizer</td>
-                            <td>
-                                <span class="status-pill status-completed">Completed</span>
-                                <span class="tracking-ref">REF: SN-TRK-1027</span>
-                            </td>
-                            <td><span class="status-pill status-paid">Paid</span></td>
-                            <td>₹1,500.00</td>
-                            <td>
-                                <div class="action-links">
-                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
-                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
-                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Dummy Data Row 5 -->
-                        <tr data-status="completed" data-date="2026-08-19" data-amount="350" data-phone="9876543214">
-                            <td>#SN-1028</td>
-                            <td>Neha Gupta</td>
-                            <td>19 Aug 2026</td>
-                            <td>Sticky Notes Set</td>
-                            <td>
-                                <span class="status-pill status-completed">Completed</span>
-                                <span class="tracking-ref">REF: SN-TRK-1028</span>
-                            </td>
-                            <td><span class="status-pill status-paid">Paid</span></td>
-                            <td>₹350.00</td>
-                            <td>
-                                <div class="action-links">
-                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
-                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
-                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Dummy Data Row 6 -->
-                        <tr data-status="cancelled" data-date="2026-08-18" data-amount="600" data-phone="9876543215">
-                            <td>#SN-1029</td>
-                            <td>Vikram Mehta</td>
-                            <td>18 Aug 2026</td>
-                            <td>Premium Notebook</td>
-                            <td>
-                                <span class="status-pill status-cancelled">Cancelled</span>
-                                <span class="tracking-ref">REF: SN-TRK-1029</span>
-                            </td>
-                            <td><span class="status-pill status-failed">Failed</span></td>
-                            <td>₹600.00</td>
-                            <td>
-                                <div class="action-links">
-                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
-                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
-                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Main Content Box for Users -->
+            <div class="content-box">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="all">All Users</button>
+                    <button class="tab-btn" data-tab="blocked">Blocked Users</button>
+                </div>
+                
+                <!-- Users Table/List -->
+                <div class="users-container">
+                    <div class="users-list" id="usersList">
+                        <div class="table-header">
+                            <div>Profile Photo</div>
+                            <div>User Name</div>
+                            <div>Email ID</div>
+                            <div>Phone Number</div>
+                            <div>Date Joined</div>
+                            <div style="text-align: right;">Actions</div>
+                        </div>
+                        
+                        <!-- Dummy User 1 -->
+                        <div class="user-card" data-status="active" data-name="Sonal Stationary" data-email="sonalstationarygiftsandtoys@gmail.com" data-phone="" data-date="2026-08-14" data-orders="15">
+                            <div class="avatar" style="background-color: #ba4a23;">S</div>
+                            <div class="user-name">Sonal Stationary</div>
+                            <div class="user-email">sonalstationarygiftsandtoy...</div>
+                            <div class="user-phone">—</div>
+                            <div class="user-date">14/08/2026</div>
+                            <div class="user-actions">
+                                <button class="action-btn" title="View Details / Orders"><i class="ph ph-info"></i></button>
+                                <button class="action-btn" title="Delete User"><i class="ph ph-trash"></i></button>
+                                <button class="action-btn" title="Block User"><i class="ph ph-prohibit"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Dummy User 2 -->
+                        <div class="user-card" data-status="active" data-name="Anjum Ashraf" data-email="anjum1979@gmail.com" data-phone="9870580843" data-date="2026-08-09" data-orders="3">
+                            <div class="avatar" style="background-color: #435b66;">a</div>
+                            <div class="user-name">Anjum Ashraf</div>
+                            <div class="user-email">anjum1979@gmail.com</div>
+                            <div class="user-phone">9870580843</div>
+                            <div class="user-date">09/08/2026</div>
+                            <div class="user-actions">
+                                <button class="action-btn" title="View Details / Orders"><i class="ph ph-info"></i></button>
+                                <button class="action-btn" title="Delete User"><i class="ph ph-trash"></i></button>
+                                <button class="action-btn" title="Block User"><i class="ph ph-prohibit"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Dummy User 3 -->
+                        <div class="user-card" data-status="active" data-name="Owais Sarguroh" data-email="owais.sir2011@gmail.com" data-phone="" data-date="2026-06-26" data-orders="8">
+                            <div class="avatar" style="background-color: #e5e7eb;">
+                                <img src="https://ui-avatars.com/api/?name=Owais+Sarguroh&background=random&color=fff" alt="Owais Sarguroh">
+                            </div>
+                            <div class="user-name">Owais Sarguroh</div>
+                            <div class="user-email">owais.sir2011@gmail.com</div>
+                            <div class="user-phone">—</div>
+                            <div class="user-date">26/06/2026</div>
+                            <div class="user-actions">
+                                <button class="action-btn" title="View Details / Orders"><i class="ph ph-info"></i></button>
+                                <button class="action-btn" title="Delete User"><i class="ph ph-trash"></i></button>
+                                <button class="action-btn" title="Block User"><i class="ph ph-prohibit"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Dummy User 4 -->
+                        <div class="user-card" data-status="blocked" data-name="Rakesh Kumar" data-email="rakesh.k88@yahoo.in" data-phone="9823456789" data-date="2026-05-12" data-orders="0">
+                            <div class="avatar" style="background-color: #7d6b5d;">R</div>
+                            <div class="user-name">Rakesh Kumar</div>
+                            <div class="user-email">rakesh.k88@yahoo.in</div>
+                            <div class="user-phone">9823456789</div>
+                            <div class="user-date">12/05/2026</div>
+                            <div class="user-actions">
+                                <button class="action-btn" title="View Details / Orders"><i class="ph ph-info"></i></button>
+                                <button class="action-btn" title="Delete User"><i class="ph ph-trash"></i></button>
+                                <button class="action-btn" title="Unblock User"><i class="ph ph-check-circle"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Dummy User 5 -->
+                        <div class="user-card" data-status="unverified" data-name="Priya Patel" data-email="priyapatel.design@gmail.com" data-phone="9988776655" data-date="2026-08-20" data-orders="0">
+                            <div class="avatar" style="background-color: #9caf9f;">P</div>
+                            <div class="user-name">Priya Patel</div>
+                            <div class="user-email">priyapatel.design@gmail...</div>
+                            <div class="user-phone">9988776655</div>
+                            <div class="user-date">20/08/2026</div>
+                            <div class="user-actions">
+                                <button class="action-btn" title="View Details / Orders"><i class="ph ph-info"></i></button>
+                                <button class="action-btn" title="Delete User"><i class="ph ph-trash"></i></button>
+                                <button class="action-btn" title="Block User"><i class="ph ph-prohibit"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -850,83 +868,101 @@
             });
 
             // Filters & Sorting Logic
-            const searchInput = document.getElementById('searchOrder');
+            const searchInput = document.getElementById('searchUser');
             const statusSelect = document.getElementById('statusFilter');
             const sortSelect = document.getElementById('sortFilter');
             const resetBtn = document.getElementById('resetFilters');
-            const tbody = document.getElementById('ordersBody');
+            const tabs = document.querySelectorAll('.tab-btn');
             
-            // Store original rows for filtering
-            const originalRows = Array.from(tbody.querySelectorAll('tr'));
+            const usersList = document.getElementById('usersList');
+            const userCards = Array.from(usersList.querySelectorAll('.user-card'));
+            
+            let currentTab = 'all';
 
             function applyFilters() {
                 const searchTerm = searchInput.value.toLowerCase().trim();
                 const statusFilter = statusSelect.value;
                 const sortVal = sortSelect.value;
 
-                // 1. Filter rows
-                let filteredRows = originalRows.filter(row => {
-                    const id = row.cells[0].textContent.toLowerCase();
-                    const name = row.cells[1].textContent.toLowerCase();
-                    const date = row.cells[2].textContent.toLowerCase();
-                    const product = row.cells[3].textContent.toLowerCase();
-                    const phone = row.dataset.phone || '';
-                    
-                    const rowStatus = row.dataset.status;
+                // Filter
+                let visibleCards = [];
+                userCards.forEach(card => {
+                    const name = card.dataset.name.toLowerCase();
+                    const email = card.dataset.email.toLowerCase();
+                    const phone = card.dataset.phone.toLowerCase();
+                    const status = card.dataset.status;
 
                     const matchesSearch = searchTerm === '' || 
-                                          id.includes(searchTerm) || 
                                           name.includes(searchTerm) || 
-                                          date.includes(searchTerm) || 
-                                          product.includes(searchTerm) || 
+                                          email.includes(searchTerm) || 
                                           phone.includes(searchTerm);
                                           
-                    const matchesStatus = statusFilter === 'all' || rowStatus === statusFilter;
+                    const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                    const matchesTab = currentTab === 'all' || (currentTab === 'blocked' && status === 'blocked');
 
-                    return matchesSearch && matchesStatus;
+                    if (matchesSearch && matchesStatus && matchesTab) {
+                        card.style.display = 'grid';
+                        visibleCards.push(card);
+                    } else {
+                        card.style.display = 'none';
+                    }
                 });
 
-                // 2. Sort rows
-                filteredRows.sort((a, b) => {
-                    const dateA = new Date(a.dataset.date).getTime();
-                    const dateB = new Date(b.dataset.date).getTime();
-                    const amountA = parseFloat(a.dataset.amount);
-                    const amountB = parseFloat(b.dataset.amount);
+                // Sort
+                visibleCards.sort((a, b) => {
+                    const dateA = new Date(a.dataset.date.split('/').reverse().join('-')).getTime();
+                    const dateB = new Date(b.dataset.date.split('/').reverse().join('-')).getTime();
+                    const nameA = a.dataset.name;
+                    const nameB = b.dataset.name;
+                    const ordersA = parseInt(a.dataset.orders);
+                    const ordersB = parseInt(b.dataset.orders);
 
-                    if (sortVal === 'date_desc') return dateB - dateA;
-                    if (sortVal === 'date_asc') return dateA - dateB;
-                    if (sortVal === 'amount_desc') return amountB - amountA;
-                    if (sortVal === 'amount_asc') return amountA - amountB;
+                    if (sortVal === 'newest') return dateB - dateA;
+                    if (sortVal === 'oldest') return dateA - dateB;
+                    if (sortVal === 'name_az') return nameA.localeCompare(nameB);
+                    if (sortVal === 'orders') return ordersB - ordersA;
                     
                     return 0;
                 });
 
-                // 3. Render rows
-                tbody.innerHTML = '';
-                if (filteredRows.length === 0) {
-                    const emptyRow = document.createElement('tr');
-                    emptyRow.innerHTML = `<td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No orders found matching your criteria.</td>`;
-                    tbody.appendChild(emptyRow);
-                } else {
-                    filteredRows.forEach(row => tbody.appendChild(row));
+                // Re-append sorted cards
+                visibleCards.forEach(card => usersList.appendChild(card));
+                
+                // Show empty state if none
+                const existingEmpty = usersList.querySelector('.empty-state');
+                if (existingEmpty) existingEmpty.remove();
+                
+                if (visibleCards.length === 0) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-state';
+                    emptyDiv.style.padding = '2rem';
+                    emptyDiv.style.textAlign = 'center';
+                    emptyDiv.style.color = 'var(--text-secondary)';
+                    emptyDiv.textContent = 'No users found matching your criteria.';
+                    usersList.appendChild(emptyDiv);
                 }
             }
 
-            // Event Listeners for Filters
+            // Event Listeners
             searchInput.addEventListener('input', applyFilters);
             statusSelect.addEventListener('change', applyFilters);
             sortSelect.addEventListener('change', applyFilters);
 
-            // Reset Button
             resetBtn.addEventListener('click', () => {
                 searchInput.value = '';
                 statusSelect.value = 'all';
-                sortSelect.value = 'date_desc';
+                sortSelect.value = 'newest';
                 applyFilters();
             });
             
-            // Initial render
-            applyFilters();
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentTab = tab.dataset.tab;
+                    applyFilters();
+                });
+            });
         });
     </script>
 </body>

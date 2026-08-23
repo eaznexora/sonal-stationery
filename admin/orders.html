@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonal Stationary | Admin Orders</title>
+    
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            /* Sonal Stationary Color Palette */
+            --bg-primary: #fbf9f6;
+            --bg-secondary: #f2eee8;
+            --bg-white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #6e6b66;
+            --accent-sage: #9caf9f;
+            --accent-sage-dark: #829586;
+            --border-color: #e2dfd8;
+            
+            /* Typography */
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            /* Layout */
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header img {
+            height: 36px;
+            width: auto;
+        }
+
+        .sidebar-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            margin: 0 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .nav-item:hover {
+            background-color: var(--border-color);
+        }
+
+        .nav-item.active {
+            background-color: #efeadf; /* Creamy highlight */
+            color: var(--text-primary);
+            border: 1px solid #e1dbcf;
+        }
+        
+        .nav-item .dropdown-icon {
+            margin-left: auto;
+            font-size: 1rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #d9534f;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+            margin: 0 0.5rem;
+        }
+        
+        .logout-btn:hover {
+            background-color: #fde8e8;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Top Header */
+        .top-header {
+            background-color: var(--bg-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-title h1 {
+            font-family: var(--font-body);
+            font-size: 1.25rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .back-btn {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        
+        .back-btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            background-color: var(--bg-white);
+            font-family: var(--font-body);
+            width: 280px;
+            font-size: 0.9rem;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-sage-dark);
+            color: white;
+            border: 1px solid var(--accent-sage-dark);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-sage);
+            border-color: var(--accent-sage);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--accent-sage-dark);
+            border: 1px solid var(--accent-sage-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: #eaf1eb;
+        }
+        
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-left: 1rem;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+        }
+        
+        .header-icons i {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .header-icons i:hover {
+            color: var(--accent-sage-dark);
+        }
+
+        /* Dashboard Body */
+        .dashboard-body {
+            padding: 1.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Overview Cards */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .card {
+            background-color: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .card-title {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .card-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        /* Toolbar */
+        .toolbar {
+            background: var(--bg-white);
+            padding: 1.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .toolbar-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .toolbar-input, .toolbar-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            background-color: var(--bg-secondary);
+            width: 100%;
+        }
+        
+        .toolbar-reset {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.4rem;
+            margin-bottom: 2px;
+            transition: color 0.2s;
+        }
+        
+        .toolbar-reset:hover {
+            color: var(--text-primary);
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--bg-white);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 900px;
+        }
+        
+        th, td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        
+        th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            background-color: var(--bg-primary);
+        }
+        
+        tbody tr:hover {
+            background-color: #fcfbfa;
+        }
+        
+        /* Pill Styles */
+        .status-pill {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-pending { background-color: #fef0c7; color: #b54708; }
+        .status-processing { background-color: #e0f2fe; color: #026aa7; }
+        .status-manifested { background-color: #f3e8ff; color: #6b21a8; }
+        .status-completed, .status-paid { background-color: #d1fadf; color: #027a48; }
+        .status-cancelled, .status-failed { background-color: #fee4e2; color: #b42318; }
+        
+        .tracking-ref {
+            display: block;
+            font-size: 0.7rem;
+            color: #1a73e8;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+        
+        .action-links {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .action-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .action-link:hover {
+            text-decoration: underline;
+        }
+        
+        .track-order-link {
+            color: #d32f2f;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .overview-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .search-bar input {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-title h1 {
+                font-size: 1.1rem;
+            }
+            
+            .header-actions .search-bar,
+            .header-actions .header-icons {
+                display: none;
+            }
+            
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            .dashboard-body {
+                padding: 1rem;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .toolbar-reset {
+                align-self: flex-end;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.open {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../logo.png" alt="Sonal Stationary Logo" onerror="this.style.display='none'">
+            <h2>Sonal<br>Stationary</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ph ph-squares-four"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-list-dashes"></i> Categories
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-package"></i> Products
+                <i class="ph ph-caret-down dropdown-icon"></i>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="ph ph-shopping-cart"></i> Orders
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-users"></i> Users
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chat-circle-dots"></i> Inquiries
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-archive-box"></i> Inventory
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chart-bar"></i> Analytics
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-image"></i> Banners
+                <i class="ph ph-caret-down dropdown-icon"></i>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-gear"></i> Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="logout-btn">
+                <i class="ph ph-sign-out"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-title">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ph ph-list"></i>
+                </button>
+                <a href="dashboard.html" class="back-btn"><i class="ph ph-caret-left"></i></a>
+                <h1>Orders</h1>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" placeholder="Search orders, products, customers...">
+                </div>
+                
+                <a href="#" class="btn btn-primary">
+                    <i class="ph ph-plus"></i> Add Product
+                </a>
+                <a href="#" class="btn btn-outline">
+                    Export Orders
+                </a>
+                
+                <div class="header-icons">
+                    <i class="ph ph-magnifying-glass" style="display:none;" id="mobileSearchIcon"></i>
+                    <i class="ph ph-user"></i>
+                    <i class="ph ph-shopping-bag"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Body -->
+        <div class="dashboard-body">
+            
+            <!-- Overview Cards -->
+            <div class="overview-cards">
+                <div class="card">
+                    <div class="card-title">Total Orders</div>
+                    <div class="card-value" id="cardTotalOrders">27</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Orders this Month</div>
+                    <div class="card-value">12</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Orders Pending</div>
+                    <div class="card-value" id="cardPendingOrders">5</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Orders Completed</div>
+                    <div class="card-value" id="cardCompletedOrders">22</div>
+                </div>
+            </div>
+            
+            <!-- Filter & Search Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <label for="searchOrder">Search Order</label>
+                    <input type="text" id="searchOrder" class="toolbar-input" placeholder="Enter Order ID / Product Name / Date">
+                </div>
+                <div class="toolbar-group">
+                    <label for="statusFilter">Status</label>
+                    <select id="statusFilter" class="toolbar-select">
+                        <option value="all">Select Status (All)</option>
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="manifested">Manifested</option>
+                        <option value="completed">Completed / Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label for="sortFilter">Sort By</label>
+                    <select id="sortFilter" class="toolbar-select">
+                        <option value="date_desc">Date: Newest to Oldest</option>
+                        <option value="date_asc">Date: Oldest to Newest</option>
+                        <option value="amount_desc">Amount: High to Low</option>
+                        <option value="amount_asc">Amount: Low to High</option>
+                    </select>
+                </div>
+                <button class="toolbar-reset" id="resetFilters" title="Reset Filters">
+                    <i class="ph ph-arrow-counter-clockwise"></i>
+                </button>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="table-container">
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Date</th>
+                            <th>Product</th>
+                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersBody">
+                        <!-- Dummy Data Row 1 -->
+                        <tr data-status="pending" data-date="2026-08-23" data-amount="1250" data-phone="9876543210">
+                            <td>#SN-1024</td>
+                            <td>Aarav Sharma</td>
+                            <td>23 Aug 2026</td>
+                            <td>Leather Journal (x2)</td>
+                            <td>
+                                <span class="status-pill status-pending">Pending</span>
+                                <span class="tracking-ref">REF: SN-TRK-1024</span>
+                            </td>
+                            <td><span class="status-pill status-paid">Paid</span></td>
+                            <td>₹1,250.00</td>
+                            <td>
+                                <div class="action-links">
+                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
+                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
+                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Dummy Data Row 2 -->
+                        <tr data-status="processing" data-date="2026-08-22" data-amount="890" data-phone="9876543211">
+                            <td>#SN-1025</td>
+                            <td>Priya Patel</td>
+                            <td>22 Aug 2026</td>
+                            <td>Calligraphy Pen Set</td>
+                            <td>
+                                <span class="status-pill status-processing">Processing</span>
+                                <span class="tracking-ref">REF: SN-TRK-1025</span>
+                            </td>
+                            <td><span class="status-pill status-paid">Paid</span></td>
+                            <td>₹890.00</td>
+                            <td>
+                                <div class="action-links">
+                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
+                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
+                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Dummy Data Row 3 -->
+                        <tr data-status="manifested" data-date="2026-08-21" data-amount="450" data-phone="9876543212">
+                            <td>#SN-1026</td>
+                            <td>Rahul Desai</td>
+                            <td>21 Aug 2026</td>
+                            <td>Pastel Highlighters</td>
+                            <td>
+                                <span class="status-pill status-manifested">Manifested</span>
+                                <span class="tracking-ref">REF: SN-TRK-1026</span>
+                            </td>
+                            <td><span class="status-pill status-pending">Pending</span></td>
+                            <td>₹450.00</td>
+                            <td>
+                                <div class="action-links">
+                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
+                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
+                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Dummy Data Row 4 -->
+                        <tr data-status="completed" data-date="2026-08-20" data-amount="1500" data-phone="9876543213">
+                            <td>#SN-1027</td>
+                            <td>Ananya Singh</td>
+                            <td>20 Aug 2026</td>
+                            <td>Desk Organizer</td>
+                            <td>
+                                <span class="status-pill status-completed">Completed</span>
+                                <span class="tracking-ref">REF: SN-TRK-1027</span>
+                            </td>
+                            <td><span class="status-pill status-paid">Paid</span></td>
+                            <td>₹1,500.00</td>
+                            <td>
+                                <div class="action-links">
+                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
+                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
+                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Dummy Data Row 5 -->
+                        <tr data-status="completed" data-date="2026-08-19" data-amount="350" data-phone="9876543214">
+                            <td>#SN-1028</td>
+                            <td>Neha Gupta</td>
+                            <td>19 Aug 2026</td>
+                            <td>Sticky Notes Set</td>
+                            <td>
+                                <span class="status-pill status-completed">Completed</span>
+                                <span class="tracking-ref">REF: SN-TRK-1028</span>
+                            </td>
+                            <td><span class="status-pill status-paid">Paid</span></td>
+                            <td>₹350.00</td>
+                            <td>
+                                <div class="action-links">
+                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
+                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
+                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Dummy Data Row 6 -->
+                        <tr data-status="cancelled" data-date="2026-08-18" data-amount="600" data-phone="9876543215">
+                            <td>#SN-1029</td>
+                            <td>Vikram Mehta</td>
+                            <td>18 Aug 2026</td>
+                            <td>Premium Notebook</td>
+                            <td>
+                                <span class="status-pill status-cancelled">Cancelled</span>
+                                <span class="tracking-ref">REF: SN-TRK-1029</span>
+                            </td>
+                            <td><span class="status-pill status-failed">Failed</span></td>
+                            <td>₹600.00</td>
+                            <td>
+                                <div class="action-links">
+                                    <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
+                                    <a href="#" class="action-link"><i class="ph ph-eye"></i> View Details</a>
+                                    <a href="#" class="action-link"><i class="ph ph-printer"></i> Print Invoice</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.add('open');
+                sidebarOverlay.classList.add('open');
+            });
+            
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('open');
+            });
+
+            // Filters & Sorting Logic
+            const searchInput = document.getElementById('searchOrder');
+            const statusSelect = document.getElementById('statusFilter');
+            const sortSelect = document.getElementById('sortFilter');
+            const resetBtn = document.getElementById('resetFilters');
+            const tbody = document.getElementById('ordersBody');
+            
+            // Store original rows for filtering
+            const originalRows = Array.from(tbody.querySelectorAll('tr'));
+
+            function applyFilters() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const statusFilter = statusSelect.value;
+                const sortVal = sortSelect.value;
+
+                // 1. Filter rows
+                let filteredRows = originalRows.filter(row => {
+                    const id = row.cells[0].textContent.toLowerCase();
+                    const name = row.cells[1].textContent.toLowerCase();
+                    const date = row.cells[2].textContent.toLowerCase();
+                    const product = row.cells[3].textContent.toLowerCase();
+                    const phone = row.dataset.phone || '';
+                    
+                    const rowStatus = row.dataset.status;
+
+                    const matchesSearch = searchTerm === '' || 
+                                          id.includes(searchTerm) || 
+                                          name.includes(searchTerm) || 
+                                          date.includes(searchTerm) || 
+                                          product.includes(searchTerm) || 
+                                          phone.includes(searchTerm);
+                                          
+                    const matchesStatus = statusFilter === 'all' || rowStatus === statusFilter;
+
+                    return matchesSearch && matchesStatus;
+                });
+
+                // 2. Sort rows
+                filteredRows.sort((a, b) => {
+                    const dateA = new Date(a.dataset.date).getTime();
+                    const dateB = new Date(b.dataset.date).getTime();
+                    const amountA = parseFloat(a.dataset.amount);
+                    const amountB = parseFloat(b.dataset.amount);
+
+                    if (sortVal === 'date_desc') return dateB - dateA;
+                    if (sortVal === 'date_asc') return dateA - dateB;
+                    if (sortVal === 'amount_desc') return amountB - amountA;
+                    if (sortVal === 'amount_asc') return amountA - amountB;
+                    
+                    return 0;
+                });
+
+                // 3. Render rows
+                tbody.innerHTML = '';
+                if (filteredRows.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `<td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No orders found matching your criteria.</td>`;
+                    tbody.appendChild(emptyRow);
+                } else {
+                    filteredRows.forEach(row => tbody.appendChild(row));
+                }
+            }
+
+            // Event Listeners for Filters
+            searchInput.addEventListener('input', applyFilters);
+            statusSelect.addEventListener('change', applyFilters);
+            sortSelect.addEventListener('change', applyFilters);
+
+            // Reset Button
+            resetBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                statusSelect.value = 'all';
+                sortSelect.value = 'date_desc';
+                applyFilters();
+            });
+            
+            // Initial render
+            applyFilters();
+        });
+    </script>
+</body>
+</html>

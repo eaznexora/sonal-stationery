@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonal Stationary | Inventory Management</title>
+    
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            /* Sonal Stationary Color Palette */
+            --bg-primary: #fbf9f6;
+            --bg-secondary: #f2eee8;
+            --bg-white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #6e6b66;
+            --accent-sage: #9caf9f;
+            --accent-sage-dark: #829586;
+            --border-color: #e2dfd8;
+            
+            /* Status Colors */
+            --status-instock-bg: #e6f4ea;
+            --status-instock-text: #1e7e34;
+            --status-instock-row: #f8fbf9;
+            
+            --status-low-bg: #fdf3e1;
+            --status-low-text: #b07010;
+            --status-low-row: #fffbf5;
+            
+            --status-out-bg: #fce8e8;
+            --status-out-text: #d32f2f;
+            --status-out-row: #fdf7f7;
+            
+            /* Typography */
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            /* Layout */
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header img {
+            height: 36px;
+            width: auto;
+        }
+
+        .sidebar-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            margin: 0 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .nav-item:hover {
+            background-color: var(--border-color);
+        }
+
+        .nav-item.active {
+            background-color: #efeadf;
+            color: var(--text-primary);
+            border: 1px solid #e1dbcf;
+        }
+        
+        .nav-item .dropdown-icon {
+            margin-left: auto;
+            font-size: 1rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #d9534f;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+            margin: 0 0.5rem;
+        }
+        
+        .logout-btn:hover {
+            background-color: #fde8e8;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Top Header */
+        .top-header {
+            background-color: var(--bg-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-title h1 {
+            font-family: var(--font-body);
+            font-size: 1.25rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .back-btn {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        
+        .back-btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            background-color: var(--bg-white);
+            font-family: var(--font-body);
+            width: 280px;
+            font-size: 0.9rem;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-sage-dark);
+            color: white;
+            border: 1px solid var(--accent-sage-dark);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-sage);
+            border-color: var(--accent-sage);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--accent-sage-dark);
+            border: 1px solid var(--accent-sage-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: #eaf1eb;
+        }
+
+        .btn-icon {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-left: 1rem;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+        }
+        
+        .header-icons i {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .header-icons i:hover {
+            color: var(--accent-sage-dark);
+        }
+
+        /* Dashboard Body */
+        .dashboard-body {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Overview Cards */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .card-value {
+            font-size: 1.8rem;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .card-alert {
+            color: var(--status-out-text);
+        }
+        .card-warning {
+            color: var(--status-low-text);
+        }
+
+        /* Inventory Container */
+        .inventory-section {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Filter & Search Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .toolbar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .toolbar-group label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .toolbar-input, .toolbar-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            color: var(--text-primary);
+            background-color: var(--bg-white);
+        }
+
+        .toolbar-input {
+            width: 320px;
+        }
+        
+        .toolbar-select {
+            min-width: 180px;
+        }
+
+        .toolbar-reset {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+            margin-top: auto;
+            transition: all 0.2s;
+        }
+
+        .toolbar-reset:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Tabs & Bulk Actions */
+        .tabs-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .tab {
+            padding: 1rem 0;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--accent-sage-dark);
+            border-bottom-color: var(--accent-sage-dark);
+        }
+
+        .bulk-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pagination-indicator {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Inventory Table */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Row Status Tints */
+        tr.row-instock { background-color: var(--status-instock-row); }
+        tr.row-low { background-color: var(--status-low-row); }
+        tr.row-out { background-color: var(--status-out-row); }
+        
+        tr:hover {
+            filter: brightness(0.98);
+        }
+
+        /* Table Checkbox */
+        .checkbox-cell {
+            width: 40px;
+            padding-right: 0.5rem;
+        }
+        
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-sage-dark);
+            cursor: pointer;
+        }
+
+        /* Product Identity Column */
+        .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 250px;
+        }
+
+        .product-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            object-fit: cover;
+            background-color: var(--bg-white);
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .product-sku {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .category-tag {
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Stock Input */
+        .stock-input {
+            width: 70px;
+            padding: 0.4rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: var(--font-body);
+            text-align: center;
+            background: var(--bg-white);
+        }
+
+        .stock-input:focus {
+            outline: 1px solid var(--accent-sage);
+            border-color: var(--accent-sage);
+        }
+
+        /* Status Pills */
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-instock {
+            background-color: var(--status-instock-bg);
+            color: var(--status-instock-text);
+        }
+
+        .status-low {
+            background-color: var(--status-low-bg);
+            color: var(--status-low-text);
+        }
+
+        .status-out {
+            background-color: var(--status-out-bg);
+            color: var(--status-out-text);
+        }
+
+        .batch-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .overview-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-title h1 {
+                font-size: 1.1rem;
+            }
+            
+            .header-actions .search-bar,
+            .header-actions .header-icons {
+                display: none;
+            }
+            
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            .dashboard-body {
+                padding: 1rem;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .toolbar-input {
+                width: 100%;
+            }
+
+            .toolbar-reset {
+                align-self: flex-end;
+            }
+            
+            .tabs-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                padding: 1rem 1.5rem;
+            }
+            
+            .bulk-actions {
+                justify-content: flex-end;
+            }
+            
+            .product-cell {
+                position: sticky;
+                left: 0;
+                background-color: inherit;
+                z-index: 5;
+            }
+            th:nth-child(2) {
+                position: sticky;
+                left: 0;
+                z-index: 15;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.open {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../logo.png" alt="Sonal Stationary Logo" onerror="this.style.display='none'">
+            <h2>Sonal<br>Stationary</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ph ph-squares-four"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-list-dashes"></i> Categories
+            </a>
+            <a href="add-product.html" class="nav-item">
+                <i class="ph ph-package"></i> Products
+                <i class="ph ph-caret-down dropdown-icon"></i>
+            </a>
+            <a href="orders.html" class="nav-item">
+                <i class="ph ph-shopping-cart"></i> Orders
+            </a>
+            <a href="users.html" class="nav-item">
+                <i class="ph ph-users"></i> Users
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chat-circle-dots"></i> Inquiries
+            </a>
+            <a href="inventory.html" class="nav-item active">
+                <i class="ph ph-archive-box"></i> Inventory
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chart-bar"></i> Analytics
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-image"></i> Banners
+                <i class="ph ph-caret-down dropdown-icon"></i>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-gear"></i> Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="logout-btn">
+                <i class="ph ph-sign-out"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-title">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ph ph-list"></i>
+                </button>
+                <a href="dashboard.html" class="back-btn"><i class="ph ph-caret-left"></i></a>
+                <h1>Inventory</h1>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" placeholder="Global search...">
+                </div>
+                
+                <button class="btn btn-primary">
+                    <i class="ph ph-plus"></i> Add Stock
+                </button>
+                <button class="btn btn-outline">
+                    <i class="ph ph-export"></i> Export Inventory Report
+                </button>
+                
+                <div class="header-icons">
+                    <i class="ph ph-magnifying-glass" style="display:none;" id="mobileSearchIcon"></i>
+                    <i class="ph ph-bell"></i>
+                    <i class="ph ph-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Body -->
+        <div class="dashboard-body">
+            
+            <!-- Overview Cards -->
+            <div class="overview-cards">
+                <div class="card">
+                    <div class="card-title">Total Inventory Units</div>
+                    <div class="card-value">1,378</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Inventory Added This Month</div>
+                    <div class="card-value">120</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Low Stock Alerts</div>
+                    <div class="card-value card-warning">8</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Out of Stock Items</div>
+                    <div class="card-value card-alert">2</div>
+                </div>
+            </div>
+            
+            <div class="inventory-section">
+                <!-- Filter & Search Toolbar -->
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <label for="searchProduct">Search</label>
+                        <input type="text" id="searchProduct" class="toolbar-input" placeholder="Search by Product Name / SKU...">
+                    </div>
+                    <div class="toolbar-group">
+                        <label for="statusFilter">Stock Status</label>
+                        <select id="statusFilter" class="toolbar-select">
+                            <option value="all">All Statuses</option>
+                            <option value="instock">In Stock</option>
+                            <option value="low">Low Stock</option>
+                            <option value="out">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div class="toolbar-group">
+                        <label for="sortFilter">Sort By</label>
+                        <select id="sortFilter" class="toolbar-select">
+                            <option value="stock_asc">Stock: Low to High</option>
+                            <option value="stock_desc">Stock: High to Low</option>
+                            <option value="recent">Recently Updated</option>
+                            <option value="name_asc">Name: A-Z</option>
+                        </select>
+                    </div>
+                    <button class="toolbar-reset" id="resetFilters" title="Reset Filters">
+                        <i class="ph ph-arrows-counter-clockwise"></i>
+                    </button>
+                </div>
+
+                <!-- Tabs & Bulk Actions -->
+                <div class="tabs-toolbar">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="all">All Products</div>
+                        <div class="tab" data-tab="hidden">Hidden / Archived Products</div>
+                    </div>
+                    <div class="bulk-actions">
+                        <button class="btn-icon" title="Toggle Visibility">
+                            <i class="ph ph-eye"></i>
+                        </button>
+                        <button class="btn btn-outline" style="padding: 0.4rem 0.75rem;">Quick Update</button>
+                        <div class="pagination-indicator">
+                            1 / 12
+                            <button class="btn-icon" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-left"></i></button>
+                            <button class="btn-icon" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Table -->
+                <div class="table-container">
+                    <table id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="masterCheckbox"></th>
+                                <th>Product Details</th>
+                                <th>Sub-category</th>
+                                <th>Stock</th>
+                                <th>Batch / Threshold</th>
+                                <th>Stock Status</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryBody">
+                            <!-- Item 1 -->
+                            <tr class="row-instock" data-status="instock">
+                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                                <td class="product-cell">
+                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Jnl" alt="Thumbnail" class="product-thumb">
+                                    <div class="product-info">
+                                        <span class="product-name">A5 Hardcover Dotted Journal</span>
+                                        <span class="product-sku">SS-NB-001</span>
+                                    </div>
+                                </td>
+                                <td><span class="category-tag">Journals</span></td>
+                                <td><input type="number" class="stock-input" value="145" min="0"></td>
+                                <td class="batch-text">Min: 20</td>
+                                <td><span class="status-pill status-instock">In Stock</span></td>
+                                <td>15/08/2026</td>
+                            </tr>
+                            <!-- Item 2 -->
+                            <tr class="row-instock" data-status="instock">
+                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                                <td class="product-cell">
+                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Pen" alt="Thumbnail" class="product-thumb">
+                                    <div class="product-info">
+                                        <span class="product-name">0.5mm Archival Gel Pen Set</span>
+                                        <span class="product-sku">SS-PN-042</span>
+                                    </div>
+                                </td>
+                                <td><span class="category-tag">Pens & Inks</span></td>
+                                <td><input type="number" class="stock-input" value="85" min="0"></td>
+                                <td class="batch-text">Min: 15</td>
+                                <td><span class="status-pill status-instock">In Stock</span></td>
+                                <td>12/08/2026</td>
+                            </tr>
+                            <!-- Item 3 -->
+                            <tr class="row-low" data-status="low">
+                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                                <td class="product-cell">
+                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Rul" alt="Thumbnail" class="product-thumb">
+                                    <div class="product-info">
+                                        <span class="product-name">Matte Brass Ruler</span>
+                                        <span class="product-sku">SS-DA-011</span>
+                                    </div>
+                                </td>
+                                <td><span class="category-tag">Desk Accessories</span></td>
+                                <td><input type="number" class="stock-input" value="12" min="0"></td>
+                                <td class="batch-text">Min: 15</td>
+                                <td><span class="status-pill status-low">Low Stock</span></td>
+                                <td>20/08/2026</td>
+                            </tr>
+                            <!-- Item 4 -->
+                            <tr class="row-out" data-status="out">
+                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                                <td class="product-cell">
+                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Ink" alt="Thumbnail" class="product-thumb">
+                                    <div class="product-info">
+                                        <span class="product-name">Premium Fountain Pen Ink (Midnight Blue)</span>
+                                        <span class="product-sku">SS-PN-089</span>
+                                    </div>
+                                </td>
+                                <td><span class="category-tag">Pens & Inks</span></td>
+                                <td><input type="number" class="stock-input" value="0" min="0"></td>
+                                <td class="batch-text">Min: 10</td>
+                                <td><span class="status-pill status-out">Out of Stock</span></td>
+                                <td>22/08/2026</td>
+                            </tr>
+                            <!-- Item 5 -->
+                            <tr class="row-instock" data-status="instock">
+                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                                <td class="product-cell">
+                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Pnr" alt="Thumbnail" class="product-thumb">
+                                    <div class="product-info">
+                                        <span class="product-name">Weekly Minimalist Planner 2027</span>
+                                        <span class="product-sku">SS-PL-005</span>
+                                    </div>
+                                </td>
+                                <td><span class="category-tag">Planners</span></td>
+                                <td><input type="number" class="stock-input" value="250" min="0"></td>
+                                <td class="batch-text">Min: 50</td>
+                                <td><span class="status-pill status-instock">In Stock</span></td>
+                                <td>18/08/2026</td>
+                            </tr>
+                            <!-- Item 6 -->
+                            <tr class="row-low" data-status="low">
+                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                                <td class="product-cell">
+                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Stk" alt="Thumbnail" class="product-thumb">
+                                    <div class="product-info">
+                                        <span class="product-name">Pastel Sticky Notes Bundle</span>
+                                        <span class="product-sku">SS-ST-022</span>
+                                    </div>
+                                </td>
+                                <td><span class="category-tag">Paper Goods</span></td>
+                                <td><input type="number" class="stock-input" value="18" min="0"></td>
+                                <td class="batch-text">Min: 30</td>
+                                <td><span class="status-pill status-low">Low Stock</span></td>
+                                <td>21/08/2026</td>
+                            </tr>
+                            <!-- Item 7 -->
+                            <tr class="row-out" data-status="out">
+                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                                <td class="product-cell">
+                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Clp" alt="Thumbnail" class="product-thumb">
+                                    <div class="product-info">
+                                        <span class="product-name">Rose Gold Binder Clips (Set of 12)</span>
+                                        <span class="product-sku">SS-DA-034</span>
+                                    </div>
+                                </td>
+                                <td><span class="category-tag">Desk Accessories</span></td>
+                                <td><input type="number" class="stock-input" value="0" min="0"></td>
+                                <td class="batch-text">Min: 25</td>
+                                <td><span class="status-pill status-out">Out of Stock</span></td>
+                                <td>23/08/2026</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <script>
+        // Sidebar Toggle for Mobile
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('open');
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Tab Switching
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                // Future: Handle actual data filtering based on 'tab.dataset.tab'
+            });
+        });
+
+        // Search & Filter Logic
+        const searchInput = document.getElementById('searchProduct');
+        const statusFilter = document.getElementById('statusFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const resetBtn = document.getElementById('resetFilters');
+        const tableBody = document.getElementById('inventoryBody');
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusTerm = statusFilter.value;
+
+            rows.forEach(row => {
+                const productName = row.querySelector('.product-name').textContent.toLowerCase();
+                const productSku = row.querySelector('.product-sku').textContent.toLowerCase();
+                const rowStatus = row.dataset.status;
+
+                const matchesSearch = productName.includes(searchTerm) || productSku.includes(searchTerm);
+                const matchesStatus = (statusTerm === 'all') || (rowStatus === statusTerm);
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            // Sorting logic can be added here if needed
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        statusFilter.addEventListener('change', filterTable);
+        sortFilter.addEventListener('change', filterTable);
+
+        // Reset Filters
+        resetBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            statusFilter.value = 'all';
+            sortFilter.value = 'stock_asc'; // Default
+            filterTable();
+        });
+
+        // Master Checkbox Logic
+        const masterCheckbox = document.getElementById('masterCheckbox');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+
+        masterCheckbox.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            rowCheckboxes.forEach(cb => {
+                // Only select visible rows
+                if (cb.closest('tr').style.display !== 'none') {
+                    cb.checked = isChecked;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

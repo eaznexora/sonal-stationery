@@ -410,6 +410,7 @@
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 0.5rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
             transition: transform 0.2s, box-shadow 0.2s;
@@ -421,8 +422,8 @@
         }
 
         .card-title {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
             font-weight: 500;
         }
 
@@ -475,13 +476,13 @@
 
         .toolbar-input, .toolbar-select {
             padding: 0.6rem 1rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid transparent;
             border-radius: 6px;
             font-family: var(--font-body);
             font-size: 0.9rem;
             outline: none;
             color: var(--text-primary);
-            background-color: var(--bg-white);
+            background-color: #f2eee8;
         }
 
         .toolbar-input {
@@ -564,37 +565,66 @@
         .table-container {
             width: 100%;
             overflow-x: auto;
+            padding: 0 1.5rem 1.5rem 1.5rem;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0 8px;
             text-align: left;
             white-space: nowrap;
         }
 
         th, td {
             padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
             font-size: 0.9rem;
             vertical-align: middle;
         }
 
         th {
-            background-color: var(--bg-primary);
+            background-color: var(--bg-white);
             color: var(--text-secondary);
             font-weight: 500;
             position: sticky;
             top: 0;
             z-index: 10;
+            border-bottom: 1px solid var(--border-color);
         }
 
+        td {
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid transparent;
+        }
+        td:first-child { border-left: 1px solid transparent; border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+        td:last-child { border-right: 1px solid transparent; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+
         /* Row Status Tints */
-        tr.row-instock { background-color: var(--status-instock-row); }
-        tr.row-low { background-color: var(--status-low-row); }
-        tr.row-out { background-color: var(--status-out-row); }
+        tr.row-instock td { 
+            background-color: #e8f5e9; 
+            border-top-color: #81c784; 
+            border-bottom-color: #81c784; 
+        }
+        tr.row-instock td:first-child { border-left-color: #81c784; }
+        tr.row-instock td:last-child { border-right-color: #81c784; }
+
+        tr.row-low td { 
+            background-color: #fff8e1; 
+            border-top-color: #ffd54f; 
+            border-bottom-color: #ffd54f; 
+        }
+        tr.row-low td:first-child { border-left-color: #ffd54f; }
+        tr.row-low td:last-child { border-right-color: #ffd54f; }
+
+        tr.row-out td { 
+            background-color: #ffebee; 
+            border-top-color: #e57373; 
+            border-bottom-color: #e57373; 
+        }
+        tr.row-out td:first-child { border-left-color: #e57373; }
+        tr.row-out td:last-child { border-right-color: #e57373; }
         
-        tr:hover {
+        tr:hover td {
             filter: brightness(0.98);
         }
 
@@ -871,29 +901,207 @@
             <div class="header-title">
                 <button class="menu-toggle" id="menuToggle">
                     <i class="ph ph-list"></i>
+            text-align: center;
+        }
+
+        .status-instock {
+            background-color: var(--status-instock-bg);
+            color: var(--status-instock-text);
+        }
+
+        .status-low {
+            background-color: var(--status-low-bg);
+            color: var(--status-low-text);
+        }
+
+        .status-out {
+            background-color: var(--status-out-bg);
+            color: var(--status-out-text);
+        }
+
+        .batch-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .overview-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-title h1 {
+                font-size: 1.1rem;
+            }
+            
+            .header-actions .search-bar,
+            .header-actions .header-icons {
+                display: none;
+            }
+            
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            .dashboard-body {
+                padding: 1rem;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .toolbar-input {
+                width: 100%;
+            }
+
+            .toolbar-reset {
+                align-self: flex-end;
+            }
+            
+            .tabs-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                padding: 1rem 1.5rem;
+            }
+            
+            .bulk-actions {
+                justify-content: flex-end;
+            }
+            
+            .product-cell {
+                position: sticky;
+                left: 0;
+                background-color: inherit;
+                z-index: 5;
+            }
+            th:nth-child(2) {
+                position: sticky;
+                left: 0;
+                z-index: 15;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.open {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../logo.png" alt="Sonal Stationary Logo" onerror="this.style.display='none'">
+            <h2>Sonal<br>Stationary</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ph ph-squares-four"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-list-dashes"></i> Categories
+            </a>
+            <div class="nav-item-group">
+                <a href="#" class="nav-item" id="productsDropdownToggle">
+                    <i class="ph ph-package"></i> Products
+                    <i class="ph ph-caret-down dropdown-icon"></i>
+                </a>
+                <div class="submenu-container" id="productsSubmenuContainer">
+                    <div class="submenu">
+                        <a href="products.html" class="submenu-item" id="nav-product-list">Product List</a>
+                        <a href="add-product.html" class="submenu-item" id="nav-add-product">Add a Product</a>
+                    </div>
+                </div>
+            </div>
+            <a href="orders.html" class="nav-item">
+                <i class="ph ph-shopping-cart"></i> Orders
+            </a>
+            <a href="users.html" class="nav-item">
+                <i class="ph ph-users"></i> Users
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chat-circle-dots"></i> Inquiries
+            </a>
+            <a href="inventory.html" class="nav-item active">
+                <i class="ph ph-archive-box"></i> Inventory
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chart-bar"></i> Analytics
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-image"></i> Banners
+                <i class="ph ph-caret-down dropdown-icon"></i>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-gear"></i> Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="logout-btn">
+                <i class="ph ph-sign-out"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-title">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ph ph-list"></i>
                 </button>
                 <a href="dashboard.html" class="back-btn"><i class="ph ph-caret-left"></i></a>
                 <h1>Inventory</h1>
             </div>
             
-            <div class="header-actions">
-                <div class="search-bar">
-                    <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" placeholder="Global search...">
-                </div>
-                
-                <button class="btn btn-primary">
-                    <i class="ph ph-plus"></i> Add Stock
-                </button>
-                <button class="btn btn-outline">
-                    <i class="ph ph-export"></i> Export Inventory Report
-                </button>
-                
-                <div class="header-icons">
-                    <i class="ph ph-magnifying-glass" style="display:none;" id="mobileSearchIcon"></i>
-                    <i class="ph ph-bell"></i>
-                    <i class="ph ph-user"></i>
-                </div>
+            <div class="header-actions" style="display:none;">
             </div>
         </header>
 
@@ -903,20 +1111,20 @@
             <!-- Overview Cards -->
             <div class="overview-cards">
                 <div class="card">
-                    <div class="card-title">Total Inventory Units</div>
-                    <div class="card-value">1,378</div>
+                    <div class="card-title">Total Inventory</div>
+                    <div class="card-value">1378</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Inventory Added This Month</div>
-                    <div class="card-value">120</div>
+                    <div class="card-title">Inventory added this month</div>
+                    <div class="card-value">2</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Low Stock Alerts</div>
-                    <div class="card-value card-warning">8</div>
+                    <div class="card-title">Orders Pending</div>
+                    <div class="card-value">25</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Out of Stock Items</div>
-                    <div class="card-value card-alert">2</div>
+                    <div class="card-title">Orders Completed</div>
+                    <div class="card-value">0</div>
                 </div>
             </div>
             
@@ -924,11 +1132,11 @@
                 <!-- Filter & Search Toolbar -->
                 <div class="toolbar">
                     <div class="toolbar-group">
-                        <label for="searchProduct">Search</label>
+                        <label for="searchProduct">Search Product</label>
                         <input type="text" id="searchProduct" class="toolbar-input" placeholder="Search by Product Name / SKU...">
                     </div>
                     <div class="toolbar-group">
-                        <label for="statusFilter">Stock Status</label>
+                        <label for="statusFilter">Status</label>
                         <select id="statusFilter" class="toolbar-select">
                             <option value="all">All Statuses</option>
                             <option value="instock">In Stock</option>
@@ -939,10 +1147,10 @@
                     <div class="toolbar-group">
                         <label for="sortFilter">Sort By</label>
                         <select id="sortFilter" class="toolbar-select">
+                            <option value="newest">Newest First</option>
                             <option value="stock_asc">Stock: Low to High</option>
                             <option value="stock_desc">Stock: High to Low</option>
-                            <option value="recent">Recently Updated</option>
-                            <option value="name_asc">Name: A-Z</option>
+                            <option value="name_asc">Alphabetical</option>
                         </select>
                     </div>
                     <button class="toolbar-reset" id="resetFilters" title="Reset Filters">
@@ -954,16 +1162,16 @@
                 <div class="tabs-toolbar">
                     <div class="tabs">
                         <div class="tab active" data-tab="all">All Products</div>
-                        <div class="tab" data-tab="hidden">Hidden / Archived Products</div>
+                        <div class="tab" data-tab="hidden">Hidden Products</div>
                     </div>
                     <div class="bulk-actions">
+                        <span style="font-size:0.9rem; font-weight:500; margin-right:0.5rem; color:var(--text-primary);">Bulk Actions:</span>
                         <button class="btn-icon" title="Toggle Visibility">
                             <i class="ph ph-eye"></i>
                         </button>
-                        <button class="btn btn-outline" style="padding: 0.4rem 0.75rem;">Quick Update</button>
                         <div class="pagination-indicator">
-                            1 / 12
                             <button class="btn-icon" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-left"></i></button>
+                            1 / 138
                             <button class="btn-icon" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-right"></i></button>
                         </div>
                     </div>
@@ -975,128 +1183,95 @@
                         <thead>
                             <tr>
                                 <th class="checkbox-cell"><input type="checkbox" id="masterCheckbox"></th>
-                                <th>Product Details</th>
-                                <th>Sub-category</th>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>SKU</th>
+                                <th>Category</th>
                                 <th>Stock</th>
-                                <th>Batch / Threshold</th>
-                                <th>Stock Status</th>
+                                <th>Batch</th>
+                                <th>Status</th>
                                 <th>Last Updated</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryBody">
-                            <!-- Item 1 -->
                             <tr class="row-instock" data-status="instock">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td class="product-cell">
-                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Jnl" alt="Thumbnail" class="product-thumb">
-                                    <div class="product-info">
-                                        <span class="product-name">A5 Hardcover Dotted Journal</span>
-                                        <span class="product-sku">SS-NB-001</span>
-                                    </div>
-                                </td>
+                                <td><img src="https://via.placeholder.com/40x40/e8f5e9/4caf50?text=Jnl" alt="Thumbnail" class="product-thumb"></td>
+                                <td class="product-name">Hardcover Journal 120 GSM</td>
+                                <td class="product-sku">SS-NB-101</td>
                                 <td><span class="category-tag">Journals</span></td>
-                                <td><input type="number" class="stock-input" value="145" min="0"></td>
-                                <td class="batch-text">Min: 20</td>
+                                <td><input type="number" class="stock-input" value="1000" min="0"></td>
+                                <td class="batch-text">4/6</td>
                                 <td><span class="status-pill status-instock">In Stock</span></td>
-                                <td>15/08/2026</td>
+                                <td>8/21/2026</td>
                             </tr>
-                            <!-- Item 2 -->
                             <tr class="row-instock" data-status="instock">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td class="product-cell">
-                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Pen" alt="Thumbnail" class="product-thumb">
-                                    <div class="product-info">
-                                        <span class="product-name">0.5mm Archival Gel Pen Set</span>
-                                        <span class="product-sku">SS-PN-042</span>
-                                    </div>
-                                </td>
-                                <td><span class="category-tag">Pens & Inks</span></td>
-                                <td><input type="number" class="stock-input" value="85" min="0"></td>
-                                <td class="batch-text">Min: 15</td>
+                                <td><img src="https://via.placeholder.com/40x40/e8f5e9/4caf50?text=Pen" alt="Thumbnail" class="product-thumb"></td>
+                                <td class="product-name">Calligraphy Fountain Pen</td>
+                                <td class="product-sku">SS-PN-204</td>
+                                <td><span class="category-tag">Pens</span></td>
+                                <td><input type="number" class="stock-input" value="450" min="0"></td>
+                                <td class="batch-text">6/12</td>
                                 <td><span class="status-pill status-instock">In Stock</span></td>
-                                <td>12/08/2026</td>
+                                <td>8/21/2026</td>
                             </tr>
-                            <!-- Item 3 -->
                             <tr class="row-low" data-status="low">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td class="product-cell">
-                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Rul" alt="Thumbnail" class="product-thumb">
-                                    <div class="product-info">
-                                        <span class="product-name">Matte Brass Ruler</span>
-                                        <span class="product-sku">SS-DA-011</span>
-                                    </div>
-                                </td>
-                                <td><span class="category-tag">Desk Accessories</span></td>
+                                <td><img src="https://via.placeholder.com/40x40/fff8e1/ffb300?text=Hlt" alt="Thumbnail" class="product-thumb"></td>
+                                <td class="product-name">Pastel Highlighter Set</td>
+                                <td class="product-sku">SS-HL-112</td>
+                                <td><span class="category-tag">Highlighters</span></td>
                                 <td><input type="number" class="stock-input" value="12" min="0"></td>
-                                <td class="batch-text">Min: 15</td>
+                                <td class="batch-text">1/2</td>
                                 <td><span class="status-pill status-low">Low Stock</span></td>
-                                <td>20/08/2026</td>
+                                <td>8/20/2026</td>
                             </tr>
-                            <!-- Item 4 -->
                             <tr class="row-out" data-status="out">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td class="product-cell">
-                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Ink" alt="Thumbnail" class="product-thumb">
-                                    <div class="product-info">
-                                        <span class="product-name">Premium Fountain Pen Ink (Midnight Blue)</span>
-                                        <span class="product-sku">SS-PN-089</span>
-                                    </div>
-                                </td>
-                                <td><span class="category-tag">Pens & Inks</span></td>
+                                <td><img src="https://via.placeholder.com/40x40/ffebee/f44336?text=Brs" alt="Thumbnail" class="product-thumb"></td>
+                                <td class="product-name">Brass Desk Clip Set</td>
+                                <td class="product-sku">SS-DA-302</td>
+                                <td><span class="category-tag">Desk Tools</span></td>
                                 <td><input type="number" class="stock-input" value="0" min="0"></td>
-                                <td class="batch-text">Min: 10</td>
+                                <td class="batch-text">2/4</td>
                                 <td><span class="status-pill status-out">Out of Stock</span></td>
-                                <td>22/08/2026</td>
+                                <td>8/18/2026</td>
                             </tr>
-                            <!-- Item 5 -->
                             <tr class="row-instock" data-status="instock">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td class="product-cell">
-                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Pnr" alt="Thumbnail" class="product-thumb">
-                                    <div class="product-info">
-                                        <span class="product-name">Weekly Minimalist Planner 2027</span>
-                                        <span class="product-sku">SS-PL-005</span>
-                                    </div>
-                                </td>
+                                <td><img src="https://via.placeholder.com/40x40/e8f5e9/4caf50?text=Pln" alt="Thumbnail" class="product-thumb"></td>
+                                <td class="product-name">Weekly Minimalist Planner</td>
+                                <td class="product-sku">SS-PL-005</td>
                                 <td><span class="category-tag">Planners</span></td>
-                                <td><input type="number" class="stock-input" value="250" min="0"></td>
-                                <td class="batch-text">Min: 50</td>
+                                <td><input type="number" class="stock-input" value="320" min="0"></td>
+                                <td class="batch-text">10/20</td>
                                 <td><span class="status-pill status-instock">In Stock</span></td>
-                                <td>18/08/2026</td>
+                                <td>8/21/2026</td>
                             </tr>
-                            <!-- Item 6 -->
                             <tr class="row-low" data-status="low">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td class="product-cell">
-                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Stk" alt="Thumbnail" class="product-thumb">
-                                    <div class="product-info">
-                                        <span class="product-name">Pastel Sticky Notes Bundle</span>
-                                        <span class="product-sku">SS-ST-022</span>
-                                    </div>
-                                </td>
-                                <td><span class="category-tag">Paper Goods</span></td>
-                                <td><input type="number" class="stock-input" value="18" min="0"></td>
-                                <td class="batch-text">Min: 30</td>
+                                <td><img src="https://via.placeholder.com/40x40/fff8e1/ffb300?text=Cvs" alt="Thumbnail" class="product-thumb"></td>
+                                <td class="product-name">Premium Cotton Canvas</td>
+                                <td class="product-sku">SS-CV-503</td>
+                                <td><span class="category-tag">Canvases</span></td>
+                                <td><input type="number" class="stock-input" value="2" min="0"></td>
+                                <td class="batch-text">2/8</td>
                                 <td><span class="status-pill status-low">Low Stock</span></td>
-                                <td>21/08/2026</td>
+                                <td>8/21/2026</td>
                             </tr>
-                            <!-- Item 7 -->
-                            <tr class="row-out" data-status="out">
+                            <tr class="row-instock" data-status="instock">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td class="product-cell">
-                                    <img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Clp" alt="Thumbnail" class="product-thumb">
-                                    <div class="product-info">
-                                        <span class="product-name">Rose Gold Binder Clips (Set of 12)</span>
-                                        <span class="product-sku">SS-DA-034</span>
-                                    </div>
-                                </td>
-                                <td><span class="category-tag">Desk Accessories</span></td>
-                                <td><input type="number" class="stock-input" value="0" min="0"></td>
-                                <td class="batch-text">Min: 25</td>
-                                <td><span class="status-pill status-out">Out of Stock</span></td>
-                                <td>23/08/2026</td>
+                                <td><img src="https://via.placeholder.com/40x40/e8f5e9/4caf50?text=Wrp" alt="Thumbnail" class="product-thumb"></td>
+                                <td class="product-name">Floral Wrapping Paper</td>
+                                <td class="product-sku">SS-WP-709</td>
+                                <td><span class="category-tag">Wrapping</span></td>
+                                <td><input type="number" class="stock-input" value="500" min="0"></td>
+                                <td class="batch-text">10/50</td>
+                                <td><span class="status-pill status-instock">In Stock</span></td>
+                                <td>8/21/2026</td>
                             </tr>
-                        </tbody>
+                                                </tbody>
                     </table>
                 </div>
             </div>
@@ -1217,3 +1392,5 @@
     </script>
 </body>
 </html>
+
+

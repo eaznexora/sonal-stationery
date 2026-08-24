@@ -131,6 +131,64 @@
         .nav-item .dropdown-icon {
             margin-left: auto;
             font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item-group .nav-item.open .dropdown-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Submenu Styles */
+        .submenu-container {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease;
+            margin: 0 1rem;
+        }
+        
+        .submenu-container.open {
+            grid-template-rows: 1fr;
+        }
+
+        .submenu {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            position: relative;
+        }
+
+        .submenu::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 10px;
+            width: 1px;
+            background-color: var(--border-color);
+        }
+
+        .submenu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border-radius: 8px;
+            margin-left: 10px;
+            position: relative;
+        }
+
+        .submenu-item:hover {
+            color: var(--text-primary);
+            background-color: var(--border-color);
+        }
+
+        .submenu-item.active {
+            color: var(--text-primary);
+            font-weight: 500;
         }
 
         .sidebar-footer {
@@ -640,10 +698,18 @@
             <a href="#" class="nav-item">
                 <i class="ph ph-list-dashes"></i> Categories
             </a>
-            <a href="add-product.html" class="nav-item">
-                <i class="ph ph-package"></i> Products
-                <i class="ph ph-caret-down dropdown-icon"></i>
-            </a>
+            <div class="nav-item-group">
+                <a href="#" class="nav-item" id="productsDropdownToggle">
+                    <i class="ph ph-package"></i> Products
+                    <i class="ph ph-caret-down dropdown-icon"></i>
+                </a>
+                <div class="submenu-container" id="productsSubmenuContainer">
+                    <div class="submenu">
+                        <a href="inventory.html" class="submenu-item" id="nav-product-list">Product List</a>
+                        <a href="add-product.html" class="submenu-item" id="nav-add-product">Add a Product</a>
+                    </div>
+                </div>
+            </div>
             <a href="orders.html" class="nav-item">
                 <i class="ph ph-shopping-cart"></i> Orders
             </a>
@@ -933,6 +999,38 @@
                     }
                 }
             });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const productsToggle = document.getElementById('productsDropdownToggle');
+            const productsContainer = document.getElementById('productsSubmenuContainer');
+            const currentPath = window.location.pathname;
+
+            // Toggle submenu on click
+            if(productsToggle) {
+                productsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    productsToggle.classList.toggle('open');
+                    productsContainer.classList.toggle('open');
+                });
+            }
+
+            // Auto-expand if on related page
+            if (currentPath.includes('add-product.html') || currentPath.includes('inventory.html') || currentPath.includes('products.html')) {
+                if(productsToggle && productsContainer) {
+                    productsToggle.classList.add('open', 'active');
+                    productsContainer.classList.add('open');
+                }
+                
+                if (currentPath.includes('add-product.html')) {
+                    const addItem = document.getElementById('nav-add-product');
+                    if(addItem) addItem.classList.add('active');
+                } else {
+                    const listItem = document.getElementById('nav-product-list');
+                    if(listItem) listItem.classList.add('active');
+                }
+            }
         });
     </script>
 </body>

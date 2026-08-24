@@ -410,6 +410,7 @@
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 0.5rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
             transition: transform 0.2s, box-shadow 0.2s;
@@ -421,8 +422,8 @@
         }
 
         .card-title {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
             font-weight: 500;
         }
 
@@ -475,13 +476,13 @@
 
         .toolbar-input, .toolbar-select {
             padding: 0.6rem 1rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid transparent;
             border-radius: 6px;
             font-family: var(--font-body);
             font-size: 0.9rem;
             outline: none;
             color: var(--text-primary);
-            background-color: var(--bg-white);
+            background-color: #f2eee8;
         }
 
         .toolbar-input {
@@ -726,12 +727,11 @@
         }
         
         .discount-badge {
-            background-color: #fdf3e1;
-            color: #b07010;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            color: var(--status-out-text);
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: none;
+            padding: 0;
         }
         
         .status-active {
@@ -874,7 +874,7 @@
                 </a>
                 <div class="submenu-container" id="productsSubmenuContainer">
                     <div class="submenu">
-                        <a href="inventory.html" class="submenu-item" id="nav-product-list">Product List</a>
+                        <a href="products.html" class="submenu-item" id="nav-product-list">Product List</a>
                         <a href="add-product.html" class="submenu-item" id="nav-add-product">Add a Product</a>
                     </div>
                 </div>
@@ -1010,6 +1010,7 @@
                         <div class="tab" data-tab="draft">Draft</div>
                     </div>
                     <div class="bulk-actions">
+                        <span style="font-size:0.9rem; font-weight:500; margin-right:0.5rem; color:var(--text-primary);">Bulk Actions:</span>
                         <button class="btn-icon" title="Toggle Visibility">
                             <i class="ph ph-eye"></i>
                         </button>
@@ -1017,8 +1018,8 @@
                             <i class="ph ph-trash"></i>
                         </button>
                         <div class="pagination-indicator">
-                            1–15 of 1379
                             <button class="btn-icon" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-left"></i></button>
+                            1–15 of 1379
                             <button class="btn-icon" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-right"></i></button>
                         </div>
                     </div>
@@ -1031,7 +1032,8 @@
                             <tr>
                                 <th class="checkbox-cell"><input type="checkbox" id="masterCheckbox"></th>
                                 <th>Image</th>
-                                <th>Product Name & SKU</th>
+                                <th>Product Name</th>
+                                <th>SKU</th>
                                 <th>Sub-category</th>
                                 <th>Stock</th>
                                 <th>Batch Quantity</th>
@@ -1046,12 +1048,7 @@
                             <tr class="row-instock" data-status="active" data-category="notebooks">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
                                 <td><img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=A5" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-cell">
-                                    <div class="product-info">
-                                        <span class="product-name">A5 Dotted Hardcover Journal</span>
-                                        <span class="product-sku">SS-NB-101</span>
-                                    </div>
-                                </td>
+                                <td class="product-name">A5 Dotted Hardcover Journal</td><td class="product-sku" style="color:var(--text-secondary);font-size:0.85rem;">SS-NB-101</td>
                                 <td><span class="category-tag">Journals</span></td>
                                 <td>1000</td>
                                 <td class="batch-text">4/6</td>
@@ -1068,12 +1065,7 @@
                             <tr class="row-instock" data-status="active" data-category="pens">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
                                 <td><img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Pen" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-cell">
-                                    <div class="product-info">
-                                        <span class="product-name">0.5mm Archival Gel Pen 6-Pack</span>
-                                        <span class="product-sku">SS-PN-204</span>
-                                    </div>
-                                </td>
+                                <td class="product-name">0.5mm Archival Gel Pen 6-Pack</td><td class="product-sku" style="color:var(--text-secondary);font-size:0.85rem;">SS-PN-204</td>
                                 <td><span class="category-tag">Gel Pens</span></td>
                                 <td>450</td>
                                 <td class="batch-text">6/12</td>
@@ -1090,12 +1082,7 @@
                             <tr class="row-low" data-status="low" data-category="art">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
                                 <td><img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Brs" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-cell">
-                                    <div class="product-info">
-                                        <span class="product-name">Brass Desk Clip Set</span>
-                                        <span class="product-sku">SS-DA-302</span>
-                                    </div>
-                                </td>
+                                <td class="product-name">Brass Desk Clip Set</td><td class="product-sku" style="color:var(--text-secondary);font-size:0.85rem;">SS-DA-302</td>
                                 <td><span class="category-tag">Desk Tools</span></td>
                                 <td>2</td>
                                 <td class="batch-text">1/2</td>
@@ -1112,12 +1099,7 @@
                             <tr class="row-instock" data-status="draft" data-category="gifts">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
                                 <td><img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Gft" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-cell">
-                                    <div class="product-info">
-                                        <span class="product-name">Premium Calligraphy Gift Set</span>
-                                        <span class="product-sku">SS-GF-401</span>
-                                    </div>
-                                </td>
+                                <td class="product-name">Premium Calligraphy Gift Set</td><td class="product-sku" style="color:var(--text-secondary);font-size:0.85rem;">SS-GF-401</td>
                                 <td><span class="category-tag">Gift Sets</span></td>
                                 <td>50</td>
                                 <td class="batch-text">2/4</td>
@@ -1134,12 +1116,7 @@
                             <tr class="row-out" data-status="out" data-category="notebooks">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
                                 <td><img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Pnr" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-cell">
-                                    <div class="product-info">
-                                        <span class="product-name">Weekly Minimalist Planner 2027</span>
-                                        <span class="product-sku">SS-PL-005</span>
-                                    </div>
-                                </td>
+                                <td class="product-name">Weekly Minimalist Planner 2027</td><td class="product-sku" style="color:var(--text-secondary);font-size:0.85rem;">SS-PL-005</td>
                                 <td><span class="category-tag">Planners</span></td>
                                 <td>0</td>
                                 <td class="batch-text">10/20</td>
@@ -1156,12 +1133,7 @@
                             <tr class="row-instock" data-status="active" data-category="pens">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
                                 <td><img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Hlt" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-cell">
-                                    <div class="product-info">
-                                        <span class="product-name">Pastel Highlighter Set (5 Colors)</span>
-                                        <span class="product-sku">SS-HL-112</span>
-                                    </div>
-                                </td>
+                                <td class="product-name">Pastel Highlighter Set (5 Colors)</td><td class="product-sku" style="color:var(--text-secondary);font-size:0.85rem;">SS-HL-112</td>
                                 <td><span class="category-tag">Highlighters</span></td>
                                 <td>320</td>
                                 <td class="batch-text">5/10</td>
@@ -1178,12 +1150,7 @@
                             <tr class="row-instock" data-status="active" data-category="art">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
                                 <td><img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Cvs" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-cell">
-                                    <div class="product-info">
-                                        <span class="product-name">Premium Cotton Canvas (8x10)</span>
-                                        <span class="product-sku">SS-CV-503</span>
-                                    </div>
-                                </td>
+                                <td class="product-name">Premium Cotton Canvas (8x10)</td><td class="product-sku" style="color:var(--text-secondary);font-size:0.85rem;">SS-CV-503</td>
                                 <td><span class="category-tag">Canvases</span></td>
                                 <td>150</td>
                                 <td class="batch-text">2/8</td>
@@ -1200,12 +1167,7 @@
                             <tr class="row-instock" data-status="active" data-category="gifts">
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
                                 <td><img src="https://via.placeholder.com/40x40/f2eee8/9caf9f?text=Wrp" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-cell">
-                                    <div class="product-info">
-                                        <span class="product-name">Floral Wrapping Paper Roll</span>
-                                        <span class="product-sku">SS-WP-709</span>
-                                    </div>
-                                </td>
+                                <td class="product-name">Floral Wrapping Paper Roll</td><td class="product-sku" style="color:var(--text-secondary);font-size:0.85rem;">SS-WP-709</td>
                                 <td><span class="category-tag">Wrapping</span></td>
                                 <td>500</td>
                                 <td class="batch-text">10/50</td>
@@ -1342,3 +1304,4 @@
     </script>
 </body>
 </html>
+

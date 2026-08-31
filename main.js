@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Icons
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    if (window.lucide) {
+        try { lucide.createIcons(); } catch(e) { console.warn(e); }
     }
 
     // 2. Header Scroll Effect
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        if (window.lucide) { try { lucide.createIcons(); } catch(e) { console.warn(e); } }
     }
 
     // Expose global functions for onclick
@@ -363,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Re-initialize icons in case dynamic content was added
     if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+        if (window.lucide) { try { lucide.createIcons(); } catch(e) { console.warn(e); } }
     }
 });
 

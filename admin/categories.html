@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sonal Stationary | Admin Dashboard</title>
+    <title>Sonal Stationary | Admin Users</title>
     
     <!-- Favicons -->
     <link rel="shortcut icon" href="/favicon.ico">
@@ -17,9 +17,6 @@
     
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -245,10 +242,28 @@
             font-family: var(--font-body);
             font-size: 1.25rem;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .header-title h1 span {
-            font-weight: 600;
+        .back-btn {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        
+        .back-btn:hover {
+            background: var(--bg-secondary);
         }
 
         .menu-toggle {
@@ -321,7 +336,7 @@
         }
 
         .btn-outline:hover {
-            background-color: #eaf1eb; /* very light sage for hover */
+            background-color: #eaf1eb;
         }
         
         .header-icons {
@@ -352,17 +367,15 @@
 
         /* Overview Cards */
         .overview-cards {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-            flex-wrap: wrap;
         }
 
         .card {
             background-color: var(--bg-white);
-            padding: 1.25rem;
+            padding: 1.5rem;
             border-radius: 10px;
-            flex: 1;
-            min-width: 140px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             border: 1px solid var(--border-color);
             display: flex;
@@ -371,240 +384,217 @@
             text-align: center;
         }
         
-        .card.highlight {
-            background-color: #efeadf;
-            border-color: #e1dbcf;
-        }
-
         .card-title {
             color: var(--text-primary);
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
             font-weight: 500;
         }
 
         .card-value {
-            font-size: 1.35rem;
+            font-size: 1.75rem;
             font-weight: 600;
             color: var(--text-primary);
         }
-
-        /* Main Grid Layout */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2.5fr 1fr;
-            gap: 1.5rem;
-        }
-
-        /* Chart Section */
-        .chart-section {
-            background-color: var(--bg-white);
-            padding: 1.5rem;
+        
+        /* Toolbar */
+        .toolbar {
+            background: var(--bg-white);
+            padding: 1.25rem;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             border: 1px solid var(--border-color);
-        }
-
-        .chart-header {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
+            gap: 1.25rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
         }
         
-        .chart-title-area h3 {
-            font-size: 1.1rem;
+        .toolbar-group {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: var(--font-body);
-            font-weight: 600;
+            flex-direction: column;
+            gap: 0.4rem;
+            flex: 1;
+            min-width: 200px;
         }
         
-        .badge-green {
-            background-color: #e6f4ea;
-            color: #1e8e3e;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-        }
-        
-        .chart-subtitle {
-            color: var(--text-secondary);
+        .toolbar-group label {
             font-size: 0.85rem;
-            margin-top: 4px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .toolbar-input, .toolbar-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            background-color: var(--bg-secondary);
+            width: 100%;
+        }
+        
+        .toolbar-reset {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.4rem;
+            margin-bottom: 2px;
+            transition: color 0.2s;
+        }
+        
+        .toolbar-reset:hover {
+            color: var(--text-primary);
         }
 
-        .chart-tabs {
+        /* Users Page Specific Styles */
+        .content-box {
+            background: var(--bg-white);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .tabs {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             margin-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
         }
-
-        .chart-tab {
+        
+        .tab-btn {
             background: none;
             border: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            cursor: pointer;
-            padding: 0.3rem 0.8rem;
-            border-radius: 16px;
-            font-size: 0.9rem;
-        }
-
-        .chart-tab.active {
-            color: var(--accent-sage-dark);
-            background-color: #eaf1eb;
-        }
-
-        .chart-filters {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-        }
-
-        .chart-total span {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+            padding: 0.5rem 0.25rem;
+            font-size: 1rem;
             font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-
-        .chart-total strong {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .time-filters {
-            display: flex;
-            gap: 0.25rem;
-        }
-
-        .time-filter {
-            background: none;
-            border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .time-filter.active {
-            background-color: var(--accent-sage-dark);
-            color: white;
-        }
-
-        .chart-container {
-            height: 280px;
-            width: 100%;
             position: relative;
-        }
-
-        /* Widgets Section */
-        .widgets-section {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .widget {
-            background-color: var(--bg-white);
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            border: 1px solid var(--border-color);
-        }
-
-        .widget-title {
-            font-size: 1.1rem;
-            margin-bottom: 1.25rem;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .widget-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .widget-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
+            font-family: var(--font-body);
         }
         
-        .widget-item-val {
-            color: var(--accent-sage-dark);
-            font-weight: 500;
-        }
-        
-        .customer-stats {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-        
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-        
-        .stat-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        
-        .stat-info {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .stat-info-title {
-            font-size: 0.85rem;
+        .tab-btn:hover {
             color: var(--text-primary);
         }
         
-        .stat-info-sub {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+        .tab-btn.active {
+            color: var(--text-primary);
         }
         
-        .stat-value {
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--text-primary);
+        }
+
+        /* User Cards List */
+        .users-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-width: 900px;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 100px 2fr 2.5fr 2fr 1.5fr 120px;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-card {
+            display: grid;
+            grid-template-columns: 100px 2fr 2.5fr 2fr 1.5fr 120px;
+            align-items: center;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: box-shadow 0.2s, background-color 0.2s;
+        }
+        
+        .user-card:hover {
+            background-color: #fcfbfa;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .avatar {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: white;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .user-email, .user-phone, .user-date {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .action-btn i {
+            background: #1a1a1a;
+            color: white;
+            border-radius: 50%;
+            padding: 4px;
+            font-size: 1rem;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
         }
 
         /* Responsive Styles */
-        @media (max-width: 1200px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         @media (max-width: 992px) {
             .overview-cards {
-                justify-content: flex-start;
-            }
-            .card {
-                flex: 1 1 calc(33.333% - 1rem);
+                grid-template-columns: repeat(2, 1fr);
             }
             .search-bar input {
                 width: 200px;
@@ -641,22 +631,24 @@
                 padding: 0.5rem 0.75rem;
                 font-size: 0.85rem;
             }
-
-            .card {
-                flex: 1 1 calc(50% - 1rem);
-            }
             
             .dashboard-body {
                 padding: 1rem;
             }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .toolbar-reset {
+                align-self: flex-end;
+            }
         }
 
         @media (max-width: 480px) {
-            .card {
-                flex: 1 1 100%;
-            }
-            .chart-tabs {
-                flex-wrap: wrap;
+            .overview-cards {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -688,11 +680,11 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../logo.png" alt="Sonal Stationary Logo">
+            <img src="../logo.png" alt="Sonal Stationary Logo" onerror="this.style.display='none'">
             <h2>Sonal<br>Stationary</h2>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item active">
+            <a href="dashboard.html" class="nav-item">
                 <i class="ph ph-squares-four"></i> Dashboard
             </a>
             <a href="categories.html" class="nav-item" id="nav-categories"><i class="ph ph-list-dashes"></i> Categories
@@ -738,7 +730,6 @@
             </a>
         </div>
     </aside>
-
     <!-- Main Content -->
     <main class="main-content">
         <!-- Header -->
@@ -747,257 +738,196 @@
                 <button class="menu-toggle" id="menuToggle">
                     <i class="ph ph-list"></i>
                 </button>
-                <h1><span>Sonal Stationary</span> | Admin Dashboard</h1>
+                <h1>Categories</h1>
             </div>
-            
             <div class="header-actions">
-                <div class="search-bar">
-                    <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" placeholder="Search orders, products, custo.......">
-                </div>
-                
-                <a href="add-product.html" class="btn btn-primary">
-                    <i class="ph ph-plus"></i> Add Product
-                </a>
-                <a href="orders.html" class="btn btn-outline">
-                    View Orders
-                </a>
-                
-                <div class="header-icons">
-                    <i class="ph ph-magnifying-glass" style="display:none;" id="mobileSearchIcon"></i>
-                    <i class="ph ph-user"></i>
-                    <i class="ph ph-shopping-bag"></i>
-                </div>
+                <button class="btn btn-primary" onclick="openCategoryModal()">
+                    <i class="ph ph-plus"></i> Add Category
+                </button>
             </div>
         </header>
 
         <!-- Dashboard Body -->
         <div class="dashboard-body">
-            
-            <!-- Overview Cards -->
-            <div class="overview-cards">
-                <div class="card highlight">
-                    <div class="card-title">Total Revenue</div>
-                    <div class="card-value">₹11,850.80</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Total Orders</div>
-                    <div class="card-value">27</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Total Customers</div>
-                    <div class="card-value">14</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Pending Orders</div>
-                    <div class="card-value">22</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Average Order Value</div>
-                    <div class="card-value">₹438.92</div>
-                </div>
+            <div class="table-container" style="background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color); text-align: left;">
+                            <th style="padding: 1rem 0.5rem; font-weight: 600;">Image</th>
+                            <th style="padding: 1rem 0.5rem; font-weight: 600;">Name</th>
+                            <th style="padding: 1rem 0.5rem; font-weight: 600;">Subcategories</th>
+                            <th style="padding: 1rem 0.5rem; font-weight: 600;">Status</th>
+                            <th style="padding: 1rem 0.5rem; font-weight: 600; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoriesTableBody">
+                        <!-- Categories injected here -->
+                        <tr><td colspan="5" style="text-align:center; padding: 2rem;">Loading...</td></tr>
+                    </tbody>
+                </table>
             </div>
-
-            <!-- Grid Layout -->
-            <div class="dashboard-grid">
-                
-                <!-- Main Chart Area -->
-                <div class="chart-section">
-                    <div class="chart-header">
-                        <div class="chart-title-area">
-                            <h3>Revenue Growth <span class="badge-green"><i class="ph ph-arrow-up"></i> 0%</span></h3>
-                            <div class="chart-subtitle">Performance insights for the selected period</div>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-tabs">
-                        <button class="chart-tab active">Revenue</button>
-                        <button class="chart-tab">Orders</button>
-                        <button class="chart-tab">Customers</button>
-                        <button class="chart-tab">AOV</button>
-                    </div>
-                    
-                    <div class="chart-filters">
-                        <div class="chart-total">
-                            <span>Total for period</span>
-                            <strong>₹99.00</strong>
-                        </div>
-                        <div class="time-filters">
-                            <button class="time-filter">7D</button>
-                            <button class="time-filter active">30D</button>
-                            <button class="time-filter">90D</button>
-                            <button class="time-filter">1Y</button>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-                
-                <!-- Right Widgets -->
-                <div class="widgets-section">
-                    
-                    <div class="widget">
-                        <h4 class="widget-title">Sales by Category</h4>
-                        <div class="widget-list">
-                            <div class="widget-item">
-                                <span>Stationery</span>
-                                <span class="widget-item-val">1 sold</span>
-                            </div>
-                            <div class="widget-item">
-                                <span>Gifts</span>
-                                <span class="widget-item-val">1 sold</span>
-                            </div>
-                            <div class="widget-item">
-                                <span>Toys</span>
-                                <span class="widget-item-val">1 sold</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="widget">
-                        <h4 class="widget-title">Returning vs New Customers</h4>
-                        <div class="customer-stats">
-                            <div class="stat-row">
-                                <div class="stat-info">
-                                    <span class="stat-info-title">undefined</span>
-                                    <span class="stat-info-sub">25 order(s)</span>
-                                </div>
-                                <div class="stat-value">₹10,517.80</div>
-                            </div>
-                            <div class="stat-row">
-                                <div class="stat-info">
-                                    <span class="stat-info-title">undefined</span>
-                                    <span class="stat-info-sub">1 order(s)</span>
-                                </div>
-                                <div class="stat-value">₹1,234.00</div>
-                            </div>
-                            <div class="stat-row">
-                                <div class="stat-info">
-                                    <span class="stat-info-title">undefined</span>
-                                    <span class="stat-info-sub">1 order(s)</span>
-                                </div>
-                                <div class="stat-value">₹99.00</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-                
-            </div>
-            
         </div>
     </main>
 
+    <!-- Modal for Create/Edit -->
+    <div class="sidebar-overlay" id="categoryModalOverlay" style="z-index: 1000;"></div>
+    <div id="categoryModal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; display: none; z-index: 1001; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+        <h2 id="modalTitle" style="margin-bottom: 1.5rem; font-family: var(--font-heading);">Add Category</h2>
+        <form id="categoryForm">
+            <input type="hidden" id="categoryId">
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="display:block; margin-bottom: 0.5rem; font-weight: 500;">Category Name *</label>
+                <input type="text" id="categoryName" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="display:block; margin-bottom: 0.5rem; font-weight: 500;">Subcategories (comma separated)</label>
+                <input type="text" id="categorySub" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" placeholder="e.g. Notebooks, Journals">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="display:block; margin-bottom: 0.5rem; font-weight: 500;">Status</label>
+                <select id="categoryStatus" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;">
+                    <option value="active">Active</option>
+                    <option value="hidden">Hidden</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label style="display:block; margin-bottom: 0.5rem; font-weight: 500;">Image Cover</label>
+                <input type="file" id="categoryImage" accept="image/*">
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-outline danger" onclick="closeCategoryModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Category</button>
+            </div>
+        </form>
+    </div>
+
     <script>
-        // Mobile Sidebar Toggle Logic
+        // Sidebar Toggle
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('open');
-            sidebarOverlay.classList.toggle('open');
-        }
-
-        menuToggle.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar);
-
-        // Responsive icon adjustment for mobile search
-        function handleResize() {
-            const mobileSearchIcon = document.getElementById('mobileSearchIcon');
-            if (window.innerWidth <= 768) {
-                mobileSearchIcon.style.display = 'block';
-            } else {
-                mobileSearchIcon.style.display = 'none';
-            }
-        }
-        
-        window.addEventListener('resize', handleResize);
-        handleResize(); // Init
-
-        // Chart.js Implementation
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            
-            // Create gradient
-            let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(156, 175, 159, 0.5)'); // Sage green transparent
-            gradient.addColorStop(1, 'rgba(156, 175, 159, 0.0)');
-            
-            const revenueChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['25 Jul', '26 Jul', '27 Jul', '28 Jul', '29 Jul', '30 Jul', '31 Jul'], // Dummy labels
-                    datasets: [{
-                        label: 'Revenue',
-                        data: [35, 60, 80, 75, 60, 75, 95], // Dummy data points to match curve roughly
-                        borderColor: '#829586', // accent-sage-dark
-                        backgroundColor: gradient,
-                        borderWidth: 2,
-                        pointBackgroundColor: '#829586',
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        fill: true,
-                        tension: 0.4 // Smooth curve
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#2c2c2c',
-                            titleFont: { family: 'Inter' },
-                            bodyFont: { family: 'Inter' },
-                            callbacks: {
-                                label: function(context) {
-                                    return '₹' + context.parsed.y;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100, // Matching the image y-axis roughly
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value;
-                                },
-                                stepSize: 10,
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                },
-                                color: '#6e6b66'
-                            },
-                            grid: {
-                                color: '#e2dfd8',
-                                drawBorder: false,
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                },
-                                color: '#6e6b66',
-                                maxTicksLimit: 1 // Only showing rightmost mostly based on screenshot "31 Jul"
-                            }
-                        }
-                    }
-                }
+        const overlay = document.getElementById('sidebarOverlay');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                if (overlay) overlay.classList.toggle('open');
             });
+        }
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+            });
+        }
+
+        const API_BASE = window.location.port === '5000' ? '' : 'http://localhost:5000';
+
+        window.fetchCategories = async function() {
+            try {
+                const res = await fetch(`${API_BASE}/api/categories?all=true`);
+                const categories = await res.json();
+                const tbody = document.getElementById('categoriesTableBody');
+                tbody.innerHTML = '';
+                if(!categories || categories.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">No categories found.</td></tr>';
+                    return;
+                }
+
+                categories.forEach(cat => {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = '1px solid var(--border-color)';
+                    
+                    const safeCat = JSON.stringify(cat).replace(/'/g, "&#39;");
+                    
+                    tr.innerHTML = `
+                        <td style="padding: 1rem 0.5rem;"><img src="${cat.image}" width="40" height="40" style="border-radius:4px; object-fit:cover;"></td>
+                        <td style="padding: 1rem 0.5rem; font-weight:500;">${cat.name}</td>
+                        <td style="padding: 1rem 0.5rem;">${cat.subCategories ? cat.subCategories.join(', ') : ''}</td>
+                        <td style="padding: 1rem 0.5rem;">
+                            <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; background: ${cat.status === 'active' ? '#eaf6f2' : '#f2eee8'}; color: ${cat.status === 'active' ? '#4a7c59' : '#6e6b66'};">${cat.status}</span>
+                        </td>
+                        <td style="padding: 1rem 0.5rem; text-align: right;">
+                            <button onclick='window.editCategory(${safeCat})' style="background:none; border:none; color:var(--text-secondary); cursor:pointer; margin-right:8px;"><i class="ph ph-pencil-simple" style="font-size:1.2rem;"></i></button>
+                            <button onclick="window.deleteCategory('${cat._id}')" style="background:none; border:none; color:#d9534f; cursor:pointer;"><i class="ph ph-trash" style="font-size:1.2rem;"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        };
+
+        window.openCategoryModal = function() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            document.getElementById('modalTitle').textContent = 'Add Category';
+            document.getElementById('categoryModal').style.display = 'block';
+            document.getElementById('categoryModalOverlay').style.display = 'block';
+        };
+
+        window.closeCategoryModal = function() {
+            document.getElementById('categoryModal').style.display = 'none';
+            document.getElementById('categoryModalOverlay').style.display = 'none';
+        };
+
+        window.editCategory = function(cat) {
+            document.getElementById('categoryId').value = cat._id;
+            document.getElementById('categoryName').value = cat.name;
+            document.getElementById('categorySub').value = cat.subCategories ? cat.subCategories.join(', ') : '';
+            document.getElementById('categoryStatus').value = cat.status;
+            document.getElementById('modalTitle').textContent = 'Edit Category';
+            document.getElementById('categoryModal').style.display = 'block';
+            document.getElementById('categoryModalOverlay').style.display = 'block';
+        };
+
+        window.deleteCategory = async function(id) {
+            if(!confirm('Are you sure you want to delete this category?')) return;
+            try {
+                await fetch(`${API_BASE}/api/categories/` + id, { method: 'DELETE' });
+                window.fetchCategories();
+            } catch(e) { console.error(e); }
+        };
+
+        document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('categoryId').value;
+            const formData = new FormData();
+            formData.append('name', document.getElementById('categoryName').value);
+            formData.append('subCategories', document.getElementById('categorySub').value);
+            formData.append('status', document.getElementById('categoryStatus').value);
+            
+            const fileInput = document.getElementById('categoryImage');
+            if(fileInput.files.length > 0) {
+                formData.append('images', fileInput.files[0]);
+            }
+            
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${API_BASE}/api/categories/` + id : `${API_BASE}/api/categories`;
+
+            try {
+                const res = await fetch(url, { method, body: formData });
+                if(res.ok) {
+                    window.closeCategoryModal();
+                    window.fetchCategories();
+                } else {
+                    const data = await res.json();
+                    alert(data.message || 'Error saving category');
+                }
+            } catch(err) {
+                alert('Error: ' + err.message);
+            }
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            window.fetchCategories();
+            
+            // Set active state in sidebar
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(i => i.classList.remove('active'));
+            // Set Categories active if nav item exists
+            const listCat = document.getElementById('nav-categories');
+            if(listCat) listCat.classList.add('active');
         });
     </script>
     <script>
@@ -1034,5 +964,4 @@
     </script>
 </body>
 </html>
-
 

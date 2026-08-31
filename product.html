@@ -194,28 +194,26 @@
                             <span>Details & Dimensions</span>
                             <i data-lucide="chevron-down" class="chevron"></i>
                         </button>
-                        <div class="accordion-content">
-                            <p><strong>Size:</strong> 8" W x 6" H x 2.5" D<br>
-                            <strong>Weight:</strong> 0.8 lbs<br>
-                            <strong>Material:</strong> 100% Organic Linen body, vegetable-tanned leather strap and trim.</p>
+                        <div class="accordion-content" id="accDetails">
+                            <p>Loading...</p>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <button class="accordion-header" onclick="toggleAccordion(this)">
-                            <span>Care Instructions</span>
+                            <span>Key Features</span>
                             <i data-lucide="chevron-down" class="chevron"></i>
                         </button>
-                        <div class="accordion-content">
-                            <p>Spot clean the linen with a damp cloth and mild soap. Condition the leather strap every 6 months to maintain suppleness. Avoid prolonged exposure to direct sunlight and moisture.</p>
+                        <div class="accordion-content" id="accFeatures">
+                            <p>Loading...</p>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <button class="accordion-header" onclick="toggleAccordion(this)">
-                            <span>Shipping & Free Returns</span>
+                            <span>Product FAQs</span>
                             <i data-lucide="chevron-down" class="chevron"></i>
                         </button>
-                        <div class="accordion-content">
-                            <p>Standard delivery takes 3-5 business days. Expedited shipping is available at checkout. Enjoy hassle-free free returns within 30 days of purchase.</p>
+                        <div class="accordion-content" id="accFaqs">
+                            <p>Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -487,6 +485,101 @@
                 } else {
                     stickyCart.classList.remove('visible');
                 }
+            }
+        });
+
+        // Dynamic Product Loading
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            if (!productId) return;
+
+            const API_BASE = window.location.port === '5000' ? '' : 'http://localhost:5000';
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/products/${productId}`);
+                if (!res.ok) throw new Error('Product not found');
+                const product = await res.json();
+                
+                document.querySelector('.product-title').textContent = product.name;
+                document.querySelector('.product-price').textContent = `₹${(product.price || 0).toFixed(2)}`;
+                document.querySelector('.product-description').textContent = product.description;
+                document.querySelector('.category-tag').textContent = product.category;
+                
+                // Images
+                if (product.images && product.images.length > 0) {
+                    const mainImg = document.getElementById('mainProductImage');
+                    const firstImg = product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0];
+                    mainImg.src = firstImg;
+                    mainImg.alt = product.name;
+                    
+                    const thumbRow = document.querySelector('.thumbnail-row');
+                    thumbRow.innerHTML = product.images.map((img, idx) => {
+                        const src = img.startsWith('http') ? img : API_BASE + img;
+                        return `<img class="thumbnail ${idx === 0 ? 'active' : ''}" src="${src}" alt="View ${idx + 1}" onclick="changeImage(this)">`;
+                    }).join('');
+                }
+
+                // Colors
+                const colorSelector = document.querySelector('.variant-selector');
+                if (product.colors && product.colors.length > 0) {
+                    colorSelector.style.display = 'block';
+                    const colorSwatchesContainer = document.querySelector('.color-swatches');
+                    document.getElementById('selectedColorName').textContent = product.colors[0].name;
+                    colorSwatchesContainer.innerHTML = product.colors.map((c, i) => `
+                        <button class="swatch ${i === 0 ? 'active' : ''}" style="background-color: ${c.hex};" aria-label="${c.name}" onclick="selectColor(this, '${c.name}')"></button>
+                    `).join('');
+                } else {
+                    colorSelector.style.display = 'none';
+                }
+
+                // Gift Wrap
+                const giftWrapContainer = document.querySelector('.gifting-options');
+                if (!product.isGiftWrapAvailable) {
+                    giftWrapContainer.style.display = 'none';
+                }
+
+                // Accordions
+                const accDetails = document.getElementById('accDetails');
+                accDetails.innerHTML = `
+                  <p><strong>Description:</strong> ${product.description || 'N/A'}</p>
+                  ${product.dimensions ? `<p><strong>Dimensions:</strong> ${product.dimensions.length || '-'} × ${product.dimensions.width || '-'} × ${product.dimensions.height || '-'} cm</p>` : ''}
+                  ${product.weight ? `<p><strong>Weight:</strong> ${product.weight} kg</p>` : ''}
+                `;
+
+                const accFeatures = document.getElementById('accFeatures');
+                if (product.keyFeatures && product.keyFeatures.length > 0) {
+                    accFeatures.innerHTML = `<ul class="features-list">${product.keyFeatures.map(f => `<li>${f}</li>`).join('')}</ul>`;
+                } else {
+                    accFeatures.innerHTML = `<p>No special features listed.</p>`;
+                }
+
+                const accFaqs = document.getElementById('accFaqs');
+                if (product.faqs && product.faqs.length > 0) {
+                    accFaqs.innerHTML = `<div class="faqs-list">` + product.faqs.map(faq => `
+                        <div class="faq-item">
+                            <p class="faq-q"><strong>Q: ${faq.question}</strong></p>
+                            <p class="faq-a">${faq.answer}</p>
+                        </div>
+                    `).join('') + `</div>`;
+                } else {
+                    accFaqs.innerHTML = `<p>Standard delivery takes 3-5 business days. Expedited shipping is available at checkout. Enjoy hassle-free free returns within 30 days of purchase.</p>`;
+                }
+
+                // Add to Cart btn wire up
+                const addToCartBtns = document.querySelectorAll('.btn-add-cart');
+                addToCartBtns.forEach(btn => {
+                    btn.dataset.id = product._id;
+                    btn.dataset.title = product.name;
+                    btn.dataset.price = product.price;
+                    if(product.images && product.images.length > 0) {
+                        btn.dataset.image = product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0];
+                    }
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.querySelector('.pdp-container').innerHTML = '<h2>Product not found</h2>';
             }
         });
     </script>

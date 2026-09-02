@@ -9,38 +9,83 @@ const categories = [
   { name: 'Pens & Pencils', slug: 'pens-pencils', status: 'active' },
   { name: 'Notebooks & Diaries', slug: 'notebooks-diaries', status: 'active' },
   { name: 'Art Supplies', slug: 'art-supplies', status: 'active' },
-  { name: 'Gifts & Wrapping', slug: 'gifts-wrapping', status: 'active' }
+  { name: 'Gifts & Wrapping', slug: 'gifts-wrapping', status: 'active' },
+  { name: 'Office Supplies', slug: 'office-supplies', status: 'active' },
+  { name: 'School Essentials', slug: 'school-essentials', status: 'active' }
 ];
 
-// Sample Stationery Products
+// Sample Stationery Products (9 total)
 const products = [
+  // Pens
   {
     name: 'Premium Gel Pen - Black',
     slug: 'premium-gel-pen-black',
     sku: 'PEN-GEL-BLK-001',
-    description: 'Smooth writing premium gel pen with waterproof ink.',
+    description: 'Smooth writing premium gel pen.',
     price: 50,
-    discountPrice: 45,
     category: 'Pens & Pencils',
     stock: 150,
     status: 'active',
     isFeatured: true
   },
   {
+    name: 'Fountain Pen Classic',
+    slug: 'fountain-pen-classic',
+    sku: 'PEN-FOUNTAIN-001',
+    description: 'Classic ink fountain pen for smooth writing.',
+    price: 350,
+    category: 'Pens & Pencils',
+    stock: 50,
+    status: 'active'
+  },
+  {
+    name: 'Pack of 10 HB Pencils',
+    slug: 'pack-of-10-hb-pencils',
+    sku: 'PENCIL-HB-10',
+    description: 'High quality HB pencils for drawing and writing.',
+    price: 80,
+    category: 'Pens & Pencils',
+    stock: 200,
+    status: 'active'
+  },
+  // Notebooks
+  {
     name: 'A4 Spiral Notebook',
     slug: 'a4-spiral-notebook',
     sku: 'NOTE-SPIRAL-A4-001',
-    description: 'High-quality A4 spiral bound notebook with 200 ruled pages.',
+    description: 'A4 spiral bound notebook with 200 ruled pages.',
     price: 150,
     category: 'Notebooks & Diaries',
     stock: 80,
+    status: 'active',
+    isFeatured: true
+  },
+  {
+    name: 'Executive Hardcover Diary',
+    slug: 'executive-hardcover-diary',
+    sku: 'NOTE-HARD-001',
+    description: 'Premium hardcover diary for professionals.',
+    price: 450,
+    category: 'Notebooks & Diaries',
+    stock: 30,
     status: 'active'
   },
+  {
+    name: 'Pocket Memo Pad',
+    slug: 'pocket-memo-pad',
+    sku: 'NOTE-MEMO-001',
+    description: 'Small 100-page memo pad for quick notes.',
+    price: 40,
+    category: 'Notebooks & Diaries',
+    stock: 120,
+    status: 'active'
+  },
+  // Art Supplies
   {
     name: 'Professional Watercolor Set (24 Colors)',
     slug: 'professional-watercolor-set-24',
     sku: 'ART-WC-24-001',
-    description: 'Vibrant 24 color professional watercolor pan set with brush.',
+    description: 'Vibrant 24 color professional watercolor pan set.',
     price: 850,
     category: 'Art Supplies',
     stock: 25,
@@ -48,14 +93,25 @@ const products = [
     isFeatured: true
   },
   {
-    name: 'Festive Gift Wrap Roll (5 Meters)',
-    slug: 'festive-gift-wrap-roll-5m',
-    sku: 'GIFT-WRAP-5M-001',
-    description: 'Beautiful 5-meter festive design gift wrap roll.',
-    price: 120,
-    category: 'Gifts & Wrapping',
-    stock: 200,
+    name: 'Sketchbook A3',
+    slug: 'sketchbook-a3',
+    sku: 'ART-SKETCH-A3',
+    description: 'Thick paper A3 sketchbook for artists.',
+    price: 250,
+    category: 'Art Supplies',
+    stock: 60,
     status: 'active'
+  },
+  {
+    name: 'Acrylic Paint Set (12 Tubes)',
+    slug: 'acrylic-paint-set-12',
+    sku: 'ART-ACRYLIC-12',
+    description: '12 vibrant acrylic paint tubes.',
+    price: 600,
+    category: 'Art Supplies',
+    stock: 45,
+    status: 'active',
+    isFeatured: true
   }
 ];
 

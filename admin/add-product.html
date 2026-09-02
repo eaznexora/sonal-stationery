@@ -1223,7 +1223,9 @@
             
             document.addEventListener('DOMContentLoaded', async () => {
                 try {
-                    const API_BASE = window.location.port === '5000' ? '' : 'http://localhost:5000';
+                    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+                      ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
+                      : '';
                     const res = await fetch(`${API_BASE}/api/products/${editProductId}`);
                     const prod = await res.json();
 
@@ -1586,7 +1588,9 @@
                     });
                 }
                 
-                const API_BASE = window.location.port === '5000' ? '' : 'http://localhost:5000';
+                const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+                  ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
+                  : '';
                 
                 const endpoint = editProductId ? `${API_BASE}/api/products/${editProductId}` : `${API_BASE}/api/products`;
                 const method = editProductId ? 'PUT' : 'POST';
@@ -1617,7 +1621,9 @@
         });
     </script>
     <script>
-        const API_BASE = window.location.port === '5000' ? '' : 'http://localhost:5000';
+        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+          ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
+          : '';
         let categoriesData = [];
         
         async function loadCategories() {

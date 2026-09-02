@@ -221,64 +221,13 @@
         </div>
 
         <!-- Cross-sell Section -->
-        <section class="cross-sell-section">
+        <section class="cross-sell-section" id="pairsWellWithSection">
             <div class="section-header">
                 <h2>Pairs Well With</h2>
                 <div class="divider"></div>
             </div>
-            <div class="product-grid">
-                <!-- Product Card 1 -->
-                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
-                    <div class="img-wrapper">
-                        <img src="https://picsum.photos/400/500?random=21" alt="Matching Linen Wallet">
-                        <div class="product-hover">
-                            <button class="btn-quick-add" data-id="s1" data-title="Leather Key Fob" data-price="25.00" data-image="https://picsum.photos/400/500?random=14" data-variant="Default">Quick Add</button>
-                        </div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Matching Linen Wallet</h3>
-                        <p class="price">$45.00</p>
-                    </div>
-                </article>
-                <!-- Product Card 2 -->
-                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
-                    <div class="img-wrapper">
-                        <img src="https://picsum.photos/400/500?random=22" alt="Soft Teddy Bear">
-                        <div class="product-hover">
-                            <button class="btn-quick-add" data-id="s2" data-title="Linen Dust Bag" data-price="15.00" data-image="https://picsum.photos/400/500?random=15" data-variant="Default">Quick Add</button>
-                        </div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Plush Bear Companion</h3>
-                        <p class="price">$30.00</p>
-                    </div>
-                </article>
-                <!-- Product Card 3 -->
-                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
-                    <div class="img-wrapper">
-                        <img src="https://picsum.photos/400/500?random=23" alt="Leather Key Fob">
-                        <div class="product-hover">
-                            <button class="btn-quick-add" data-id="s3" data-title="Leather Care Kit" data-price="35.00" data-image="https://picsum.photos/400/500?random=16" data-variant="Default">Quick Add</button>
-                        </div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Leather Key Fob</h3>
-                        <p class="price">$25.00</p>
-                    </div>
-                </article>
-                <!-- Product Card 4 -->
-                <article class="product-card" onclick="window.location.href='product.html';" style="cursor: pointer;">
-                    <div class="img-wrapper">
-                        <img src="https://picsum.photos/400/500?random=24" alt="SONAL Stationary Gift Card">
-                        <div class="product-hover">
-                            <button class="btn-quick-add" data-id="s4" data-title="Minimalist Cardholder" data-price="45.00" data-image="https://picsum.photos/400/500?random=17" data-variant="Default">Quick Add</button>
-                        </div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Digital Gift Card</h3>
-                        <p class="price">$50.00</p>
-                    </div>
-                </article>
+            <div class="product-grid" id="pairsWellWithGrid">
+                <!-- Dynamically injected related products -->
             </div>
         </section>
     </main>
@@ -494,7 +443,9 @@
             const productId = urlParams.get('id');
             if (!productId) return;
 
-            const API_BASE = window.location.port === '5000' ? '' : 'http://localhost:5000';
+            const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+              ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
+              : '';
             
             try {
                 const res = await fetch(`${API_BASE}/api/products/${productId}`);
@@ -576,6 +527,49 @@
                         btn.dataset.image = product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0];
                     }
                 });
+
+                // Fetch related products
+                let relatedRes = await fetch(`${API_BASE}/api/products?category=${encodeURIComponent(product.category)}&status=active&limit=8`);
+                let relatedData = await relatedRes.json();
+                let related = (Array.isArray(relatedData) ? relatedData : (relatedData.products || relatedData.data || [])).filter(p => p._id !== productId);
+
+                if (related.length < 4) {
+                    let recentRes = await fetch(`${API_BASE}/api/products?status=active&limit=8`);
+                    let recentData = await recentRes.json();
+                    let recent = (Array.isArray(recentData) ? recentData : (recentData.products || recentData.data || [])).filter(p => p._id !== productId);
+                    
+                    recent.forEach(r => {
+                        if (!related.find(p => p._id === r._id)) {
+                            related.push(r);
+                        }
+                    });
+                }
+
+                const pairsSection = document.getElementById('pairsWellWithSection');
+                const pairsGrid = document.getElementById('pairsWellWithGrid');
+
+                if (related.length === 0) {
+                    if (pairsSection) pairsSection.style.display = 'none';
+                } else if (pairsGrid) {
+                    const toRender = related.slice(0, 4);
+                    pairsGrid.innerHTML = toRender.map(p => {
+                        const img = p.images && p.images.length > 0 ? (p.images[0].startsWith('http') ? p.images[0] : API_BASE + p.images[0]) : '/logo.png';
+                        return `
+                            <article class="product-card" onclick="window.location.href='product.html?id=${p._id}';" style="cursor: pointer;">
+                                <div class="img-wrapper">
+                                    <img src="${img}" alt="${p.name || 'Product'}">
+                                    <div class="product-hover">
+                                        <button class="btn-quick-add" data-id="${p._id}" data-title="${p.name}" data-price="${p.price}" data-image="${img}">Quick Add</button>
+                                    </div>
+                                </div>
+                                <div class="product-info">
+                                    <h3>${p.name || 'Untitled'}</h3>
+                                    <p class="price">₹${parseFloat(p.price || 0).toFixed(2)}</p>
+                                </div>
+                            </article>
+                        `;
+                    }).join('');
+                }
 
             } catch (err) {
                 console.error(err);

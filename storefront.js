@@ -20,11 +20,10 @@ async function renderHomepageCategories() {
             return;
         }
 
-        catGrid.innerHTML = categories.slice(0, 6).map((cat, index) => {
+        catGrid.innerHTML = categories.slice(0, 4).map((cat) => {
             const img = cat.image || '/logo.png';
-            const hideClass = index >= 3 ? ' hide-on-mobile' : '';
             return `
-            <a href="category-products.html?cat=${encodeURIComponent(cat.name)}" class="category-card${hideClass}">
+            <a href="category-products.html?cat=${encodeURIComponent(cat.name)}" class="category-card">
                 <img src="${img}" alt="${cat.name}" onerror="this.src='/logo.png'">
                 <div class="category-overlay">
                     <h3>${cat.name}</h3>
@@ -54,7 +53,7 @@ async function renderFeaturedProducts() {
         const featured = productList.filter(p => p.isFeatured);
         let products = featured.length >= 4 ? featured : productList;
         
-        products = products.slice(0, 9);
+        products = products.slice(0, 12);
 
         if (products.length === 0) {
             prodGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No products available.</p>';

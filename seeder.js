@@ -4,17 +4,15 @@ const connectDB = require('./config/db');
 const Category = require('./models/Category');
 const Product = require('./models/Product');
 
-// Sample Stationery Categories
+// Sample Stationery Categories (4 core categories)
 const categories = [
   { name: 'Pens & Pencils', slug: 'pens-pencils', status: 'active' },
   { name: 'Notebooks & Diaries', slug: 'notebooks-diaries', status: 'active' },
   { name: 'Art Supplies', slug: 'art-supplies', status: 'active' },
-  { name: 'Gifts & Wrapping', slug: 'gifts-wrapping', status: 'active' },
-  { name: 'Office Supplies', slug: 'office-supplies', status: 'active' },
-  { name: 'School Essentials', slug: 'school-essentials', status: 'active' }
+  { name: 'Gifts & Wrapping', slug: 'gifts-wrapping', status: 'active' }
 ];
 
-// Sample Stationery Products (9 total)
+// Sample Stationery Products (12 total)
 const products = [
   // Pens
   {
@@ -46,6 +44,16 @@ const products = [
     price: 80,
     category: 'Pens & Pencils',
     stock: 200,
+    status: 'active'
+  },
+  {
+    name: 'Multi-Color Pen Pack',
+    slug: 'multi-color-pen-pack',
+    sku: 'PEN-MULTI-04',
+    description: 'Pack of 4 vibrant color pens for notes.',
+    price: 120,
+    category: 'Pens & Pencils',
+    stock: 100,
     status: 'active'
   },
   // Notebooks
@@ -80,6 +88,16 @@ const products = [
     stock: 120,
     status: 'active'
   },
+  {
+    name: 'Dot Grid Journal',
+    slug: 'dot-grid-journal',
+    sku: 'NOTE-DOT-001',
+    description: 'Perfect for bullet journaling.',
+    price: 250,
+    category: 'Notebooks & Diaries',
+    stock: 60,
+    status: 'active'
+  },
   // Art Supplies
   {
     name: 'Professional Watercolor Set (24 Colors)',
@@ -112,6 +130,17 @@ const products = [
     stock: 45,
     status: 'active',
     isFeatured: true
+  },
+  // Gifts & Wrapping
+  {
+    name: 'Decorative Ribbon Set',
+    slug: 'decorative-ribbon-set',
+    sku: 'GIFT-RIBBON-SET',
+    description: 'Set of 5 metallic ribbons for gift wrapping.',
+    price: 180,
+    category: 'Gifts & Wrapping',
+    stock: 90,
+    status: 'active'
   }
 ];
 

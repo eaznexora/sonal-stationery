@@ -30,7 +30,7 @@ app.use('/api/categories', categoryRoutes);
 
 // Serve uploads folder statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Serve all root files statically so frontend can be accessed via port 5000
+// Serve all root files statically so frontend can be accessed via port 5005
 app.use(express.static(path.join(__dirname, '.')));
 
 // Health check route
@@ -39,7 +39,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Start Server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5005;
 app.listen(PORT, () => {
   console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });

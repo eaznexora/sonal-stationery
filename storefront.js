@@ -1,6 +1,6 @@
 // storefront.js
 const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
+  ? (window.location.port === '5005' ? '' : 'http://localhost:5005')
   : '';
 
 // Fetch and render Categories for Homepage

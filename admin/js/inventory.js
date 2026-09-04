@@ -28,14 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         masterCheckbox: document.getElementById('masterCheckbox')
     };
 
-    // SVG Placeholder
-    const svgPlaceholder = `
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="4" fill="#E2DFD8"/>
-            <path d="M25 15V25M15 15V25M12 25H28M12 15H28" stroke="#829586" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-    `;
-
     // Fetch KPIs
     const fetchStats = async () => {
         try {
@@ -114,10 +106,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 pillClass = 'status-out'; // visual fallback
             }
 
-            const hasImage = p.images && p.images.length > 0 && p.images[0] && !p.images[0].includes('logo.png');
-            const imgHtml = hasImage 
-                ? `<img src="${p.images[0]}" alt="${p.name}" class="product-thumb" onerror="this.outerHTML='${svgPlaceholder}'">`
-                : svgPlaceholder;
+            let imagePath = '/logo.png';
+            let rawImage = null;
+            
+            if (p.images && Array.isArray(p.images) && p.images.length > 0) rawImage = p.images[0];
+            else if (p.images && typeof p.images === 'string') rawImage = p.images;
+            else if (p.image) rawImage = p.image;
+            else if (p.thumbnail) rawImage = p.thumbnail;
+            
+            if (rawImage && typeof rawImage === 'string') {
+                if (rawImage.startsWith('http://') || rawImage.startsWith('https://') || rawImage.startsWith('/')) {
+                    imagePath = rawImage;
+                } else if (rawImage.startsWith('uploads/')) {
+                    imagePath = '/' + rawImage;
+                } else {
+                    imagePath = '/uploads/' + rawImage;
+                }
+            }
+
+            const imgHtml = `<img src="${imagePath}" alt="${p.name}" class="product-thumb" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid #E2DFD8;" onerror="this.onerror=null; this.src='/logo.png'">`;
 
             const tr = document.createElement('tr');
             tr.className = rowClass;

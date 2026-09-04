@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonal Stationary | Admin Login</title>
+    
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        :root {
+            --bg-primary: #fbf9f6;
+            --bg-secondary: #f2eee8;
+            --bg-white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #6e6b66;
+            --accent-sage: #9caf9f;
+            --accent-sage-dark: #829586;
+            --border-color: #e2dfd8;
+            --error-color: #e74c3c;
+            
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background-color: var(--bg-white);
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-container img {
+            height: 48px;
+            margin-bottom: 16px;
+        }
+
+        .logo-container h1 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .logo-container p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--bg-primary);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-sage);
+            background-color: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(156, 175, 159, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent-sage);
+            color: var(--bg-white);
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-sage-dark);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-link a {
+            color: var(--accent-sage-dark);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-link a:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .alert.error {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            display: block;
+        }
+
+        .alert.success {
+            background-color: rgba(156, 175, 159, 0.1);
+            color: var(--accent-sage-dark);
+            border: 1px solid rgba(156, 175, 159, 0.3);
+            display: block;
+        }
+
+        /* OTP Input styling */
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .otp-container input {
+            width: 48px;
+            height: 56px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+        }
+
+        .otp-container input:focus {
+            outline: none;
+            border-color: var(--accent-sage);
+            background-color: var(--bg-white);
+        }
+
+        /* View toggles */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="/logo.png" alt="Sonal Stationary Logo" onerror="this.src='https://via.placeholder.com/150x50?text=Sonal+Stationery'">
+            <h1>Admin Access</h1>
+            <p>Secure login to your dashboard</p>
+        </div>
+
+        <div id="alert-box" class="alert"></div>
+
+        <!-- Password Login View -->
+        <div id="view-password" class="view-section active">
+            <form id="form-password" onsubmit="handlePasswordLogin(event)">
+                <div class="form-group">
+                    <label for="pass-email">Admin Email</label>
+                    <input type="email" id="pass-email" required placeholder="admin@sonalstationery.com">
+                </div>
+                <div class="form-group">
+                    <label for="pass-password">Master Password</label>
+                    <input type="password" id="pass-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn" id="btn-password">
+                    <span class="btn-text">Log In</span>
+                    <div class="loader" id="loader-password"></div>
+                </button>
+            </form>
+            <div class="toggle-link">
+                <a onclick="switchView('view-otp-request')">Sign in with Email OTP instead <i class="ph ph-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <!-- OTP Request View -->
+        <div id="view-otp-request" class="view-section">
+            <form id="form-otp-request" onsubmit="handleOtpRequest(event)">
+                <div class="form-group">
+                    <label for="otp-email">Admin Email</label>
+                    <input type="email" id="otp-email" required placeholder="admin@sonalstationery.com">
+                </div>
+                <button type="submit" class="btn" id="btn-otp-request">
+                    <span class="btn-text">Send OTP</span>
+                    <div class="loader" id="loader-otp-request"></div>
+                </button>
+            </form>
+            <div class="toggle-link">
+                <a onclick="switchView('view-password')"><i class="ph ph-arrow-left"></i> Back to Password Login</a>
+            </div>
+        </div>
+
+        <!-- OTP Verify View -->
+        <div id="view-otp-verify" class="view-section">
+            <p style="text-align: center; font-size: 0.9rem; margin-bottom: 20px; color: var(--text-secondary);">
+                Enter the 6-digit code sent to <br><strong id="display-otp-email" style="color: var(--text-primary)"></strong>
+            </p>
+            <form id="form-otp-verify" onsubmit="handleOtpVerify(event)">
+                <div class="otp-container" id="otp-inputs">
+                    <input type="text" maxlength="1" required data-index="0">
+                    <input type="text" maxlength="1" required data-index="1">
+                    <input type="text" maxlength="1" required data-index="2">
+                    <input type="text" maxlength="1" required data-index="3">
+                    <input type="text" maxlength="1" required data-index="4">
+                    <input type="text" maxlength="1" required data-index="5">
+                </div>
+                <button type="submit" class="btn" id="btn-otp-verify">
+                    <span class="btn-text">Verify & Login</span>
+                    <div class="loader" id="loader-otp-verify"></div>
+                </button>
+            </form>
+            <div class="toggle-link">
+                <a onclick="switchView('view-otp-request')">Didn't receive it? Try again</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEmail = '';
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            hideAlert();
+        }
+
+        function showAlert(msg, type = 'error') {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.textContent = msg;
+            alertBox.className = `alert ${type}`;
+        }
+
+        function hideAlert() {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.className = 'alert';
+            alertBox.textContent = '';
+        }
+
+        function toggleLoading(btnId, loaderId, isLoading) {
+            const btn = document.getElementById(btnId);
+            const loader = document.getElementById(loaderId);
+            const text = btn.querySelector('.btn-text');
+            
+            btn.disabled = isLoading;
+            if (isLoading) {
+                text.style.display = 'none';
+                loader.style.display = 'block';
+            } else {
+                text.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        }
+
+        async function handlePasswordLogin(e) {
+            e.preventDefault();
+            hideAlert();
+            
+            const email = document.getElementById('pass-email').value;
+            const password = document.getElementById('pass-password').value;
+            
+            toggleLoading('btn-password', 'loader-password', true);
+
+            try {
+                const res = await fetch('/api/admin/login-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    showAlert(data.message || 'Login failed');
+                }
+            } catch (err) {
+                showAlert('Server connection error. Please try again.');
+            } finally {
+                toggleLoading('btn-password', 'loader-password', false);
+            }
+        }
+
+        async function handleOtpRequest(e) {
+            e.preventDefault();
+            hideAlert();
+            
+            currentEmail = document.getElementById('otp-email').value;
+            
+            toggleLoading('btn-otp-request', 'loader-otp-request', true);
+
+            try {
+                const res = await fetch('/api/admin/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentEmail })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    document.getElementById('display-otp-email').textContent = currentEmail;
+                    switchView('view-otp-verify');
+                    showAlert('OTP sent successfully!', 'success');
+                    // Focus first input
+                    setTimeout(() => document.querySelector('.otp-container input').focus(), 100);
+                } else {
+                    showAlert(data.message || 'Failed to send OTP');
+                }
+            } catch (err) {
+                showAlert('Server connection error. Please try again.');
+            } finally {
+                toggleLoading('btn-otp-request', 'loader-otp-request', false);
+            }
+        }
+
+        async function handleOtpVerify(e) {
+            e.preventDefault();
+            hideAlert();
+            
+            const inputs = document.querySelectorAll('.otp-container input');
+            let otp = '';
+            inputs.forEach(input => otp += input.value);
+            
+            if (otp.length !== 6) {
+                showAlert('Please enter the 6-digit OTP');
+                return;
+            }
+            
+            toggleLoading('btn-otp-verify', 'loader-otp-verify', true);
+
+            try {
+                const res = await fetch('/api/admin/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentEmail, otp })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    showAlert(data.message || 'Invalid OTP');
+                }
+            } catch (err) {
+                showAlert('Server connection error. Please try again.');
+            } finally {
+                toggleLoading('btn-otp-verify', 'loader-otp-verify', false);
+            }
+        }
+
+        // OTP Input navigation logic
+        const otpInputs = document.querySelectorAll('.otp-container input');
+        otpInputs.forEach((input, index) => {
+            // Select all text on focus
+            input.addEventListener('focus', function() {
+                this.select();
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                // Prevent non-numeric chars except backspace/arrow keys
+                if (!/^[0-9]$/.test(e.key) && !['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                    e.preventDefault();
+                }
+            });
+
+            input.addEventListener('input', function(e) {
+                // Move to next input on type
+                if (this.value && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keyup', function(e) {
+                // Move to prev input on backspace
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+
+            // Handle paste
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+                
+                if (pastedData) {
+                    for (let i = 0; i < pastedData.length; i++) {
+                        if (index + i < otpInputs.length) {
+                            otpInputs[index + i].value = pastedData[i];
+                        }
+                    }
+                    const focusIndex = Math.min(index + pastedData.length, otpInputs.length - 1);
+                    otpInputs[focusIndex].focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

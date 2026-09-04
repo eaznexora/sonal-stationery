@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1110,19 +1110,19 @@
             <div class="overview-cards">
                 <div class="card">
                     <div class="card-title">Total Inventory</div>
-                    <div class="card-value">1378</div>
+                    <div class="card-value" id="kpi-total-inventory">0</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Inventory added this month</div>
-                    <div class="card-value">2</div>
+                    <div class="card-value" id="kpi-added-month">0</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Orders Pending</div>
-                    <div class="card-value">25</div>
+                    <div class="card-value" id="kpi-orders-pending">0</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Orders Completed</div>
-                    <div class="card-value">0</div>
+                    <div class="card-value" id="kpi-orders-completed">0</div>
                 </div>
             </div>
             
@@ -1168,9 +1168,9 @@
                             <i class="ph ph-eye"></i>
                         </button>
                         <div class="pagination-indicator">
-                            <button class="btn-icon" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-left"></i></button>
-                            1 / 138
-                            <button class="btn-icon" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-right"></i></button>
+                            <button class="btn-icon" id="prevPageBtn" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-left"></i></button>
+                            <span id="pageCounter">1 / 1</span>
+                            <button class="btn-icon" id="nextPageBtn" style="width:28px;height:28px;font-size:1rem;"><i class="ph ph-caret-right"></i></button>
                         </div>
                     </div>
                 </div>
@@ -1192,84 +1192,8 @@
                             </tr>
                         </thead>
                         <tbody id="inventoryBody">
-                            <tr class="row-instock" data-status="instock">
-                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td><img src="https://via.placeholder.com/40x40/e8f5e9/4caf50?text=Jnl" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-name">Hardcover Journal 120 GSM</td>
-                                <td class="product-sku">SS-NB-101</td>
-                                <td><span class="category-tag">Journals</span></td>
-                                <td><input type="number" class="stock-input" value="1000" min="0"></td>
-                                <td class="batch-text">4/6</td>
-                                <td><span class="status-pill status-instock">In Stock</span></td>
-                                <td>8/21/2026</td>
-                            </tr>
-                            <tr class="row-instock" data-status="instock">
-                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td><img src="https://via.placeholder.com/40x40/e8f5e9/4caf50?text=Pen" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-name">Calligraphy Fountain Pen</td>
-                                <td class="product-sku">SS-PN-204</td>
-                                <td><span class="category-tag">Pens</span></td>
-                                <td><input type="number" class="stock-input" value="450" min="0"></td>
-                                <td class="batch-text">6/12</td>
-                                <td><span class="status-pill status-instock">In Stock</span></td>
-                                <td>8/21/2026</td>
-                            </tr>
-                            <tr class="row-low" data-status="low">
-                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td><img src="https://via.placeholder.com/40x40/fff8e1/ffb300?text=Hlt" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-name">Pastel Highlighter Set</td>
-                                <td class="product-sku">SS-HL-112</td>
-                                <td><span class="category-tag">Highlighters</span></td>
-                                <td><input type="number" class="stock-input" value="12" min="0"></td>
-                                <td class="batch-text">1/2</td>
-                                <td><span class="status-pill status-low">Low Stock</span></td>
-                                <td>8/20/2026</td>
-                            </tr>
-                            <tr class="row-out" data-status="out">
-                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td><img src="https://via.placeholder.com/40x40/ffebee/f44336?text=Brs" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-name">Brass Desk Clip Set</td>
-                                <td class="product-sku">SS-DA-302</td>
-                                <td><span class="category-tag">Desk Tools</span></td>
-                                <td><input type="number" class="stock-input" value="0" min="0"></td>
-                                <td class="batch-text">2/4</td>
-                                <td><span class="status-pill status-out">Out of Stock</span></td>
-                                <td>8/18/2026</td>
-                            </tr>
-                            <tr class="row-instock" data-status="instock">
-                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td><img src="https://via.placeholder.com/40x40/e8f5e9/4caf50?text=Pln" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-name">Weekly Minimalist Planner</td>
-                                <td class="product-sku">SS-PL-005</td>
-                                <td><span class="category-tag">Planners</span></td>
-                                <td><input type="number" class="stock-input" value="320" min="0"></td>
-                                <td class="batch-text">10/20</td>
-                                <td><span class="status-pill status-instock">In Stock</span></td>
-                                <td>8/21/2026</td>
-                            </tr>
-                            <tr class="row-low" data-status="low">
-                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td><img src="https://via.placeholder.com/40x40/fff8e1/ffb300?text=Cvs" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-name">Premium Cotton Canvas</td>
-                                <td class="product-sku">SS-CV-503</td>
-                                <td><span class="category-tag">Canvases</span></td>
-                                <td><input type="number" class="stock-input" value="2" min="0"></td>
-                                <td class="batch-text">2/8</td>
-                                <td><span class="status-pill status-low">Low Stock</span></td>
-                                <td>8/21/2026</td>
-                            </tr>
-                            <tr class="row-instock" data-status="instock">
-                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
-                                <td><img src="https://via.placeholder.com/40x40/e8f5e9/4caf50?text=Wrp" alt="Thumbnail" class="product-thumb"></td>
-                                <td class="product-name">Floral Wrapping Paper</td>
-                                <td class="product-sku">SS-WP-709</td>
-                                <td><span class="category-tag">Wrapping</span></td>
-                                <td><input type="number" class="stock-input" value="500" min="0"></td>
-                                <td class="batch-text">10/50</td>
-                                <td><span class="status-pill status-instock">In Stock</span></td>
-                                <td>8/21/2026</td>
-                            </tr>
-                                                </tbody>
+                            <!-- Injected dynamically via inventory.js -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -1291,71 +1215,7 @@
         menuToggle.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
 
-        // Tab Switching
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                // Future: Handle actual data filtering based on 'tab.dataset.tab'
-            });
-        });
-
-        // Search & Filter Logic
-        const searchInput = document.getElementById('searchProduct');
-        const statusFilter = document.getElementById('statusFilter');
-        const sortFilter = document.getElementById('sortFilter');
-        const resetBtn = document.getElementById('resetFilters');
-        const tableBody = document.getElementById('inventoryBody');
-        const rows = Array.from(tableBody.querySelectorAll('tr'));
-
-        function filterTable() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const statusTerm = statusFilter.value;
-
-            rows.forEach(row => {
-                const productName = row.querySelector('.product-name').textContent.toLowerCase();
-                const productSku = row.querySelector('.product-sku').textContent.toLowerCase();
-                const rowStatus = row.dataset.status;
-
-                const matchesSearch = productName.includes(searchTerm) || productSku.includes(searchTerm);
-                const matchesStatus = (statusTerm === 'all') || (rowStatus === statusTerm);
-
-                if (matchesSearch && matchesStatus) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-            // Sorting logic can be added here if needed
-        }
-
-        searchInput.addEventListener('input', filterTable);
-        statusFilter.addEventListener('change', filterTable);
-        sortFilter.addEventListener('change', filterTable);
-
-        // Reset Filters
-        resetBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            statusFilter.value = 'all';
-            sortFilter.value = 'stock_asc'; // Default
-            filterTable();
-        });
-
-        // Master Checkbox Logic
-        const masterCheckbox = document.getElementById('masterCheckbox');
-        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-
-        masterCheckbox.addEventListener('change', (e) => {
-            const isChecked = e.target.checked;
-            rowCheckboxes.forEach(cb => {
-                // Only select visible rows
-                if (cb.closest('tr').style.display !== 'none') {
-                    cb.checked = isChecked;
-                }
-            });
-        });
-    </script>
+    <script src="/admin/js/inventory.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const productsToggle = document.getElementById('productsDropdownToggle');

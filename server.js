@@ -35,7 +35,7 @@ app.use('/api/categories', categoryRoutes);
 
 // Admin static route protection
 app.use('/admin', (req, res, next) => {
-  if (req.path === '/login.html' || req.path === '/login') {
+  if (req.path === '/login.html' || req.path === '/login' || req.path.startsWith('/js/') || req.path.startsWith('/css/')) {
     return next();
   }
   const token = req.cookies?.admin_token;

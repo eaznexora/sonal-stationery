@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -778,23 +778,23 @@
             <div class="overview-cards">
                 <div class="card highlight">
                     <div class="card-title">Total Revenue</div>
-                    <div class="card-value">₹11,850.80</div>
+                    <div class="card-value" id="kpi-revenue">₹0.00</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Total Orders</div>
-                    <div class="card-value">27</div>
+                    <div class="card-value" id="kpi-orders">0</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Total Customers</div>
-                    <div class="card-value">14</div>
+                    <div class="card-value" id="kpi-customers">0</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Pending Orders</div>
-                    <div class="card-value">22</div>
+                    <div class="card-value" id="kpi-pending">0</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Average Order Value</div>
-                    <div class="card-value">₹438.92</div>
+                    <div class="card-value" id="kpi-aov">₹0.00</div>
                 </div>
             </div>
 
@@ -820,13 +820,13 @@
                     <div class="chart-filters">
                         <div class="chart-total">
                             <span>Total for period</span>
-                            <strong>₹99.00</strong>
+                            <strong id="chart-total-value">₹0.00</strong>
                         </div>
                         <div class="time-filters">
-                            <button class="time-filter">7D</button>
-                            <button class="time-filter active">30D</button>
-                            <button class="time-filter">90D</button>
-                            <button class="time-filter">1Y</button>
+                            <button class="time-filter" data-period="7d">7D</button>
+                            <button class="time-filter active" data-period="30d">30D</button>
+                            <button class="time-filter" data-period="90d">90D</button>
+                            <button class="time-filter" data-period="1y">1Y</button>
                         </div>
                     </div>
                     
@@ -840,46 +840,17 @@
                     
                     <div class="widget">
                         <h4 class="widget-title">Sales by Category</h4>
-                        <div class="widget-list">
-                            <div class="widget-item">
-                                <span>Stationery</span>
-                                <span class="widget-item-val">1 sold</span>
-                            </div>
-                            <div class="widget-item">
-                                <span>Gifts</span>
-                                <span class="widget-item-val">1 sold</span>
-                            </div>
-                            <div class="widget-item">
-                                <span>Toys</span>
-                                <span class="widget-item-val">1 sold</span>
-                            </div>
+                        <div class="widget-list" id="sales-category-list">
+                            <!-- Rendered dynamically -->
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Loading categories...</p>
                         </div>
                     </div>
                     
                     <div class="widget">
                         <h4 class="widget-title">Returning vs New Customers</h4>
-                        <div class="customer-stats">
-                            <div class="stat-row">
-                                <div class="stat-info">
-                                    <span class="stat-info-title">undefined</span>
-                                    <span class="stat-info-sub">25 order(s)</span>
-                                </div>
-                                <div class="stat-value">₹10,517.80</div>
-                            </div>
-                            <div class="stat-row">
-                                <div class="stat-info">
-                                    <span class="stat-info-title">undefined</span>
-                                    <span class="stat-info-sub">1 order(s)</span>
-                                </div>
-                                <div class="stat-value">₹1,234.00</div>
-                            </div>
-                            <div class="stat-row">
-                                <div class="stat-info">
-                                    <span class="stat-info-title">undefined</span>
-                                    <span class="stat-info-sub">1 order(s)</span>
-                                </div>
-                                <div class="stat-value">₹99.00</div>
-                            </div>
+                        <div class="customer-stats" id="customer-retention-list">
+                            <!-- Rendered dynamically -->
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Loading data...</p>
                         </div>
                     </div>
                     
@@ -917,89 +888,7 @@
         window.addEventListener('resize', handleResize);
         handleResize(); // Init
 
-        // Chart.js Implementation
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            
-            // Create gradient
-            let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(156, 175, 159, 0.5)'); // Sage green transparent
-            gradient.addColorStop(1, 'rgba(156, 175, 159, 0.0)');
-            
-            const revenueChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['25 Jul', '26 Jul', '27 Jul', '28 Jul', '29 Jul', '30 Jul', '31 Jul'], // Dummy labels
-                    datasets: [{
-                        label: 'Revenue',
-                        data: [35, 60, 80, 75, 60, 75, 95], // Dummy data points to match curve roughly
-                        borderColor: '#829586', // accent-sage-dark
-                        backgroundColor: gradient,
-                        borderWidth: 2,
-                        pointBackgroundColor: '#829586',
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        fill: true,
-                        tension: 0.4 // Smooth curve
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#2c2c2c',
-                            titleFont: { family: 'Inter' },
-                            bodyFont: { family: 'Inter' },
-                            callbacks: {
-                                label: function(context) {
-                                    return '₹' + context.parsed.y;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100, // Matching the image y-axis roughly
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value;
-                                },
-                                stepSize: 10,
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                },
-                                color: '#6e6b66'
-                            },
-                            grid: {
-                                color: '#e2dfd8',
-                                drawBorder: false,
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                },
-                                color: '#6e6b66',
-                                maxTicksLimit: 1 // Only showing rightmost mostly based on screenshot "31 Jul"
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
+    <script src="js/dashboard.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const productsToggle = document.getElementById('productsDropdownToggle');

@@ -724,7 +724,7 @@
             <a href="analytics.html" class="nav-item">
                 <i class="ph ph-chart-bar"></i> Analytics
             </a>
-            <a href="#" class="nav-item">
+            <a href="settings.html" class="nav-item">
                 <i class="ph ph-gear"></i> Settings
             </a>
         </nav>
@@ -821,6 +821,42 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Edit Employee Modal -->
+        <div id="editEmployeeModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: var(--bg-white); padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <h3 style="margin-bottom: 1.5rem;">Edit Employee Access</h3>
+                <form id="editEmployeeForm" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <input type="hidden" id="editEmpId">
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 500;">Employee Email</label>
+                        <input type="email" id="editEmpEmail" readonly style="width: 100%; padding: 0.75rem; border: 1px solid #E2DFD8; border-radius: 6px; font-family: inherit; background-color: #f5f5f5; color: #666; cursor: not-allowed;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 500;">New Password (Optional)</label>
+                        <input type="text" id="editEmpPassword" placeholder="Leave blank to keep current password" style="width: 100%; padding: 0.75rem; border: 1px solid #E2DFD8; border-radius: 6px; font-family: inherit;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 500;">Permissions</label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; font-size: 0.9rem;">
+                            <label><input type="checkbox" name="editPerms" value="dashboard"> Dashboard</label>
+                            <label><input type="checkbox" name="editPerms" value="categories"> Categories</label>
+                            <label><input type="checkbox" name="editPerms" value="products"> Products (View/Edit)</label>
+                            <label><input type="checkbox" name="editPerms" value="products_add"> Add Product</label>
+                            <label><input type="checkbox" name="editPerms" value="orders"> Orders</label>
+                            <label><input type="checkbox" name="editPerms" value="users"> Users</label>
+                            <label><input type="checkbox" name="editPerms" value="inventory"> Inventory</label>
+                            <label><input type="checkbox" name="editPerms" value="analytics"> Analytics</label>
+                            <label><input type="checkbox" name="editPerms" value="settings"> Settings</label>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button type="button" class="btn btn-outline" id="btnCancelEdit" style="flex: 1;">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                    </div>
+                </form>
             </div>
         </div>
     </main>

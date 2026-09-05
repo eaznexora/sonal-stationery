@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td style="padding: 1rem; color: ${statusColor}; font-weight: 500;">${statusText}</td>
                 <td style="padding: 1rem; text-align: right;">
                     ${emp.role !== 'superadmin' ? `
+                        <button class="btn-edit" data-id="${emp._id}" data-email="${emp.email}" data-perms="${emp.permissions.join(',')}" style="padding: 4px 8px; font-size: 0.8rem; background: #e3f2fd; color: #1976d2; border: none; cursor: pointer; border-radius: 4px; margin-right: 4px;">Edit</button>
                         <button class="btn-toggle-status" data-id="${emp._id}" data-active="${emp.isActive}" style="padding: 4px 8px; font-size: 0.8rem; background: #eee; border: none; cursor: pointer; border-radius: 4px; margin-right: 4px;">Toggle</button>
                         <button class="btn-delete" data-id="${emp._id}" style="padding: 4px 8px; font-size: 0.8rem; background: #ffebee; color: #f44336; border: none; cursor: pointer; border-radius: 4px;">Remove</button>
                     ` : '<span style="color: gray; font-size: 0.85rem;">Protected</span>'}
@@ -65,6 +66,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(confirm('Are you sure you want to remove this employee completely?')) {
                     await removeEmployee(id);
                 }
+            });
+        });
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                const email = e.target.dataset.email;
+                const perms = e.target.dataset.perms ? e.target.dataset.perms.split(',') : [];
+                
+                document.getElementById('editEmpId').value = id;
+                document.getElementById('editEmpEmail').value = email;
+                document.getElementById('editEmpPassword').value = '';
+                
+                // Reset checkboxes
+                document.querySelectorAll('input[name="editPerms"]').forEach(cb => cb.checked = false);
+                // Check active ones
+                perms.forEach(p => {
+                    const cb = document.querySelector(`input[name="editPerms"][value="${p}"]`);
+                    if (cb) cb.checked = true;
+                });
+                
+                document.getElementById('editEmployeeModal').style.display = 'flex';
             });
         });
     };
@@ -120,11 +143,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.success) {
                     addEmployeeForm.reset();
                     fetchTeam();
+                    alert('Employee added successfully');
                 } else {
                     alert('Error: ' + data.message);
                 }
             } catch (error) {
                 console.error('Error adding employee', error);
+            }
+        });
+    }
+
+    const editEmployeeForm = document.getElementById('editEmployeeForm');
+    const editEmployeeModal = document.getElementById('editEmployeeModal');
+    const btnCancelEdit = document.getElementById('btnCancelEdit');
+
+    if (btnCancelEdit) {
+        btnCancelEdit.addEventListener('click', () => {
+            editEmployeeModal.style.display = 'none';
+        });
+    }
+
+    if (editEmployeeForm) {
+        editEmployeeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editEmpId').value;
+            const password = document.getElementById('editEmpPassword').value;
+            const permsChecked = document.querySelectorAll('input[name="editPerms"]:checked');
+            const permissions = Array.from(permsChecked).map(cb => cb.value);
+
+            const payload = { permissions };
+            if (password.trim() !== '') {
+                payload.password = password.trim();
+            }
+
+            try {
+                const res = await fetch(`/api/admin/settings/team/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    editEmployeeModal.style.display = 'none';
+                    fetchTeam();
+                    // optional toast
+                } else {
+                    alert('Error updating employee: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error updating employee', error);
             }
         });
     }

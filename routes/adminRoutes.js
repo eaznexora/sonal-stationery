@@ -26,8 +26,12 @@ router.route('/inventory/:id/stock')
 router.route('/analytics')
   .get(adminAuth, requirePermission('analytics'), getAnalytics);
 
-router.route('/activity')
-  .get(adminAuth, requirePermission('activity'), getActivityLogs);
+router.get('/activity', adminAuth, (req, res, next) => {
+  if (req.admin.role !== 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Access denied. Superadmin only.' });
+  }
+  next();
+}, getActivityLogs);
 
 // Settings & Team
 router.route('/settings/team')

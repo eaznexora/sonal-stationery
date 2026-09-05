@@ -16,6 +16,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Superadmin has full access
         if (admin.role === 'superadmin') return;
 
+        // Force hide activity log link for all non-superadmins
+        const activityLink = document.querySelector('a[href="activity.html"]');
+        if (activityLink) activityLink.style.display = 'none';
+
+        // Block direct access to activity.html
+        if (window.location.pathname.endsWith('/admin/activity.html')) {
+            alert('Access Denied: Superadmin only.');
+            window.location.href = '/admin/dashboard.html'; // Or any safe fallback
+            return;
+        }
+
         const perms = admin.permissions || [];
         
         // Define route to permission mapping

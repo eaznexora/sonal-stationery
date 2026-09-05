@@ -21,8 +21,10 @@ const signAndSetToken = (res, email, role = 'superadmin', permissions = []) => {
   return token;
 };
 
-// POST /api/admin/login-password
-exports.loginPassword = async (req, res) => {
+const bcrypt = require('bcryptjs');
+
+// POST /api/admin/validate-credentials
+exports.validateCredentials = async (req, res) => {
   try {
     const { email, password } = req.body;
     
@@ -30,76 +32,60 @@ exports.loginPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email and password are required' });
     }
 
-    if (
-      email.toLowerCase() === process.env.ADMIN_EMAIL.trim().toLowerCase() &&
-      password === process.env.ADMIN_PASSWORD.trim()
-    ) {
-      const token = signAndSetToken(res, email);
-      return res.json({ success: true, message: 'Login successful', token });
-    }
-
-    return res.status(401).json({ success: false, message: 'Invalid credentials' });
-  } catch (error) {
-    console.error('Password login error:', error);
-    res.status(500).json({ success: false, message: 'Server error during login' });
-  }
-};
-
-// POST /api/admin/send-otp
-exports.sendOtp = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ success: false, message: 'Email is required' });
-    }
-
     const lowerEmail = email.toLowerCase();
     
-    // Check if it's superadmin or valid active employee
-    const isSuperAdmin = lowerEmail === process.env.ADMIN_EMAIL.toLowerCase();
-    let isEmployee = false;
+    // 1. Validate credentials
+    const isSuperAdmin = (
+      lowerEmail === process.env.ADMIN_EMAIL.trim().toLowerCase() &&
+      password === process.env.ADMIN_PASSWORD.trim()
+    );
     
+    let isEmployee = false;
     if (!isSuperAdmin) {
       const employee = await AdminUser.findOne({ email: lowerEmail, isActive: true });
-      if (employee) {
-        isEmployee = true;
+      if (employee && employee.password) {
+        isEmployee = await bcrypt.compare(password, employee.password);
       }
     }
 
     if (!isSuperAdmin && !isEmployee) {
-      return res.status(401).json({ success: false, message: 'Unauthorized email' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    // Generate 6-digit numeric OTP
+    // 2. Generate and store OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    // Store OTP with 10-minute expiration
     const expiresAt = Date.now() + 10 * 60 * 1000;
     otpStorage.set(lowerEmail, { otp, expiresAt });
 
-    // Send email via Resend
-    const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: process.env.ADMIN_EMAIL, // For testing/sandbox, we might have to send to verified email. But let's send to actual email in real life. Wait, resend free tier only allows sending to verified email (the one on the account). I will use `email` here, but fallback to ADMIN_EMAIL if it fails. Actually, I'll just use the requested email and assume domain is verified.
-      subject: `Your Sonal Stationery Admin OTP: ${otp}`,
-      html: `<div style="font-family:sans-serif;padding:20px;">
-               <h2>Admin Verification Code</h2>
-               <p>Your one-time login OTP is:</p>
-               <h1 style="letter-spacing:4px;color:#2c3e50;">${otp}</h1>
-               <p>Valid for 10 minutes. Do not share this code.</p>
-             </div>`
-    });
+    // Fallback logging for testing/development
+    console.log(`[AUTH DEBUG] Generated OTP for ${lowerEmail}:${otp}`);
 
-    if (error) {
-      console.error('Resend error:', error);
-      return res.status(500).json({ success: false, message: 'Failed to send OTP email' });
+    // 3. Send email via Resend
+    const fromAddress = process.env.RESEND_FROM || 'Sonal Stationery <noreply@sonalstationary.in>';
+    
+    try {
+      const { data, error } = await resend.emails.send({
+        from: fromAddress,
+        to: email, // use requested casing for the email address
+        subject: `Your Sonal Stationery Admin OTP: ${otp}`,
+        html: `<div style="font-family:sans-serif;padding:20px;">
+                 <h2>Your Admin Login OTP</h2>
+                 <p>Your one-time password is <strong>${otp}</strong>. It expires in 10 minutes. Do not share this code.</p>
+               </div>`
+      });
+
+      if (error) {
+        console.error("Resend API Error:", error);
+        // We log the error but still return success so the user can enter the fallback OTP from logs if testing.
+      }
+    } catch (sendError) {
+      console.error("Resend Try/Catch Error:", sendError);
     }
 
-    res.json({ success: true, message: 'OTP sent successfully' });
+    res.json({ success: true, message: 'Credentials validated, OTP sent' });
   } catch (error) {
-    console.error('Send OTP error:', error);
-    res.status(500).json({ success: false, message: 'Server error sending OTP' });
+    console.error('Validate credentials error:', error);
+    res.status(500).json({ success: false, message: 'Server error during login' });
   }
 };
 

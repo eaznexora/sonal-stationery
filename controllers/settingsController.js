@@ -1,4 +1,5 @@
 const AdminUser = require('../models/AdminUser');
+const bcrypt = require('bcryptjs');
 
 exports.getTeam = async (req, res) => {
   try {
@@ -11,8 +12,9 @@ exports.getTeam = async (req, res) => {
 };
 
 exports.addEmployee = async (req, res) => {
+exports.addEmployee = async (req, res) => {
   try {
-    const { email, permissions } = req.body;
+    const { email, permissions, password } = req.body;
     if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
 
     if (email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()) {
@@ -29,6 +31,12 @@ exports.addEmployee = async (req, res) => {
       role: 'employee',
       permissions: permissions || []
     });
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+    
     await user.save();
 
     res.json({ success: true, message: 'Employee added successfully', user });
@@ -41,13 +49,18 @@ exports.addEmployee = async (req, res) => {
 exports.updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
-    const { permissions, isActive } = req.body;
+    const { permissions, isActive, password } = req.body;
 
     const user = await AdminUser.findById(id);
     if (!user) return res.status(404).json({ success: false, message: 'Employee not found' });
 
     if (permissions !== undefined) user.permissions = permissions;
     if (isActive !== undefined) user.isActive = isActive;
+    
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
 
     await user.save();
     res.json({ success: true, message: 'Employee updated successfully', user });

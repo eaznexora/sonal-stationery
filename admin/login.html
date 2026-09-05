@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sonal Stationary | Admin Login</title>
+    <title>Sonal Stationary | Admin Access</title>
     
     <!-- Favicons -->
     <link rel="shortcut icon" href="/favicon.ico">
@@ -140,6 +140,18 @@
             cursor: not-allowed;
         }
 
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
         .toggle-link {
             text-align: center;
             margin-top: 24px;
@@ -147,17 +159,26 @@
             color: var(--text-secondary);
         }
 
-        .toggle-link a {
+        .toggle-link a, .toggle-link button {
             color: var(--accent-sage-dark);
             text-decoration: none;
             font-weight: 500;
             cursor: pointer;
             transition: color 0.3s ease;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
         }
 
-        .toggle-link a:hover {
+        .toggle-link a:hover, .toggle-link button:hover:not(:disabled) {
             color: var(--text-primary);
             text-decoration: underline;
+        }
+
+        .toggle-link button:disabled {
+            color: var(--text-secondary);
+            cursor: not-allowed;
         }
 
         .alert {
@@ -245,55 +266,35 @@
         <div class="logo-container">
             <img src="/logo.png" alt="Sonal Stationary Logo" onerror="this.src='https://via.placeholder.com/150x50?text=Sonal+Stationery'">
             <h1>Admin Access</h1>
-            <p>Secure login to your dashboard</p>
+            <p id="subheading">Secure login to your dashboard</p>
         </div>
 
         <div id="alert-box" class="alert"></div>
 
-        <!-- Password Login View -->
-        <div id="view-password" class="view-section active">
-            <form id="form-password" onsubmit="handlePasswordLogin(event)">
+        <!-- Step 1: Credentials View -->
+        <div id="view-step1" class="view-section active">
+            <form id="form-step1" onsubmit="handleCredentials(event)">
                 <div class="form-group">
-                    <label for="pass-email">Admin Email</label>
-                    <input type="email" id="pass-email" required placeholder="admin@sonalstationery.com">
+                    <label for="admin-email">Admin Email</label>
+                    <input type="email" id="admin-email" required placeholder="admin@sonalstationery.com">
                 </div>
                 <div class="form-group">
-                    <label for="pass-password">Master Password</label>
-                    <input type="password" id="pass-password" required placeholder="••••••••">
+                    <label for="admin-password">Password</label>
+                    <input type="password" id="admin-password" required placeholder="••••••••">
                 </div>
-                <button type="submit" class="btn" id="btn-password">
-                    <span class="btn-text">Log In</span>
-                    <div class="loader" id="loader-password"></div>
+                <button type="submit" class="btn" id="btn-step1">
+                    <span class="btn-text">Continue</span>
+                    <div class="loader" id="loader-step1"></div>
                 </button>
             </form>
-            <div class="toggle-link">
-                <a onclick="switchView('view-otp-request')">Sign in with Email OTP instead <i class="ph ph-arrow-right"></i></a>
-            </div>
         </div>
 
-        <!-- OTP Request View -->
-        <div id="view-otp-request" class="view-section">
-            <form id="form-otp-request" onsubmit="handleOtpRequest(event)">
-                <div class="form-group">
-                    <label for="otp-email">Admin Email</label>
-                    <input type="email" id="otp-email" required placeholder="admin@sonalstationery.com">
-                </div>
-                <button type="submit" class="btn" id="btn-otp-request">
-                    <span class="btn-text">Send OTP</span>
-                    <div class="loader" id="loader-otp-request"></div>
-                </button>
-            </form>
-            <div class="toggle-link">
-                <a onclick="switchView('view-password')"><i class="ph ph-arrow-left"></i> Back to Password Login</a>
-            </div>
-        </div>
-
-        <!-- OTP Verify View -->
-        <div id="view-otp-verify" class="view-section">
+        <!-- Step 2: OTP Verify View -->
+        <div id="view-step2" class="view-section">
             <p style="text-align: center; font-size: 0.9rem; margin-bottom: 20px; color: var(--text-secondary);">
                 Enter the 6-digit code sent to <br><strong id="display-otp-email" style="color: var(--text-primary)"></strong>
             </p>
-            <form id="form-otp-verify" onsubmit="handleOtpVerify(event)">
+            <form id="form-step2" onsubmit="handleOtpVerify(event)">
                 <div class="otp-container" id="otp-inputs">
                     <input type="text" maxlength="1" required data-index="0">
                     <input type="text" maxlength="1" required data-index="1">
@@ -302,24 +303,37 @@
                     <input type="text" maxlength="1" required data-index="4">
                     <input type="text" maxlength="1" required data-index="5">
                 </div>
-                <button type="submit" class="btn" id="btn-otp-verify">
+                <button type="submit" class="btn" id="btn-step2">
                     <span class="btn-text">Verify & Login</span>
-                    <div class="loader" id="loader-otp-verify"></div>
+                    <div class="loader" id="loader-step2"></div>
                 </button>
             </form>
             <div class="toggle-link">
-                <a onclick="switchView('view-otp-request')">Didn't receive it? Try again</a>
+                <button type="button" id="btn-resend" onclick="handleResend()">Resend Code</button>
             </div>
+            <button type="button" class="btn btn-outline" onclick="switchView('view-step1')">
+                <i class="ph ph-arrow-left"></i> Back / Change Email
+            </button>
         </div>
     </div>
 
     <script>
         let currentEmail = '';
+        let currentPassword = '';
+        let resendTimer = null;
+        let cooldown = 60;
 
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
             hideAlert();
+
+            if (viewId === 'view-step1') {
+                document.getElementById('subheading').textContent = "Secure login to your dashboard";
+            } else {
+                document.getElementById('subheading').textContent = "Two-Factor Authentication";
+                setTimeout(() => document.querySelector('.otp-container input').focus(), 100);
+            }
         }
 
         function showAlert(msg, type = 'error') {
@@ -349,67 +363,88 @@
             }
         }
 
-        async function handlePasswordLogin(e) {
+        async function handleCredentials(e) {
             e.preventDefault();
             hideAlert();
             
-            const email = document.getElementById('pass-email').value;
-            const password = document.getElementById('pass-password').value;
+            currentEmail = document.getElementById('admin-email').value;
+            currentPassword = document.getElementById('admin-password').value;
             
-            toggleLoading('btn-password', 'loader-password', true);
+            toggleLoading('btn-step1', 'loader-step1', true);
 
             try {
-                const res = await fetch('/api/admin/login-password', {
+                const res = await fetch('/api/admin/validate-credentials', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                
-                const data = await res.json();
-                
-                if (data.success) {
-                    window.location.href = '/admin/dashboard.html';
-                } else {
-                    showAlert(data.message || 'Login failed');
-                }
-            } catch (err) {
-                showAlert('Server connection error. Please try again.');
-            } finally {
-                toggleLoading('btn-password', 'loader-password', false);
-            }
-        }
-
-        async function handleOtpRequest(e) {
-            e.preventDefault();
-            hideAlert();
-            
-            currentEmail = document.getElementById('otp-email').value;
-            
-            toggleLoading('btn-otp-request', 'loader-otp-request', true);
-
-            try {
-                const res = await fetch('/api/admin/send-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentEmail })
+                    body: JSON.stringify({ email: currentEmail, password: currentPassword })
                 });
                 
                 const data = await res.json();
                 
                 if (data.success) {
                     document.getElementById('display-otp-email').textContent = currentEmail;
-                    switchView('view-otp-verify');
-                    showAlert('OTP sent successfully!', 'success');
-                    // Focus first input
-                    setTimeout(() => document.querySelector('.otp-container input').focus(), 100);
+                    switchView('view-step2');
+                    showAlert('OTP sent to your email!', 'success');
+                    startCooldown();
                 } else {
-                    showAlert(data.message || 'Failed to send OTP');
+                    showAlert(data.message || 'Invalid credentials');
                 }
             } catch (err) {
                 showAlert('Server connection error. Please try again.');
             } finally {
-                toggleLoading('btn-otp-request', 'loader-otp-request', false);
+                toggleLoading('btn-step1', 'loader-step1', false);
             }
+        }
+
+        async function handleResend() {
+            if (cooldown > 0) return;
+            
+            hideAlert();
+            const btnResend = document.getElementById('btn-resend');
+            btnResend.textContent = 'Sending...';
+            btnResend.disabled = true;
+
+            try {
+                const res = await fetch('/api/admin/validate-credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentEmail, password: currentPassword })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    showAlert('New OTP sent to your email!', 'success');
+                    startCooldown();
+                } else {
+                    showAlert(data.message || 'Failed to resend OTP');
+                    btnResend.disabled = false;
+                    btnResend.textContent = 'Resend Code';
+                }
+            } catch (err) {
+                showAlert('Server connection error.');
+                btnResend.disabled = false;
+                btnResend.textContent = 'Resend Code';
+            }
+        }
+
+        function startCooldown() {
+            cooldown = 60;
+            const btnResend = document.getElementById('btn-resend');
+            btnResend.disabled = true;
+
+            if (resendTimer) clearInterval(resendTimer);
+
+            resendTimer = setInterval(() => {
+                cooldown--;
+                if (cooldown <= 0) {
+                    clearInterval(resendTimer);
+                    btnResend.disabled = false;
+                    btnResend.textContent = 'Resend Code';
+                } else {
+                    btnResend.textContent = `Resend Code (${cooldown}s)`;
+                }
+            }, 1000);
         }
 
         async function handleOtpVerify(e) {
@@ -425,7 +460,7 @@
                 return;
             }
             
-            toggleLoading('btn-otp-verify', 'loader-otp-verify', true);
+            toggleLoading('btn-step2', 'loader-step2', true);
 
             try {
                 const res = await fetch('/api/admin/verify-otp', {
@@ -444,40 +479,35 @@
             } catch (err) {
                 showAlert('Server connection error. Please try again.');
             } finally {
-                toggleLoading('btn-otp-verify', 'loader-otp-verify', false);
+                toggleLoading('btn-step2', 'loader-step2', false);
             }
         }
 
         // OTP Input navigation logic
         const otpInputs = document.querySelectorAll('.otp-container input');
         otpInputs.forEach((input, index) => {
-            // Select all text on focus
             input.addEventListener('focus', function() {
                 this.select();
             });
             
             input.addEventListener('keydown', function(e) {
-                // Prevent non-numeric chars except backspace/arrow keys
                 if (!/^[0-9]$/.test(e.key) && !['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
                     e.preventDefault();
                 }
             });
 
             input.addEventListener('input', function(e) {
-                // Move to next input on type
                 if (this.value && index < otpInputs.length - 1) {
                     otpInputs[index + 1].focus();
                 }
             });
 
             input.addEventListener('keyup', function(e) {
-                // Move to prev input on backspace
                 if (e.key === 'Backspace' && !this.value && index > 0) {
                     otpInputs[index - 1].focus();
                 }
             });
 
-            // Handle paste
             input.addEventListener('paste', function(e) {
                 e.preventDefault();
                 const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);

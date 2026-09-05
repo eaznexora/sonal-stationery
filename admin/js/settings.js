@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addEmployeeForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('empEmail').value;
+            const password = document.getElementById('empPassword').value;
             const permsChecked = document.querySelectorAll('input[name="perms"]:checked');
             const permissions = Array.from(permsChecked).map(cb => cb.value);
 
@@ -112,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch('/api/admin/settings/team', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, permissions })
+                    body: JSON.stringify({ email, password, permissions })
                 });
                 const data = await res.json();
                 

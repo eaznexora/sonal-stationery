@@ -12,7 +12,6 @@ exports.getTeam = async (req, res) => {
 };
 
 exports.addEmployee = async (req, res) => {
-exports.addEmployee = async (req, res) => {
   try {
     const { email, permissions, password } = req.body;
     if (!email) return res.status(400).json({ success: false, message: 'Email is required' });

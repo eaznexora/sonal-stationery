@@ -9,7 +9,7 @@ const adminAuth = (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.admin = decoded; // Attach admin details to request
+    req.admin = decoded; // { email, role, permissions }
     
     next();
   } catch (error) {
@@ -17,4 +17,22 @@ const adminAuth = (req, res, next) => {
   }
 };
 
-module.exports = adminAuth;
+const requirePermission = (permission) => {
+  return (req, res, next) => {
+    if (!req.admin) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    
+    if (req.admin.role === 'superadmin') {
+      return next(); // Superadmin bypasses all permission checks
+    }
+
+    if (req.admin.permissions && req.admin.permissions.includes(permission)) {
+      return next(); // Employee has the required permission
+    }
+
+    return res.status(403).json({ success: false, message: 'Forbidden. Insufficient permissions.' });
+  };
+};
+
+module.exports = { adminAuth, requirePermission };

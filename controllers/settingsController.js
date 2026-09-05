@@ -1,0 +1,71 @@
+const AdminUser = require('../models/AdminUser');
+
+exports.getTeam = async (req, res) => {
+  try {
+    const team = await AdminUser.find().sort({ createdAt: -1 });
+    res.json({ success: true, team });
+  } catch (error) {
+    console.error('getTeam Error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.addEmployee = async (req, res) => {
+  try {
+    const { email, permissions } = req.body;
+    if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+
+    if (email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()) {
+      return res.status(400).json({ success: false, message: 'Cannot add superadmin as an employee' });
+    }
+
+    let user = await AdminUser.findOne({ email: email.toLowerCase() });
+    if (user) {
+      return res.status(400).json({ success: false, message: 'User already exists' });
+    }
+
+    user = new AdminUser({
+      email: email.toLowerCase(),
+      role: 'employee',
+      permissions: permissions || []
+    });
+    await user.save();
+
+    res.json({ success: true, message: 'Employee added successfully', user });
+  } catch (error) {
+    console.error('addEmployee Error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.updateEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { permissions, isActive } = req.body;
+
+    const user = await AdminUser.findById(id);
+    if (!user) return res.status(404).json({ success: false, message: 'Employee not found' });
+
+    if (permissions !== undefined) user.permissions = permissions;
+    if (isActive !== undefined) user.isActive = isActive;
+
+    await user.save();
+    res.json({ success: true, message: 'Employee updated successfully', user });
+  } catch (error) {
+    console.error('updateEmployee Error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.removeEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await AdminUser.findByIdAndDelete(id);
+    if (!user) return res.status(404).json({ success: false, message: 'Employee not found' });
+    
+    res.json({ success: true, message: 'Employee removed successfully' });
+  } catch (error) {
+    console.error('removeEmployee Error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};

@@ -4,24 +4,34 @@ const { getAdminStats } = require('../controllers/adminController');
 const { getDashboardStats } = require('../controllers/dashboardController');
 const { getInventoryStats, getInventory, updateStock } = require('../controllers/inventoryController');
 const { getAnalytics } = require('../controllers/analyticsController');
-const adminAuth = require('../middleware/adminAuth');
+const { getTeam, addEmployee, updateEmployee, removeEmployee } = require('../controllers/settingsController');
+const { adminAuth, requirePermission } = require('../middleware/adminAuth');
 
 router.route('/stats')
-  .get(getAdminStats); // Legacy support if needed
+  .get(adminAuth, getAdminStats); // Legacy support if needed
 
 router.route('/dashboard/stats')
-  .get(adminAuth, getDashboardStats);
+  .get(adminAuth, requirePermission('dashboard'), getDashboardStats);
 
 router.route('/inventory/stats')
-  .get(adminAuth, getInventoryStats);
+  .get(adminAuth, requirePermission('inventory'), getInventoryStats);
 
 router.route('/inventory')
-  .get(adminAuth, getInventory);
+  .get(adminAuth, requirePermission('inventory'), getInventory);
 
 router.route('/inventory/:id/stock')
-  .patch(adminAuth, updateStock);
+  .patch(adminAuth, requirePermission('inventory'), updateStock);
 
 router.route('/analytics')
-  .get(adminAuth, getAnalytics);
+  .get(adminAuth, requirePermission('analytics'), getAnalytics);
+
+// Settings & Team
+router.route('/settings/team')
+  .get(adminAuth, requirePermission('settings'), getTeam)
+  .post(adminAuth, requirePermission('settings'), addEmployee);
+
+router.route('/settings/team/:id')
+  .patch(adminAuth, requirePermission('settings'), updateEmployee)
+  .delete(adminAuth, requirePermission('settings'), removeEmployee);
 
 module.exports = router;

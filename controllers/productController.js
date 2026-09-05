@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const { logActivity } = require('../utils/auditLogger');
 
 // @desc    Fetch all products (with filters, sort, pagination)
 // @route   GET /api/products
@@ -133,6 +134,14 @@ exports.createProduct = async (req, res) => {
 
     const product = new Product(productData);
     const createdProduct = await product.save();
+
+    logActivity({
+      req,
+      action: 'CREATE_PRODUCT',
+      target: `Product: ${createdProduct.name}`,
+      details: { price: createdProduct.price, stock: createdProduct.stock }
+    });
+
     res.status(201).json(createdProduct);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -201,6 +210,14 @@ exports.updateProduct = async (req, res) => {
       }
 
       const updatedProduct = await product.save();
+
+      logActivity({
+        req,
+        action: 'UPDATE_PRODUCT',
+        target: `Product: ${updatedProduct.name}`,
+        details: { status: updatedProduct.status, stock: updatedProduct.stock, price: updatedProduct.price }
+      });
+
       res.json(updatedProduct);
     } else {
       res.status(404).json({ message: 'Product not found' });
@@ -219,6 +236,14 @@ exports.deleteProduct = async (req, res) => {
 
     if (product) {
       await Product.findByIdAndDelete(req.params.id);
+      
+      logActivity({
+        req,
+        action: 'DELETE_PRODUCT',
+        target: `Product: ${product.name}`,
+        details: `Deleted product ID: ${product._id}`
+      });
+
       res.json({ message: 'Product removed' });
     } else {
       res.status(404).json({ message: 'Product not found' });

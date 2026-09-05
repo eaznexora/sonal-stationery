@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonal Stationary | Activity Audit Trail</title>
+    
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Admin Core CSS -->
+    <link rel="stylesheet" href="/admin/css/admin-core.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="/logo.png" alt="Sonal Stationary Logo" onerror="this.src='https://via.placeholder.com/150x50?text=Sonal+Stationery'">
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ph ph-squares-four"></i> Dashboard
+            </a>
+            <a href="categories.html" class="nav-item">
+                <i class="ph ph-tag"></i> Categories
+            </a>
+            <div class="nav-item-group">
+                <a href="#" class="nav-item" id="productsDropdownToggle">
+                    <i class="ph ph-package"></i> Products
+                    <i class="ph ph-caret-down dropdown-icon"></i>
+                </a>
+                <div class="submenu-container" id="productsSubmenuContainer">
+                    <div class="submenu">
+                        <a href="products.html" class="submenu-item" id="nav-product-list">Product List</a>
+                        <a href="add-product.html" class="submenu-item" id="nav-add-product">Add a Product</a>
+                    </div>
+                </div>
+            </div>
+            <a href="orders.html" class="nav-item">
+                <i class="ph ph-shopping-cart"></i> Orders
+            </a>
+            <a href="users.html" class="nav-item">
+                <i class="ph ph-users"></i> Users
+            </a>
+            <a href="#" class="nav-item">
+                <i class="ph ph-chat-circle-dots"></i> Inquiries
+            </a>
+            <a href="inventory.html" class="nav-item">
+                <i class="ph ph-archive-box"></i> Inventory
+            </a>
+            <a href="analytics.html" class="nav-item">
+                <i class="ph ph-chart-bar"></i> Analytics
+            </a>
+            <a href="activity.html" class="nav-item active">
+                <i class="ph ph-clock-counter-clockwise"></i> Activity
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ph ph-gear"></i> Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="logout-btn">
+                <i class="ph ph-sign-out"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-title">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ph ph-list"></i>
+                </button>
+                <h1><span>Sonal Stationary</span> | Activity Audit Trail</h1>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" placeholder="Search orders, products, custo.......">
+                </div>
+                
+                <div class="header-icons">
+                    <i class="ph ph-magnifying-glass" style="display:none;" id="mobileSearchIcon"></i>
+                    <i class="ph ph-user"></i>
+                    <i class="ph ph-shopping-bag"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            <div style="margin-bottom: 2rem;">
+                <h2 style="font-family: var(--font-heading); color: var(--text-primary); margin-bottom: 0.5rem;">Team Activity & Audit Trail</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Real-time log of actions performed by employees and admins.</p>
+            </div>
+
+            <div style="background: var(--bg-white); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                
+                <!-- Toolbar -->
+                <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <select id="userFilter" style="width: 100%; padding: 0.75rem; border: 1px solid #E2DFD8; border-radius: 6px; font-family: inherit; font-size: 0.9rem;">
+                            <option value="">All Employees / Users</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <select id="actionFilter" style="width: 100%; padding: 0.75rem; border: 1px solid #E2DFD8; border-radius: 6px; font-family: inherit; font-size: 0.9rem;">
+                            <option value="">All Actions</option>
+                            <option value="LOGIN">Logins</option>
+                            <option value="CREATE_PRODUCT">Product Creation</option>
+                            <option value="UPDATE_PRODUCT">Product Updates</option>
+                            <option value="DELETE_PRODUCT">Product Deletions</option>
+                            <option value="UPDATE_ORDER_STATUS">Order Status Changes</option>
+                            <option value="INVITE_EMPLOYEE">Settings - Add Employee</option>
+                            <option value="UPDATE_EMPLOYEE">Settings - Edit Employee</option>
+                            <option value="DELETE_EMPLOYEE">Settings - Remove Employee</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="btnFilter" style="padding: 0.75rem 1.5rem;"><i class="ph ph-funnel"></i> Apply Filter</button>
+                    <button class="btn btn-outline" id="btnRefresh" style="padding: 0.75rem 1.5rem;"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container" style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #E2DFD8; background-color: #faf9f7;">
+                                <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Timestamp</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Actor</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Action</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Target</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityBody">
+                            <tr><td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-secondary);">Loading activity logs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color);">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="pageInfo">Showing 1 to 50 of 0 entries</div>
+                    <div style="display: flex; gap: 0.5rem;" id="paginationControls">
+                        <button class="btn btn-outline" style="padding: 0.5rem 1rem;" disabled>Previous</button>
+                        <button class="btn btn-outline" style="padding: 0.5rem 1rem;" disabled>Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('open');
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        function handleResize() {
+            const mobileSearchIcon = document.getElementById('mobileSearchIcon');
+            if (window.innerWidth <= 768) {
+                mobileSearchIcon.style.display = 'block';
+            } else {
+                mobileSearchIcon.style.display = 'none';
+            }
+        }
+        
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Init
+    </script>
+    <script src="/admin/js/auth-guard.js"></script>
+    <script src="/admin/js/activity.js"></script>
+</body>
+</html>

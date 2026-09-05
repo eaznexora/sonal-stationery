@@ -1,5 +1,6 @@
 const AdminUser = require('../models/AdminUser');
 const bcrypt = require('bcryptjs');
+const { logActivity } = require('../utils/auditLogger');
 
 exports.getTeam = async (req, res) => {
   try {
@@ -38,6 +39,13 @@ exports.addEmployee = async (req, res) => {
     
     await user.save();
 
+    logActivity({
+      req,
+      action: 'INVITE_EMPLOYEE',
+      target: `Employee: ${user.email}`,
+      details: { permissions: user.permissions }
+    });
+
     res.json({ success: true, message: 'Employee added successfully', user });
   } catch (error) {
     console.error('addEmployee Error:', error);
@@ -62,6 +70,14 @@ exports.updateEmployee = async (req, res) => {
     }
 
     await user.save();
+    
+    logActivity({
+      req,
+      action: 'UPDATE_EMPLOYEE',
+      target: `Employee: ${user.email}`,
+      details: { permissions: user.permissions, isActive: user.isActive, passwordUpdated: !!password }
+    });
+
     res.json({ success: true, message: 'Employee updated successfully', user });
   } catch (error) {
     console.error('updateEmployee Error:', error);
@@ -75,6 +91,13 @@ exports.removeEmployee = async (req, res) => {
     const user = await AdminUser.findByIdAndDelete(id);
     if (!user) return res.status(404).json({ success: false, message: 'Employee not found' });
     
+    logActivity({
+      req,
+      action: 'DELETE_EMPLOYEE',
+      target: `Employee: ${user.email}`,
+      details: 'Removed employee access'
+    });
+
     res.json({ success: true, message: 'Employee removed successfully' });
   } catch (error) {
     console.error('removeEmployee Error:', error);

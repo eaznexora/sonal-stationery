@@ -5,6 +5,7 @@ const { getDashboardStats } = require('../controllers/dashboardController');
 const { getInventoryStats, getInventory, updateStock } = require('../controllers/inventoryController');
 const { getAnalytics } = require('../controllers/analyticsController');
 const { getTeam, addEmployee, updateEmployee, removeEmployee } = require('../controllers/settingsController');
+const { getActivityLogs } = require('../controllers/activityController');
 const { adminAuth, requirePermission } = require('../middleware/adminAuth');
 
 router.route('/stats')
@@ -24,6 +25,9 @@ router.route('/inventory/:id/stock')
 
 router.route('/analytics')
   .get(adminAuth, requirePermission('analytics'), getAnalytics);
+
+router.route('/activity')
+  .get(adminAuth, requirePermission('activity'), getActivityLogs);
 
 // Settings & Team
 router.route('/settings/team')

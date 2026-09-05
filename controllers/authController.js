@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { Resend } = require('resend');
 const AdminUser = require('../models/AdminUser');
+const { logActivity } = require('../utils/auditLogger');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -68,10 +69,25 @@ exports.validateCredentials = async (req, res) => {
         from: fromAddress,
         to: email, // use requested casing for the email address
         subject: `Your Sonal Stationery Admin OTP: ${otp}`,
-        html: `<div style="font-family:sans-serif;padding:20px;">
-                 <h2>Your Admin Login OTP</h2>
-                 <p>Your one-time password is <strong>${otp}</strong>. It expires in 10 minutes. Do not share this code.</p>
-               </div>`
+        html: `
+          <div style="background-color: #F8F6F0; padding: 40px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 500px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center;">
+              <h2 style="margin-top: 0; color: #2D3748; font-size: 24px; border-bottom: 2px solid #F1EFE9; padding-bottom: 15px; margin-bottom: 25px;">Sonal Stationery</h2>
+              <h3 style="color: #4A5568; font-size: 18px; margin-bottom: 20px;">Admin Authentication Code</h3>
+              <p style="color: #718096; font-size: 15px; margin-bottom: 25px;">Use this one-time code to sign in to your admin dashboard.</p>
+              
+              <div style="background-color: #F1EFE9; border-radius: 8px; padding: 14px 28px; display: inline-block; margin-bottom: 25px;">
+                <span style="font-family: monospace; font-size: 32px; font-weight: bold; color: #2D3748; letter-spacing: 6px;">${otp}</span>
+              </div>
+              
+              <p style="color: #718096; font-size: 14px; margin-bottom: 20px;">This code expires in 10 minutes.</p>
+              <p style="color: #A0AEC0; font-size: 13px; border-top: 1px solid #F1EFE9; padding-top: 20px; text-align: left;">If you did not request this, please contact the store administrator immediately.</p>
+            </div>
+            <div style="max-width: 500px; margin: 20px auto 0; text-align: center; color: #A0AEC0; font-size: 12px;">
+              &copy; ${new Date().getFullYear()} Sonal Stationery & Toys. Confidential internal access.
+            </div>
+          </div>
+        `
       });
 
       if (error) {
@@ -132,6 +148,13 @@ exports.verifyOtp = async (req, res) => {
     // Success! Clear OTP and generate token
     otpStorage.delete(lowerEmail);
     const token = signAndSetToken(res, email, role, permissions);
+
+    logActivity({
+      req: { admin: { email, role }, ip: req.ip },
+      action: 'LOGIN',
+      target: 'Admin Dashboard',
+      details: 'Successful OTP verification'
+    });
 
     res.json({ success: true, message: 'OTP verified successfully', token, admin: { email, role, permissions } });
   } catch (error) {

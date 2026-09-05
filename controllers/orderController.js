@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const { logActivity } = require('../utils/auditLogger');
 
 // @desc    Fetch all orders
 // @route   GET /api/orders
@@ -86,6 +87,17 @@ exports.updateOrderStatus = async (req, res) => {
       if (trackingId) order.trackingId = trackingId;
 
       const updatedOrder = await order.save();
+
+      logActivity({
+        req,
+        action: 'UPDATE_ORDER_STATUS',
+        target: `Order: ${updatedOrder.orderId}`,
+        details: { 
+          orderStatus: updatedOrder.orderStatus, 
+          paymentStatus: updatedOrder.paymentStatus 
+        }
+      });
+
       res.json(updatedOrder);
     } else {
       res.status(404).json({ message: 'Order not found' });

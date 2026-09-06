@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const routeMap = {
             'dashboard': ['/admin/dashboard.html', '/admin/'],
             'categories': ['/admin/categories.html'],
-            'products': ['/admin/products.html'],
+            'products': ['/admin/products.html', '/admin/add-product.html'],
             'products_add': ['/admin/add-product.html'],
             'orders': ['/admin/orders.html'],
             'users': ['/admin/users.html'],
@@ -57,8 +57,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Hide unauthorized sidebar links
         Object.keys(sidebarMap).forEach(key => {
             if (!perms.includes(key)) {
-                const el = document.querySelector(sidebarMap[key]);
-                if (el) el.style.display = 'none';
+                const els = document.querySelectorAll(sidebarMap[key]);
+                els.forEach(el => el.style.display = 'none');
                 
                 // If they don't have products OR products_add, hide the parent Products dropdown entirely
                 if (key === 'products' || key === 'products_add') {
@@ -79,8 +79,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (routes.some(r => currentPath.endsWith(r))) {
                 if (perms.includes(perm)) {
                     isAllowed = true;
+                    break;
                 }
-                break;
             }
         }
 

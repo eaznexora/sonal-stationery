@@ -164,18 +164,39 @@ exports.verifyOtp = async (req, res) => {
 };
 
 // GET /api/admin/check-auth
-exports.checkAuth = (req, res) => {
+exports.checkAuth = async (req, res) => {
   try {
     const token = req.cookies.admin_token || req.headers.authorization?.split(' ')[1];
-    
     if (!token) {
       return res.json({ authenticated: false, success: false });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    res.json({ authenticated: true, success: true, admin: decoded, user: decoded });
-  } catch (error) {
-    res.json({ authenticated: false, success: false });
+    
+    if (decoded.role === 'superadmin') {
+      return res.json({
+        success: true,
+        authenticated: true,
+        user: { email: decoded.email, role: 'superadmin', permissions: ['all'] },
+        admin: { email: decoded.email, role: 'superadmin', permissions: ['all'] }
+      });
+    }
+
+    // Fetch fresh user from DB so permission changes reflect immediately without re-login
+    const user = await AdminUser.findOne({ email: decoded.email }).select('-password');
+    if (!user || !user.isActive) {
+      return res.status(401).json({ success: false, authenticated: false, message: 'User deactivated or not found' });
+    }
+
+    res.json({
+      success: true,
+      authenticated: true,
+      user: { email: user.email, role: user.role, permissions: user.permissions },
+      admin: { email: user.email, role: user.role, permissions: user.permissions }
+    });
+  } catch (err) {
+    console.error('checkAuth error:', err);
+    res.json({ success: false, authenticated: false, message: 'Server error or invalid token' });
   }
 };
 

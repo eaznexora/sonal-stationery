@@ -168,8 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const id = document.getElementById('editEmpId').value;
             const password = document.getElementById('editEmpPassword').value;
-            const permsChecked = document.querySelectorAll('input[name="editPerms"]:checked');
-            const permissions = Array.from(permsChecked).map(cb => cb.value);
+            const checkedBoxes = document.querySelectorAll('#editEmployeeModal input[type="checkbox"]:checked');
+            const permissions = Array.from(checkedBoxes).map(cb => cb.value).filter(Boolean);
 
             const payload = { permissions };
             if (password.trim() !== '') {

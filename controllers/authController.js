@@ -169,13 +169,13 @@ exports.checkAuth = (req, res) => {
     const token = req.cookies.admin_token || req.headers.authorization?.split(' ')[1];
     
     if (!token) {
-      return res.json({ authenticated: false });
+      return res.json({ authenticated: false, success: false });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    res.json({ authenticated: true, admin: decoded });
+    res.json({ authenticated: true, success: true, admin: decoded, user: decoded });
   } catch (error) {
-    res.json({ authenticated: false });
+    res.json({ authenticated: false, success: false });
   }
 };
 

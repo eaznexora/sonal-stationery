@@ -10,6 +10,7 @@ const {
 router.post('/validate-credentials', validateCredentials);
 router.post('/verify-otp', verifyOtp);
 router.get('/check-auth', checkAuth);
+router.get('/me', checkAuth);
 router.post('/logout', logout);
 
 module.exports = router;

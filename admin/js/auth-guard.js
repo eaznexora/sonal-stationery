@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const admin = data.admin;
         if (!admin) return;
 
+        const user = data.user || admin;
+        console.log('[AUTH-GUARD] Current User:', user.email, 'Permissions:', user.permissions);
+
         // Superadmin has full access
         if (admin.role === 'superadmin') return;
 
@@ -45,8 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sidebarMap = {
             'dashboard': 'a[href="dashboard.html"]',
             'categories': 'a[href="categories.html"]',
-            'products': 'a[href="products.html"]',
-            'products_add': 'a[href="add-product.html"]',
             'orders': 'a[href="orders.html"]',
             'users': 'a[href="users.html"]',
             'inventory': 'a[href="inventory.html"]',
@@ -59,16 +60,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!perms.includes(key)) {
                 const els = document.querySelectorAll(sidebarMap[key]);
                 els.forEach(el => el.style.display = 'none');
-                
-                // If they don't have products OR products_add, hide the parent Products dropdown entirely
-                if (key === 'products' || key === 'products_add') {
-                    if (!perms.includes('products') && !perms.includes('products_add')) {
-                        const parent = document.getElementById('productsDropdownToggle');
-                        if (parent) parent.style.display = 'none';
-                    }
-                }
             }
         });
+
+        // Locate all Add Product links regardless of leading slashes/paths
+        const addProductLinks = document.querySelectorAll('a[href*="add-product.html"], a[data-permission="products_add"]');
+        const productListLinks = document.querySelectorAll('a[href*="products.html"]:not([href*="add-product.html"]), a[data-permission="products"]');
+
+        const hasAddProduct = user.role === 'superadmin' || (user.permissions && user.permissions.includes('products_add'));
+        const hasProductList = user.role === 'superadmin' || (user.permissions && (user.permissions.includes('products') || user.permissions.includes('products_view')));
+
+        addProductLinks.forEach(link => {
+          const parent = link.closest('li') || link;
+          if (hasAddProduct) {
+            parent.style.setProperty('display', 'block', 'important');
+            link.style.setProperty('display', 'block', 'important');
+          } else {
+            parent.style.setProperty('display', 'none', 'important');
+          }
+        });
+
+        productListLinks.forEach(link => {
+          const parent = link.closest('li') || link;
+          if (hasProductList) {
+            parent.style.setProperty('display', 'block', 'important');
+            link.style.setProperty('display', 'block', 'important');
+          } else {
+            parent.style.setProperty('display', 'none', 'important');
+          }
+        });
+
+        // Hide the parent Products dropdown entirely if neither is present
+        if (!hasAddProduct && !hasProductList) {
+            const parent = document.getElementById('productsDropdownToggle');
+            if (parent) parent.style.display = 'none';
+        }
 
         // Guard current route
         const currentPath = window.location.pathname;

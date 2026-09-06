@@ -8,6 +8,17 @@ const {
   updateCategory,
   deleteCategory,
 } = require('../controllers/categoryController');
+const { adminAuth } = require('../middleware/adminAuth');
+
+// Allow if user has either categories or products_add (or is superadmin)
+const canModifyCategory = (req, res, next) => {
+  if (req.admin.role === 'superadmin') return next();
+  const perms = req.admin.permissions || [];
+  if (perms.includes('categories') || perms.includes('products_add')) {
+    return next();
+  }
+  return res.status(403).json({ success: false, message: 'Access denied: Requires Categories or Add Product permission' });
+};
 
 // Multer config (reusing logic from products)
 const storage = multer.diskStorage({
@@ -21,11 +32,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.route('/')
-  .get(getCategories)
-  .post(upload.array('images', 1), createCategory);
+  .get(getCategories) // Public GET for frontend and dropdowns
+  .post(adminAuth, canModifyCategory, upload.array('images', 1), createCategory);
 
 router.route('/:id')
-  .put(upload.array('images', 1), updateCategory)
-  .delete(deleteCategory);
+  .put(adminAuth, canModifyCategory, upload.array('images', 1), updateCategory)
+  .delete(adminAuth, canModifyCategory, deleteCategory);
 
 module.exports = router;

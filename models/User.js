@@ -10,11 +10,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
     phone: String,
     password: {
       type: String,
-      required: true,
+      required: false,
     },
     role: {
       type: String,
@@ -26,6 +28,26 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     profilePhoto: String,
+    picture: {
+      type: String,
+      default: '',
+    },
+    googleId: {
+      type: String,
+      default: null,
+    },
+    otp: {
+      type: String,
+      default: null,
+    },
+    otpExpires: {
+      type: Date,
+      default: null,
+    },
+    addresses: {
+      type: Array,
+      default: [],
+    },
   },
   {
     timestamps: true,

@@ -85,7 +85,7 @@
 
             <div class="nav-right">
                 <button class="icon-btn" aria-label="Search"><i data-lucide="search"></i></button>
-                <a href="profile.html" class="icon-btn" aria-label="Account"><i data-lucide="user"></i></a>
+                <a href="#" onclick="event.preventDefault(); window.requireCustomerAuth(() => window.location.href='profile.html', 'Login to access your profile')" class="icon-btn" aria-label="Account"><i data-lucide="user"></i></a>
                 <button class="icon-btn" aria-label="Cart">
                     <i data-lucide="shopping-bag"></i>
                     <span class="cart-count">0</span>
@@ -97,7 +97,7 @@
 
     <!-- Mobile Sticky Bottom Navigation -->
     <nav class="mobile-bottom-nav">
-        <a href="profile.html#tab-orders" class="nav-item">
+        <a href="#" onclick="event.preventDefault(); window.requireCustomerAuth(() => window.location.href='profile.html#tab-orders', 'Login to view your orders')" class="nav-item">
             <i data-lucide="package"></i>
             <span>Orders</span>
         </a>
@@ -105,7 +105,7 @@
             <i data-lucide="grid"></i>
             <span>Categories</span>
         </a>
-        <a href="profile.html" class="nav-item">
+        <a href="#" onclick="event.preventDefault(); window.requireCustomerAuth(() => window.location.href='profile.html', 'Login to access your profile')" class="nav-item">
             <i data-lucide="user"></i>
             <span>Profile</span>
         </a>
@@ -511,6 +511,7 @@
         });
     </script>
     <script src="storefront.js"></script>
+    <script src="/js/customer-auth.js"></script>
 </body>
 
 </html>

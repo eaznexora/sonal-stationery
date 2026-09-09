@@ -43,13 +43,13 @@
 
                 <div id="authStep2" style="display:none;">
                     <p style="font-size:14px;color:#71717A;margin-bottom:20px;">Enter the 6-digit code sent to <br><b id="authDisplayEmail" style="color:#2C3E2D;"></b></p>
-                    <div class="otp-inputs" id="authOtpContainer">
-                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                    <div class="otp-inputs-container" id="authOtpContainer">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
                     </div>
                     <button type="button" class="primary-btn" id="authVerifyOtpBtn">Verify Code</button>
                     <div class="resend-text">
@@ -68,7 +68,7 @@
                         </div>
                         <div class="input-group">
                             <label>Mobile / WhatsApp Number</label>
-                            <input type="tel" id="authPhoneInput" required pattern="[0-9]{10}" placeholder="10-digit mobile number">
+                            <input type="tel" id="authPhoneInput" required inputmode="tel" pattern="[0-9]{10}" autocomplete="tel" placeholder="e.g. 9876543210">
                         </div>
                         <button type="submit" class="primary-btn" id="authSaveProfileBtn" style="margin-top:10px;">Save & Continue</button>
                     </form>
@@ -117,11 +117,22 @@
     }
 
     function updateHeaderIcon(user) {
-        const icons = document.querySelectorAll('.nav-right .icon-btn[aria-label="Account"], .mobile-bottom-nav .nav-item[href="profile.html"], .mobile-bottom-nav .nav-item[onclick*="profile.html"]');
-        icons.forEach(icon => {
+        // Desktop Profile Icon
+        const desktopIcons = document.querySelectorAll('.nav-right .icon-btn[aria-label="Account"]');
+        desktopIcons.forEach(icon => {
             if (user && user.name) {
-                // Change icon to avatar with initial
                 icon.innerHTML = `<div style="width:24px; height:24px; border-radius:50%; background:#3A4D39; color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; margin:0 auto;">${user.name.charAt(0).toUpperCase()}</div>`;
+            }
+        });
+
+        // Mobile Profile Icon (be careful to only target the main Profile tab, not Orders etc.)
+        const mobileNavItems = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+        mobileNavItems.forEach(item => {
+            if (item.innerText.includes('Profile') || item.innerText.includes('Account')) {
+                const iconElem = item.querySelector('i, svg, div');
+                if (iconElem && user && user.name) {
+                    iconElem.outerHTML = `<div style="width:24px; height:24px; border-radius:50%; background:#3A4D39; color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; margin:0 auto; margin-bottom:4px;">${user.name.charAt(0).toUpperCase()}</div>`;
+                }
             }
         });
     }

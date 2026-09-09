@@ -114,23 +114,28 @@
     margin-bottom: 8px;
 }
 
+#customerAuthModal .input-group input[type="text"],
+#customerAuthModal .input-group input[type="tel"],
 #customerAuthModal .input-group input[type="email"] {
-    width: 100%;
-    height: 48px;
-    border-radius: 12px;
-    border: 1.5px solid #E2DCD5;
-    background: #FFFFFF;
-    padding: 0 16px;
-    box-sizing: border-box;
-    font-size: 15px;
-    outline: none;
-    transition: all 0.2s;
-    color: #2C3E2D;
+    width: 100% !important;
+    height: 50px !important;
+    padding: 0 16px !important;
+    border: 1.5px solid #E2DCD5 !important;
+    border-radius: 12px !important;
+    background: #FFFFFF !important;
+    font-size: 15px !important;
+    color: #2C3E2D !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    margin-bottom: 16px !important;
 }
 
+#customerAuthModal .input-group input[type="text"]:focus,
+#customerAuthModal .input-group input[type="tel"]:focus,
 #customerAuthModal .input-group input[type="email"]:focus {
-    border-color: #4A5D4E;
-    box-shadow: 0 0 0 3px rgba(74, 93, 79, 0.15);
+    border-color: #3A4D39 !important;
+    box-shadow: 0 0 0 3px rgba(58, 77, 57, 0.12) !important;
 }
 
 #customerAuthModal .primary-btn {
@@ -163,38 +168,47 @@
 }
 
 /* OTP Segmented Inputs */
-#customerAuthModal .otp-inputs {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    gap: 8px;
+#customerAuthModal .otp-inputs-container {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    margin: 20px 0 !important;
+    width: 100% !important;
 }
 
-#customerAuthModal .otp-inputs input {
-    flex: 1;
-    height: 56px;
-    text-align: center;
-    font-size: 24px;
-    font-weight: 500;
-    border: 1.5px solid #E2DCD5;
-    border-radius: 12px;
-    background: #FFFFFF;
-    outline: none;
+#customerAuthModal .otp-box {
+    width: 44px !important;
+    height: 52px !important;
+    text-align: center !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #2C3E2D !important;
+    border: 1.5px solid #E2DCD5 !important;
+    border-radius: 10px !important;
+    background: #FFFFFF !important;
+    outline: none !important;
     transition: all 0.2s;
-    color: #2C3E2D;
     /* hide arrows */
     -moz-appearance: textfield;
 }
 
-#customerAuthModal .otp-inputs input::-webkit-outer-spin-button,
-#customerAuthModal .otp-inputs input::-webkit-inner-spin-button {
+#customerAuthModal .otp-box::-webkit-outer-spin-button,
+#customerAuthModal .otp-box::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-#customerAuthModal .otp-inputs input:focus {
-    border-color: #4A5D4E;
-    box-shadow: 0 0 0 3px rgba(74, 93, 79, 0.15);
+#customerAuthModal .otp-box:focus {
+    border-color: #3A4D39 !important;
+    box-shadow: 0 0 0 3px rgba(58, 77, 57, 0.12) !important;
+}
+
+@media (max-width: 400px) {
+    #customerAuthModal .otp-box {
+        width: 38px !important;
+        height: 46px !important;
+        font-size: 18px !important;
+    }
 }
 
 #customerAuthModal .resend-text {

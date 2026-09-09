@@ -7,5 +7,6 @@ router.post('/verify-otp', customerAuthController.verifyOtp);
 router.post('/google', customerAuthController.googleLogin);
 router.get('/me', customerAuthController.getMe);
 router.post('/logout', customerAuthController.logout);
+router.patch('/profile', customerAuthController.updateProfile);
 
 module.exports = router;

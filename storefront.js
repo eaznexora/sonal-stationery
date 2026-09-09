@@ -8,6 +8,14 @@ async function renderHomepageCategories() {
     const catGrid = document.querySelector('.category-grid');
     if (!catGrid) return;
     
+    // Enforce 3-column grid layout inline as requested
+    catGrid.style.display = 'grid';
+    catGrid.style.gridTemplateColumns = 'repeat(3, minmax(0, 1fr))';
+    catGrid.style.gap = '28px';
+    catGrid.style.width = '100%';
+    catGrid.style.maxWidth = '1200px';
+    catGrid.style.margin = '0 auto';
+
     try {
         catGrid.innerHTML = '<p>Loading categories...</p>';
         const res = await fetch(`${API_BASE}/api/categories?status=active`);

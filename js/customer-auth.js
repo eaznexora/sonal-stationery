@@ -58,8 +58,25 @@
                     </div>
                     <button type="button" class="change-email-btn" onclick="document.getElementById('authStep2').style.display='none';document.getElementById('authStep1').style.display='block';">Use a different email</button>
                 </div>
+
+                <div id="authStep3" style="display:none; text-align:left;">
+                    <h3 style="margin-bottom:20px; font-size:20px;">Almost there! Tell us about yourself</h3>
+                    <form id="authProfileForm">
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" id="authNameInput" required placeholder="Your name">
+                        </div>
+                        <div class="input-group">
+                            <label>Mobile / WhatsApp Number</label>
+                            <input type="tel" id="authPhoneInput" required pattern="[0-9]{10}" placeholder="10-digit mobile number">
+                        </div>
+                        <button type="submit" class="primary-btn" id="authSaveProfileBtn" style="margin-top:10px;">Save & Continue</button>
+                    </form>
+                </div>
             </div>
         </div>
+        
+        <div id="authToast" class="auth-toast"></div>
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
@@ -68,9 +85,11 @@
     const closeBtn = document.getElementById('authCloseBtn');
     const promptMsg = document.getElementById('authPromptMsg');
     const errorMsg = document.getElementById('authErrorMsg');
+    const toast = document.getElementById('authToast');
     
     let pendingCallback = null;
     let authEmail = '';
+    let authenticatedUser = null;
     let countdownInterval = null;
 
     // Initialize Google Sign-in when script loads
@@ -89,6 +108,41 @@
     function clearError() {
         errorMsg.style.display = 'none';
         errorMsg.innerText = '';
+    }
+
+    function showToast(msg) {
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    function updateHeaderIcon(user) {
+        const icons = document.querySelectorAll('.nav-right .icon-btn[aria-label="Account"], .mobile-bottom-nav .nav-item[href="profile.html"], .mobile-bottom-nav .nav-item[onclick*="profile.html"]');
+        icons.forEach(icon => {
+            if (user && user.name) {
+                // Change icon to avatar with initial
+                icon.innerHTML = `<div style="width:24px; height:24px; border-radius:50%; background:#3A4D39; color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; margin:0 auto;">${user.name.charAt(0).toUpperCase()}</div>`;
+            }
+        });
+    }
+
+    function handleAuthSuccess(user) {
+        authenticatedUser = user;
+        if (!user.name || !user.phone || user.name.trim() === '') {
+            document.getElementById('authStep1').style.display = 'none';
+            document.getElementById('authStep2').style.display = 'none';
+            document.getElementById('authStep3').style.display = 'block';
+            if (user.name) document.getElementById('authNameInput').value = user.name;
+        } else {
+            finalizeLogin(user);
+        }
+    }
+
+    function finalizeLogin(user) {
+        closeModal();
+        updateHeaderIcon(user);
+        showToast(`✓ Welcome to Sonal Stationery, ${user.name}!`);
+        if (pendingCallback) pendingCallback();
     }
 
     function renderGoogleButton() {
@@ -110,8 +164,7 @@
             });
             const data = await res.json();
             if (data.success) {
-                closeModal();
-                if (pendingCallback) pendingCallback();
+                handleAuthSuccess(data.user);
             } else {
                 showError(data.message || 'Google login failed');
             }
@@ -127,6 +180,7 @@
         modal.classList.add('active');
         document.getElementById('authStep1').style.display = 'block';
         document.getElementById('authStep2').style.display = 'none';
+        document.getElementById('authStep3').style.display = 'none';
         clearError();
         // Give modal a tiny bit of time to display block before rendering GSI so width calculates right
         setTimeout(renderGoogleButton, 10);
@@ -211,8 +265,7 @@
             });
             const data = await res.json();
             if (data.success) {
-                closeModal();
-                if (pendingCallback) pendingCallback();
+                handleAuthSuccess(data.user);
             } else {
                 showError(data.message || 'Invalid OTP');
             }
@@ -248,12 +301,44 @@
         document.getElementById('authEmailForm').dispatchEvent(new Event('submit'));
     });
 
+    // Profile Completion Form
+    document.getElementById('authProfileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearError();
+        const btn = document.getElementById('authSaveProfileBtn');
+        const name = document.getElementById('authNameInput').value.trim();
+        const phone = document.getElementById('authPhoneInput').value.trim();
+        
+        btn.disabled = true;
+        btn.innerText = 'Saving...';
+        
+        try {
+            const res = await fetch('/api/auth/customer/profile', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone })
+            });
+            const data = await res.json();
+            if (data.success) {
+                finalizeLogin(data.user);
+            } else {
+                showError(data.message || 'Failed to update profile');
+            }
+        } catch (err) {
+            showError('Network error');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Save & Continue';
+        }
+    });
+
     // Global exposed function
     window.requireCustomerAuth = async function(callback, promptMessage) {
         try {
             const res = await fetch('/api/auth/customer/me');
             const data = await res.json();
             if (data.success && data.authenticated) {
+                updateHeaderIcon(data.user);
                 callback(); // Already logged in
             } else {
                 openModal(callback, promptMessage); // Not logged in

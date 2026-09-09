@@ -156,3 +156,30 @@ exports.logout = (req, res) => {
   res.clearCookie('customer_token', { path: '/' });
   res.json({ success: true });
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const token = req.cookies.customer_token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+    if (!token) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { name, phone } = req.body;
+    
+    if (!name || !phone) {
+      return res.status(400).json({ success: false, message: 'Name and phone are required' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      decoded.id, 
+      { name, phone },
+      { new: true }
+    ).select('-password -otp -otpExpires');
+
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error('Update Profile Error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};

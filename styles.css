@@ -446,6 +446,32 @@ button {
   }
 }
 
+/* New Unified Rules */
+.category-grid,
+.categories-grid,
+.product-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 28px !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 20px 0 !important;
+}
+@media (max-width: 768px) {
+  .category-grid,
+  .categories-grid,
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 480px) {
+  .category-grid,
+  .categories-grid,
+  .product-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 @media (max-width: 768px) {
     .hide-on-mobile {
         display: none !important;

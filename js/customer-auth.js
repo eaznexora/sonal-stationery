@@ -20,15 +20,17 @@
     const modalHtml = `
         <div id="customerAuthModal">
             <div class="auth-card">
-                <button class="close-btn" id="authCloseBtn">&times;</button>
-                <h3>Welcome</h3>
-                <div class="auth-prompt" id="authPromptMsg">Login to continue</div>
+                <button class="close-btn" id="authCloseBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                <h3>Welcome to Sonal Stationery</h3>
+                <div class="auth-prompt" id="authPromptMsg">Login to complete your order</div>
                 <div class="auth-error" id="authErrorMsg"></div>
                 
                 <div id="authStep1">
                     <div class="google-btn-container" id="googleSignInBtn"></div>
                     
-                    <div class="divider">OR CONTINUE WITH EMAIL</div>
+                    <div class="auth-divider"><span>OR CONTINUE WITH EMAIL</span></div>
                     
                     <form id="authEmailForm">
                         <div class="input-group">
@@ -40,7 +42,7 @@
                 </div>
 
                 <div id="authStep2" style="display:none;">
-                    <p style="font-size:13px;color:#666;margin-bottom:15px;">Enter the 6-digit code sent to <br><b id="authDisplayEmail"></b></p>
+                    <p style="font-size:14px;color:#71717A;margin-bottom:20px;">Enter the 6-digit code sent to <br><b id="authDisplayEmail" style="color:#2C3E2D;"></b></p>
                     <div class="otp-inputs" id="authOtpContainer">
                         <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
                         <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
@@ -54,7 +56,7 @@
                         Didn't receive a code? 
                         <button type="button" class="resend-btn" id="authResendBtn" disabled>Resend in <span id="authTimer">60</span>s</button>
                     </div>
-                    <button type="button" style="margin-top:15px;background:none;border:none;color:#4A5D23;text-decoration:underline;cursor:pointer;" onclick="document.getElementById('authStep2').style.display='none';document.getElementById('authStep1').style.display='block';">Change Email</button>
+                    <button type="button" class="change-email-btn" onclick="document.getElementById('authStep2').style.display='none';document.getElementById('authStep1').style.display='block';">Use a different email</button>
                 </div>
             </div>
         </div>
@@ -94,7 +96,7 @@
         if (window.google && btnContainer && btnContainer.innerHTML === '') {
             google.accounts.id.renderButton(
                 btnContainer,
-                { theme: 'outline', size: 'large', width: 320 }
+                { theme: 'outline', size: 'large', width: btnContainer.offsetWidth || 376 }
             );
         }
     }
@@ -121,12 +123,13 @@
     // Modal behavior
     function openModal(callback, msg) {
         pendingCallback = callback;
-        promptMsg.innerText = msg || 'Login to continue';
+        promptMsg.innerText = msg || 'Login to complete your order';
         modal.classList.add('active');
         document.getElementById('authStep1').style.display = 'block';
         document.getElementById('authStep2').style.display = 'none';
         clearError();
-        renderGoogleButton();
+        // Give modal a tiny bit of time to display block before rendering GSI so width calculates right
+        setTimeout(renderGoogleButton, 10);
     }
 
     function closeModal() {

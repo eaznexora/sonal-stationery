@@ -1,5 +1,4 @@
-/* Warm cream / sage branded action-triggered auth modal */
-
+/* Premium Luxury Customer Auth Modal */
 #customerAuthModal {
     display: none;
     position: fixed;
@@ -10,185 +9,252 @@
     z-index: 9999;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    background-color: rgba(251, 249, 245, 0.4); /* Warm cream with opacity */
+    background-color: rgba(30, 41, 59, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 #customerAuthModal.active {
     display: flex;
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #customerAuthModal .auth-card {
-    background: #ffffff;
-    width: 90%;
-    max-width: 400px;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    border: 1px solid rgba(74, 93, 35, 0.1); /* Subtle sage border */
+    background: #FDFAF4;
+    width: 100%;
+    max-width: 440px;
+    padding: 36px 32px 32px;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px -10px rgba(45, 55, 72, 0.2);
+    border: 1px solid rgba(74, 93, 79, 0.15);
     position: relative;
     text-align: center;
 }
 
 #customerAuthModal .close-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
     background: none;
     border: none;
-    font-size: 24px;
-    color: #888;
+    border-radius: 50%;
+    font-size: 20px;
+    color: #71717A;
     cursor: pointer;
     line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+#customerAuthModal .close-btn:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #2C3E2D;
 }
 
 #customerAuthModal h3 {
     margin-top: 0;
-    margin-bottom: 10px;
-    color: #4A5D23; /* Sage */
-    font-family: inherit;
+    margin-bottom: 6px;
+    color: #2C3E2D;
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    letter-spacing: -0.02em;
 }
 
 #customerAuthModal .auth-prompt {
     font-size: 14px;
-    color: #666;
-    margin-bottom: 25px;
+    color: #71717A;
+    margin-top: 6px;
+    margin-bottom: 26px;
 }
 
 #customerAuthModal .google-btn-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
+    width: 100%;
 }
 
-#customerAuthModal .divider {
+.auth-divider {
     display: flex;
     align-items: center;
     text-align: center;
-    margin: 20px 0;
-    color: #999;
-    font-size: 12px;
+    margin: 22px 0 20px;
+    color: #A1A1AA;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
-
-#customerAuthModal .divider::before,
-#customerAuthModal .divider::after {
+.auth-divider::before,
+.auth-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #E4E4E7;
 }
-
-#customerAuthModal .divider:not(:empty)::before {
-    margin-right: .25em;
-}
-
-#customerAuthModal .divider:not(:empty)::after {
-    margin-left: .25em;
+.auth-divider span {
+    padding: 0 14px;
 }
 
 #customerAuthModal .input-group {
-    margin-bottom: 15px;
+    margin-bottom: 16px;
     text-align: left;
 }
 
 #customerAuthModal .input-group label {
     display: block;
-    margin-bottom: 5px;
-    font-size: 13px;
-    color: #555;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #52525B;
+    margin-bottom: 8px;
 }
 
 #customerAuthModal .input-group input[type="email"] {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1.5px solid #E2DCD5;
+    background: #FFFFFF;
+    padding: 0 16px;
     box-sizing: border-box;
-    font-size: 14px;
+    font-size: 15px;
     outline: none;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+    color: #2C3E2D;
 }
 
 #customerAuthModal .input-group input[type="email"]:focus {
-    border-color: #4A5D23; /* Sage */
+    border-color: #4A5D4E;
+    box-shadow: 0 0 0 3px rgba(74, 93, 79, 0.15);
 }
 
 #customerAuthModal .primary-btn {
     width: 100%;
-    background: #4A5D23; /* Sage */
-    color: white;
+    height: 48px;
+    background: #3A4D39;
+    color: #FFFFFF;
     border: none;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 12px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 4px 14px rgba(58, 77, 57, 0.25);
+    transition: background 0.2s, transform 0.1s;
 }
 
 #customerAuthModal .primary-btn:hover {
-    background: #3a4a1b;
+    background: #2F3E2E;
+}
+
+#customerAuthModal .primary-btn:active {
+    transform: scale(0.98);
 }
 
 #customerAuthModal .primary-btn:disabled {
     background: #a9b98d;
+    box-shadow: none;
     cursor: not-allowed;
+    transform: none;
 }
 
+/* OTP Segmented Inputs */
 #customerAuthModal .otp-inputs {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    gap: 8px;
 }
 
 #customerAuthModal .otp-inputs input {
-    width: 45px;
-    height: 50px;
+    flex: 1;
+    height: 56px;
     text-align: center;
-    font-size: 20px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    font-size: 24px;
+    font-weight: 500;
+    border: 1.5px solid #E2DCD5;
+    border-radius: 12px;
+    background: #FFFFFF;
     outline: none;
+    transition: all 0.2s;
+    color: #2C3E2D;
+    /* hide arrows */
+    -moz-appearance: textfield;
+}
+
+#customerAuthModal .otp-inputs input::-webkit-outer-spin-button,
+#customerAuthModal .otp-inputs input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 #customerAuthModal .otp-inputs input:focus {
-    border-color: #4A5D23;
+    border-color: #4A5D4E;
+    box-shadow: 0 0 0 3px rgba(74, 93, 79, 0.15);
 }
 
 #customerAuthModal .resend-text {
     font-size: 13px;
-    color: #666;
-    margin-top: 15px;
+    color: #71717A;
+    margin-top: 20px;
 }
 
 #customerAuthModal .resend-btn {
     background: none;
     border: none;
-    color: #4A5D23;
+    color: #3A4D39;
     font-weight: 600;
     cursor: pointer;
     padding: 0;
     text-decoration: underline;
+    transition: color 0.2s;
+}
+
+#customerAuthModal .resend-btn:hover {
+    color: #2F3E2E;
 }
 
 #customerAuthModal .resend-btn:disabled {
-    color: #999;
+    color: #A1A1AA;
     cursor: not-allowed;
     text-decoration: none;
 }
 
+#customerAuthModal .change-email-btn {
+    margin-top: 16px;
+    background: none;
+    border: none;
+    color: #3A4D39;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+#customerAuthModal .change-email-btn:hover {
+    color: #2F3E2E;
+}
+
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .auth-error {
     color: #dc3545;
     font-size: 13px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     display: none;
+}
+
+@media (max-width: 480px) {
+    #customerAuthModal .auth-card {
+        padding: 32px 24px 28px;
+        max-width: 92vw;
+    }
 }

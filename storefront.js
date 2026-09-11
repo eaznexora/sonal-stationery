@@ -148,21 +148,48 @@ async function renderCategoryProducts() {
 
 // Render dynamic mega menu if present
 async function renderMegaMenu() {
-    const megaMenu = document.querySelector('.mega-menu');
-    if (!megaMenu) return;
     try {
         const res = await fetch(`${API_BASE}/api/categories?status=active`);
         const data = await res.json();
         const categories = Array.isArray(data) ? data : (data.categories || data.data || []);
         console.log('Fetched mega menu categories:', categories);
         
-        megaMenu.innerHTML = categories.slice(0, 3).map(cat => `
-            <div class="mega-column">
-                <h4>${cat.name}</h4>
-                ${(cat.subCategories || []).map(sub => `<a href="category-products.html?cat=${encodeURIComponent(cat.name)}&sub=${encodeURIComponent(sub)}">${sub}</a>`).join('')}
-                <a href="category-products.html?cat=${encodeURIComponent(cat.name)}">View All ${cat.name}</a>
-            </div>
-        `).join('');
+        const megaMenu = document.querySelector('.mega-menu');
+        if (megaMenu) {
+            megaMenu.innerHTML = categories.slice(0, 3).map(cat => `
+                <div class="mega-column">
+                    <h4>${cat.name}</h4>
+                    ${(cat.subCategories || []).map(sub => `<a href="category-products.html?cat=${encodeURIComponent(cat.name)}&sub=${encodeURIComponent(sub)}">${sub}</a>`).join('')}
+                    <a href="category-products.html?cat=${encodeURIComponent(cat.name)}">View All ${cat.name}</a>
+                </div>
+            `).join('');
+        }
+
+        const navLeft = document.querySelector('.nav-left');
+        if (navLeft) {
+            const existingLinks = navLeft.querySelectorAll('a.nav-link:not(.dropdown-toggle)');
+            existingLinks.forEach(link => {
+                const text = link.textContent.trim().toLowerCase();
+                if (text !== 'home' && text !== 'about') {
+                    link.remove();
+                }
+            });
+
+            const aboutLink = Array.from(navLeft.querySelectorAll('a.nav-link')).find(el => el.textContent.trim().toLowerCase() === 'about');
+            
+            categories.slice(0, 3).forEach(cat => {
+                const a = document.createElement('a');
+                a.href = `category-products.html?cat=${encodeURIComponent(cat.name)}`;
+                a.className = 'nav-link';
+                a.textContent = cat.name;
+                
+                if (aboutLink) {
+                    navLeft.insertBefore(a, aboutLink);
+                } else {
+                    navLeft.appendChild(a);
+                }
+            });
+        }
     } catch(e) {
         console.error(e);
     }

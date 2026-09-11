@@ -27,7 +27,7 @@
     <meta name=""twitter:title"" content=""SONAL Stationary | Curated Fine Stationery & Gifts"">
     <meta name=""twitter:description"" content=""Thoughtfully designed everyday comforts and timeless keepsakes."">
     <meta name=""twitter:image"" content=""https://sonalstationary.in/og-image.jpg"">
-    <link rel="stylesheet" href="styles.css?v=3.3">
+    <link rel="stylesheet" href="styles.css?v=3.4">
 
     <!-- Google Fonts for modern typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,39 +44,16 @@
     <!-- Desktop Header -->
     <header class="top-header">
         <nav class="desktop-nav">
-            <div class="nav-left">
+            <div class="nav-left" id="desktopNavLeft">
                 <a href="index.html" class="nav-link">Home</a>
                 
                 <div class="dropdown-wrapper">
                     <a href="categories.html" class="nav-link dropdown-toggle">Categories <i data-lucide="chevron-down" style="width: 14px; margin-left: 4px;"></i></a>
-                    <div class="mega-menu">
-                        <div class="mega-column">
-                            <h4>Gifts</h4>
-                            <a href="category-products.html?cat=Personalized Hampers">Personalized Hampers</a>
-                            <a href="category-products.html?cat=Eco-Friendly Cards">Eco-Friendly Cards</a>
-                            <a href="category-products.html?cat=Luxury Candles">Luxury Candles</a>
-                            <a href="category-products.html?cat=Mini Keepsakes">Mini Keepsakes</a>
-                        </div>
-                        <div class="mega-column">
-                            <h4>Purses</h4>
-                            <a href="category-products.html?cat=Leather Crossbody">Leather Crossbody</a>
-                            <a href="category-products.html?cat=Tote Bags">Tote Bags</a>
-                            <a href="category-products.html?cat=Minimal Clutches">Minimal Clutches</a>
-                            <a href="category-products.html?cat=Handcrafted Wallets">Handcrafted Wallets</a>
-                        </div>
-                        <div class="mega-column">
-                            <h4>Toys</h4>
-                            <a href="category-products.html?cat=Plush Teddy Bears">Plush Teddy Bears</a>
-                            <a href="category-products.html?cat=Soft Animal Companions">Soft Animal Companions</a>
-                            <a href="category-products.html?cat=Knit Stuffed Toys">Knit Stuffed Toys</a>
-                            <a href="category-products.html?cat=Nursery Plushies">Nursery Plushies</a>
-                        </div>
+                    <div class="mega-menu" id="desktopMegaMenu">
+                        <!-- Dynamically populated -->
                     </div>
                 </div>
-
-                <a href="category-products.html?cat=Gifts" class="nav-link">Gifts</a>
-                <a href="category-products.html?cat=Purses" class="nav-link">Purses</a>
-                <a href="category-products.html?cat=Toys" class="nav-link">Toys</a>
+                <!-- Dynamic categories will be injected here -->
                 <a href="#about" class="nav-link">About</a>
             </div>
 
@@ -130,7 +107,7 @@
             <!-- Left Side: Product Gallery -->
             <div class="pdp-gallery">
                 <div class="main-image-container">
-                    <img id="mainProductImage" src="https://picsum.photos/800/1000?random=11" alt="Linen & Leather Mini Crossbody">
+                    <img id="mainProductImage" src="https://picsum.photos/800/1000?random=11" alt="Linen & Leather Mini Crossbody" style="transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1);">
                 </div>
                 <div class="thumbnail-row">
                     <img class="thumbnail active" src="https://picsum.photos/800/1000?random=11" alt="View 1" onclick="changeImage(this)">
@@ -380,204 +357,9 @@
 
     <!-- Scripts -->
     <script src="main.js"></script>
-    <script>
-        // Image Gallery Swapping
-        function changeImage(element) {
-            document.getElementById('mainProductImage').src = element.src;
-            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        // Color Swatches Selection
-        function selectColor(element, colorName) {
-            document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
-            element.classList.add('active');
-            document.getElementById('selectedColorName').innerText = colorName;
-        }
-
-        // Gifting Message Toggle
-        function toggleGiftMessage() {
-            const checkbox = document.getElementById('giftWrapCheckbox');
-            const container = document.getElementById('giftMessageContainer');
-            if (checkbox.checked) {
-                container.classList.add('expanded');
-            } else {
-                container.classList.remove('expanded');
-            }
-        }
-
-        // Quantity Increment/Decrement
-        function updateQty(change) {
-            const input = document.getElementById('qtyInput');
-            let val = parseInt(input.value) + change;
-            if (val < 1) val = 1;
-            if (val > 99) val = 99;
-            input.value = val;
-        }
-
-        // Accordion functionality
-        function toggleAccordion(button) {
-            const item = button.parentElement;
-            item.classList.toggle('active');
-        }
-        
-        // Sticky Cart Logic for Mobile
-        window.addEventListener('scroll', () => {
-            const actions = document.querySelector('.product-actions');
-            const stickyCart = document.querySelector('.mobile-sticky-cart');
-            
-            if (actions && stickyCart) {
-                const actionsRect = actions.getBoundingClientRect();
-                // Show sticky cart if we scroll past the actions and we are on mobile viewport
-                if (window.innerWidth <= 768 && actionsRect.bottom < 0) {
-                    stickyCart.classList.add('visible');
-                } else {
-                    stickyCart.classList.remove('visible');
-                }
-            }
-        });
-
-        // Dynamic Product Loading
-        document.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-            if (!productId) return;
-
-            const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-              ? (window.location.port === '5005' ? '' : 'http://localhost:5005')
-              : '';
-            
-            try {
-                const res = await fetch(`${API_BASE}/api/products/${productId}`);
-                if (!res.ok) throw new Error('Product not found');
-                const product = await res.json();
-                
-                document.querySelector('.product-title').textContent = product.name;
-                document.querySelector('.product-price').textContent = `₹${(product.price || 0).toFixed(2)}`;
-                document.querySelector('.product-description').textContent = product.description;
-                document.querySelector('.category-tag').textContent = product.category;
-                
-                // Images
-                if (product.images && product.images.length > 0) {
-                    const mainImg = document.getElementById('mainProductImage');
-                    const firstImg = product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0];
-                    mainImg.src = firstImg;
-                    mainImg.alt = product.name;
-                    
-                    const thumbRow = document.querySelector('.thumbnail-row');
-                    thumbRow.innerHTML = product.images.map((img, idx) => {
-                        const src = img.startsWith('http') ? img : API_BASE + img;
-                        return `<img class="thumbnail ${idx === 0 ? 'active' : ''}" src="${src}" alt="View ${idx + 1}" onclick="changeImage(this)">`;
-                    }).join('');
-                }
-
-                // Colors
-                const colorSelector = document.querySelector('.variant-selector');
-                if (product.colors && product.colors.length > 0) {
-                    colorSelector.style.display = 'block';
-                    const colorSwatchesContainer = document.querySelector('.color-swatches');
-                    document.getElementById('selectedColorName').textContent = product.colors[0].name;
-                    colorSwatchesContainer.innerHTML = product.colors.map((c, i) => `
-                        <button class="swatch ${i === 0 ? 'active' : ''}" style="background-color: ${c.hex};" aria-label="${c.name}" onclick="selectColor(this, '${c.name}')"></button>
-                    `).join('');
-                } else {
-                    colorSelector.style.display = 'none';
-                }
-
-                // Gift Wrap
-                const giftWrapContainer = document.querySelector('.gifting-options');
-                if (!product.isGiftWrapAvailable) {
-                    giftWrapContainer.style.display = 'none';
-                }
-
-                // Accordions
-                const accDetails = document.getElementById('accDetails');
-                accDetails.innerHTML = `
-                  <p><strong>Description:</strong> ${product.description || 'N/A'}</p>
-                  ${product.dimensions ? `<p><strong>Dimensions:</strong> ${product.dimensions.length || '-'} × ${product.dimensions.width || '-'} × ${product.dimensions.height || '-'} cm</p>` : ''}
-                  ${product.weight ? `<p><strong>Weight:</strong> ${product.weight} kg</p>` : ''}
-                `;
-
-                const accFeatures = document.getElementById('accFeatures');
-                if (product.keyFeatures && product.keyFeatures.length > 0) {
-                    accFeatures.innerHTML = `<ul class="features-list">${product.keyFeatures.map(f => `<li>${f}</li>`).join('')}</ul>`;
-                } else {
-                    accFeatures.innerHTML = `<p>No special features listed.</p>`;
-                }
-
-                const accFaqs = document.getElementById('accFaqs');
-                if (product.faqs && product.faqs.length > 0) {
-                    accFaqs.innerHTML = `<div class="faqs-list">` + product.faqs.map(faq => `
-                        <div class="faq-item">
-                            <p class="faq-q"><strong>Q: ${faq.question}</strong></p>
-                            <p class="faq-a">${faq.answer}</p>
-                        </div>
-                    `).join('') + `</div>`;
-                } else {
-                    accFaqs.innerHTML = `<p>Standard delivery takes 3-5 business days. Expedited shipping is available at checkout. Enjoy hassle-free free returns within 30 days of purchase.</p>`;
-                }
-
-                // Add to Cart btn wire up
-                const addToCartBtns = document.querySelectorAll('.btn-add-cart');
-                addToCartBtns.forEach(btn => {
-                    btn.dataset.id = product._id;
-                    btn.dataset.title = product.name;
-                    btn.dataset.price = product.price;
-                    if(product.images && product.images.length > 0) {
-                        btn.dataset.image = product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0];
-                    }
-                });
-
-                // Fetch related products
-                let relatedRes = await fetch(`${API_BASE}/api/products?category=${encodeURIComponent(product.category)}&status=active&limit=8`);
-                let relatedData = await relatedRes.json();
-                let related = (Array.isArray(relatedData) ? relatedData : (relatedData.products || relatedData.data || [])).filter(p => p._id !== productId);
-
-                if (related.length < 4) {
-                    let recentRes = await fetch(`${API_BASE}/api/products?status=active&limit=8`);
-                    let recentData = await recentRes.json();
-                    let recent = (Array.isArray(recentData) ? recentData : (recentData.products || recentData.data || [])).filter(p => p._id !== productId);
-                    
-                    recent.forEach(r => {
-                        if (!related.find(p => p._id === r._id)) {
-                            related.push(r);
-                        }
-                    });
-                }
-
-                const pairsSection = document.getElementById('pairsWellWithSection');
-                const pairsGrid = document.getElementById('pairsWellWithGrid');
-
-                if (related.length === 0) {
-                    if (pairsSection) pairsSection.style.display = 'none';
-                } else if (pairsGrid) {
-                    const toRender = related.slice(0, 4);
-                    pairsGrid.innerHTML = toRender.map(p => {
-                        const img = p.images && p.images.length > 0 ? (p.images[0].startsWith('http') ? p.images[0] : API_BASE + p.images[0]) : '/logo.png';
-                        return `
-                            <article class="product-card" onclick="window.location.href='product.html?id=${p._id}';" style="cursor: pointer;">
-                                <div class="img-wrapper">
-                                    <img src="${img}" alt="${p.name || 'Product'}">
-                                    <div class="product-hover">
-                                        <button class="btn-quick-add" data-id="${p._id}" data-title="${p.name}" data-price="${p.price}" data-image="${img}">Quick Add</button>
-                                    </div>
-                                </div>
-                                <div class="product-info">
-                                    <h3>${p.name || 'Untitled'}</h3>
-                                    <p class="price">₹${parseFloat(p.price || 0).toFixed(2)}</p>
-                                </div>
-                            </article>
-                        `;
-                    }).join('');
-                }
-
-            } catch (err) {
-                console.error(err);
-                document.querySelector('.pdp-container').innerHTML = '<h2>Product not found</h2>';
-            }
-        });
-    </script>
-    <script src="/js/customer-auth.js?v=3.3"></script>
+    <script src="storefront.js?v=3.4"></script>
+    <script src="js/product-detail.js?v=3.4"></script>
+    <script src="/js/customer-auth.js?v=3.4"></script>
 </body>
 
 </html>

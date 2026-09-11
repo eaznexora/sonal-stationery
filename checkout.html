@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | SONAL Stationary</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/checkout.css?v=3.4">
+</head>
+<body>
+    <header class="checkout-header">
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="SONAL Stationary" class="brand-logo" onerror="this.src='https://via.placeholder.com/40'">
+            <span class="logo-text">SONAL Stationary</span>
+        </a>
+    </header>
+
+    <!-- Mobile Accordion (Hidden on Desktop) -->
+    <div class="mobile-summary-accordion">
+        <button class="accordion-toggle" onclick="toggleMobileSummary()" aria-expanded="false">
+            <span style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="shopping-cart" style="width: 18px;"></i>
+                Show order summary
+                <i data-lucide="chevron-down" style="width: 16px;"></i>
+            </span>
+            <span class="total-amt" id="mobileSummaryTotal">₹0.00</span>
+        </button>
+        <div class="accordion-content" id="mobileSummaryContent">
+            <div class="summary-items" id="mobileSummaryItems">
+                <!-- Injected via JS -->
+            </div>
+            <div class="summary-totals">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="mobileSubtotal">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span id="mobileShipping">Calculated at next step</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="mobileTotal">₹0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="checkout-container">
+        <!-- Left Column: Forms -->
+        <main class="checkout-main">
+            <!-- Shipping Section -->
+            <section class="shipping-section">
+                <h2>Shipping Address</h2>
+                <form id="checkoutForm">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" required placeholder="Sonal Sharma">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required placeholder="sonal@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number (10-digit)</label>
+                            <input type="tel" id="phone" name="phone" inputmode="numeric" pattern="[0-9]{10}" required placeholder="9876543210">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="address">Street Address / Apartment</label>
+                            <input type="text" id="address" name="address" required placeholder="123 Serenity Lane, Apt 4B">
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" required placeholder="Mumbai">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" name="state" required placeholder="Maharashtra">
+                        </div>
+                        <div class="form-group">
+                            <label for="pinCode">PIN Code</label>
+                            <input type="text" id="pinCode" name="pinCode" inputmode="numeric" required placeholder="400001">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="notes">Delivery Notes (Optional)</label>
+                            <textarea id="notes" name="notes" placeholder="Leave at the front door..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Payment Section -->
+            <section class="payment-section">
+                <h2>Payment Method</h2>
+                <div class="payment-methods">
+                    <label class="payment-method-card">
+                        <input type="radio" name="paymentMethod" value="online" checked>
+                        <div class="method-info">
+                            <span class="method-title">Online Payment</span>
+                            <span class="method-desc">UPI, Credit/Debit Cards, NetBanking</span>
+                        </div>
+                        <div class="badges">
+                            <span class="badge">Instant</span>
+                            <span class="badge">Secure</span>
+                        </div>
+                    </label>
+                    <label class="payment-method-card">
+                        <input type="radio" name="paymentMethod" value="cod">
+                        <div class="method-info">
+                            <span class="method-title">Cash on Delivery</span>
+                            <span class="method-desc">Pay when your order arrives</span>
+                        </div>
+                        <div class="badges">
+                            <span class="badge">Verified</span>
+                        </div>
+                    </label>
+                </div>
+
+                <button type="button" class="btn-place-order desktop-only" id="placeOrderBtnDesktop">
+                    Place Order • <span class="btn-total">₹0.00</span>
+                </button>
+            </section>
+        </main>
+
+        <!-- Right Column: Desktop Summary -->
+        <aside class="order-summary">
+            <h3>Order Summary</h3>
+            <div class="summary-items" id="desktopSummaryItems">
+                <!-- Injected via JS -->
+            </div>
+            
+            <div class="summary-totals">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="desktopSubtotal">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span id="desktopShipping">Calculated at next step</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="desktopTotal">₹0.00</span>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Sticky Footer Button -->
+    <div class="mobile-sticky-bar">
+        <button type="button" class="btn-place-order" id="placeOrderBtnMobile">
+            Place Order • <span class="btn-total">₹0.00</span>
+        </button>
+    </div>
+
+    <script src="js/checkout.js?v=3.4"></script>
+    <script>
+        lucide.createIcons();
+        function toggleMobileSummary() {
+            const toggle = document.querySelector('.accordion-toggle');
+            const content = document.getElementById('mobileSummaryContent');
+            const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+            
+            toggle.setAttribute('aria-expanded', !isExpanded);
+            if (!isExpanded) {
+                content.classList.add('open');
+            } else {
+                content.classList.remove('open');
+            }
+        }
+    </script>
+</body>
+</html>

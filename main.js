@@ -176,9 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${item.image}" alt="${item.title}">
                 <div class="cart-item-details">
                     <h4>${item.title}</h4>
-                    <span class="cart-item-variant">Variant: ${item.variant}</span>
+                    ${item.variant && item.variant !== 'null' && item.variant !== 'Default' ? `<span class="cart-item-variant">Variant: ${item.variant}</span>` : ''}
                     ${item.giftNote ? `<span class="cart-item-gift">Gift Note Included</span>` : ''}
-                    <div class="cart-item-price">₹${item.price.toFixed(2)}</div>
+                    <div class="cart-item-pricing" style="margin-top: 4px; margin-bottom: 8px;">
+                        <span class="item-line-total" style="font-weight: 600;">₹${(item.price * item.qty).toFixed(2)}</span>
+                        ${item.qty > 1 ? `<span class="item-unit-price" style="font-size: 0.85em; color: var(--text-secondary); margin-left: 6px;">(₹${item.price.toFixed(2)} each)</span>` : ''}
+                    </div>
                     <div class="cart-qty-control">
                         <button class="qty-btn" onclick="updateItemQty(${index}, -1)">-</button>
                         <span class="qty-num">${item.qty}</span>
@@ -243,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: btn.dataset.title,
                 price: parseFloat(btn.dataset.price),
                 image: btn.dataset.image,
-                variant: btn.dataset.variant || 'Default',
+                variant: (btn.dataset.variant && btn.dataset.variant !== 'Default' && !btn.dataset.variant.includes('rgb(')) ? btn.dataset.variant : null,
                 giftNote: '',
                 qty: 1
             };
@@ -259,10 +262,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!btn.dataset.id) return;
             
             // Get active variant
+            let variant = null;
             const activeSwatch = document.querySelector('.color-swatches .swatch.active');
-            let variant = activeSwatch ? (activeSwatch.dataset.color || activeSwatch.style.backgroundColor) : 'Default';
-            if (variant.startsWith('var')) { // dirty fallback if dataset is missing
-                variant = variant === 'var(--text-primary)' ? 'Black' : (variant === 'var(--bg-secondary)' ? 'Cream' : 'Sage');
+            if (activeSwatch) {
+                variant = activeSwatch.dataset.color || activeSwatch.style.backgroundColor;
+                if (variant && variant.startsWith('var')) { // dirty fallback if dataset is missing
+                    variant = variant === 'var(--text-primary)' ? 'Black' : (variant === 'var(--bg-secondary)' ? 'Cream' : 'Sage');
+                }
+            }
+            if (!variant || variant === 'Default' || variant === 'null' || variant === 'undefined' || variant.includes('rgb(')) {
+                variant = null;
             }
             
             // Get quantity
@@ -321,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${item.image}" alt="${item.title}">
                 <div class="cart-page-details">
                     <h3>${item.title}</h3>
-                    <p class="cart-page-variant">Variant: ${item.variant}</p>
+                    ${item.variant && item.variant !== 'null' && item.variant !== 'Default' ? `<p class="cart-page-variant">Variant: ${item.variant}</p>` : ''}
                     ${item.giftNote ? `<p class="cart-page-variant" style="color: var(--accent-sage-dark);">Gift Note: "${item.giftNote}"</p>` : ''}
                     
                     <div class="cart-page-actions">
@@ -330,7 +339,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="qty-num">${item.qty}</span>
                             <button class="qty-btn" onclick="updateItemQty(${index}, 1)">+</button>
                         </div>
-                        <div class="cart-page-price">₹${(item.price * item.qty).toFixed(2)}</div>
+                        <div class="cart-item-pricing" style="display: flex; flex-direction: column; align-items: flex-end;">
+                            <span class="item-line-total" style="font-size: 1.1rem; font-weight: 600;">₹${(item.price * item.qty).toFixed(2)}</span>
+                            ${item.qty > 1 ? `<span class="item-unit-price" style="font-size: 0.85em; color: var(--text-secondary);">(₹${item.price.toFixed(2)} each)</span>` : ''}
+                        </div>
                     </div>
                     <button class="btn-remove-text" style="align-self: flex-start; margin-top: 1rem;" onclick="removeItem(${index})">Remove</button>
                 </div>

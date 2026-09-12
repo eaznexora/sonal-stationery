@@ -218,7 +218,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (buyNowBtn) {
             buyNowBtn.addEventListener('click', () => {
                 const qty = parseInt(document.getElementById('qtyInput').value) || 1;
-                const variant = document.getElementById('selectedColorName') ? document.getElementById('selectedColorName').textContent : 'Default';
+                
+                let variant = null;
+                const activeSwatch = document.querySelector('.color-swatches .swatch.active');
+                if (activeSwatch) {
+                    variant = activeSwatch.dataset.color || activeSwatch.style.backgroundColor;
+                    if (variant && variant.startsWith('var')) {
+                        variant = variant === 'var(--text-primary)' ? 'Black' : (variant === 'var(--bg-secondary)' ? 'Cream' : 'Sage');
+                    }
+                }
+                if (!variant || variant === 'Default' || variant === 'null' || variant === 'undefined' || variant.includes('rgb(')) {
+                    variant = null;
+                }
+
                 const image = (product.images && product.images.length > 0) ? (product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0]) : '';
                 
                 const item = {

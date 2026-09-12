@@ -284,6 +284,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `;
             }).join('');
         }
+        
+        if (window.lucide) {
+            lucide.createIcons();
+        }
 
     } catch (err) {
         console.error(err);

@@ -13,6 +13,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('placeOrderBtnDesktop').addEventListener('click', handlePlaceOrder);
     document.getElementById('placeOrderBtnMobile').addEventListener('click', handlePlaceOrder);
+
+    const savedAddr = localStorage.getItem('sonal_saved_address');
+    if (savedAddr) {
+        try {
+            const addrObj = JSON.parse(savedAddr);
+            const container = document.getElementById('savedAddressContainer');
+            if (container) {
+                container.style.display = 'block';
+                document.getElementById('savedAddressPreview').innerText = `${addrObj.address}, ${addrObj.city}, ${addrObj.pinCode}`;
+            }
+        } catch(e) {}
+    }
 });
 
 async function loadOrderSummary() {
@@ -143,6 +155,26 @@ async function tryAutoFillCustomer() {
     }
 }
 
+window.toggleSavedAddress = function(checkbox) {
+    try {
+        const saved = JSON.parse(localStorage.getItem('sonal_saved_address'));
+        if (!saved) return;
+        
+        if (checkbox.checked) {
+            if (saved.fullName) document.getElementById('fullName').value = saved.fullName;
+            if (saved.email) document.getElementById('email').value = saved.email;
+            if (saved.phone) document.getElementById('phone').value = saved.phone;
+            if (saved.address) document.getElementById('address').value = saved.address;
+            if (saved.city) document.getElementById('city').value = saved.city;
+            if (saved.state) document.getElementById('state').value = saved.state;
+            if (saved.pinCode) document.getElementById('pinCode').value = saved.pinCode;
+        } else {
+            document.getElementById('checkoutForm').reset();
+            tryAutoFillCustomer(); // Re-fill from API if unchecked
+        }
+    } catch(e) {}
+}
+
 function handlePlaceOrder() {
     const form = document.getElementById('checkoutForm');
     if (!form.checkValidity()) {
@@ -163,9 +195,31 @@ function handlePlaceOrder() {
             notes: formData.get('notes')
         },
         items: checkoutItems,
-        paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value,
+        paymentMethod: formData.get('paymentMethod'),
         total: subtotal + (subtotal > 500 ? 0 : 50)
     };
+
+    const saveAddrCheckbox = document.getElementById('saveAddressCheckbox');
+    if (saveAddrCheckbox && saveAddrCheckbox.checked) {
+        localStorage.setItem('sonal_saved_address', JSON.stringify({
+            fullName: orderData.customer.name,
+            email: orderData.customer.email,
+            phone: orderData.customer.phone,
+            address: orderData.customer.address,
+            city: orderData.customer.city,
+            state: orderData.customer.state,
+            pinCode: orderData.customer.pinCode
+        }));
+        
+        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+        if (token) {
+            fetch(`${API_BASE}/api/customer/profile`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ address: JSON.parse(localStorage.getItem('sonal_saved_address')) })
+            }).catch(e => console.error('Opportunistic sync failed', e));
+        }
+    }
 
     console.log("Order Placed!", orderData);
     

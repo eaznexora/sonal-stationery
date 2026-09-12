@@ -254,6 +254,69 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
+        // Wishlist logic
+        const btnWishlist = document.getElementById('btnWishlist');
+        const wishlistIcon = document.getElementById('wishlistIcon');
+        if (btnWishlist && wishlistIcon) {
+            let wishlist = JSON.parse(localStorage.getItem('sonal_wishlist') || '[]');
+            const inWishlist = wishlist.find(item => item.id === product._id);
+            if (inWishlist) {
+                wishlistIcon.setAttribute('fill', 'var(--accent-sage-dark)');
+            }
+
+            btnWishlist.addEventListener('click', () => {
+                wishlist = JSON.parse(localStorage.getItem('sonal_wishlist') || '[]');
+                const exists = wishlist.findIndex(item => item.id === product._id);
+                
+                if (exists >= 0) {
+                    wishlist.splice(exists, 1);
+                    wishlistIcon.removeAttribute('fill');
+                    showToast('Removed from Wishlist');
+                } else {
+                    const image = (product.images && product.images.length > 0) ? (product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0]) : '';
+                    wishlist.push({
+                        id: product._id,
+                        title: product.name,
+                        price: product.price,
+                        image: image
+                    });
+                    wishlistIcon.setAttribute('fill', 'var(--accent-sage-dark)');
+                    showToast('Added to Wishlist');
+                }
+                localStorage.setItem('sonal_wishlist', JSON.stringify(wishlist));
+                
+                // Opportunistic Sync
+                const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+                if (token) {
+                    fetch(`${API_BASE}/api/customer/profile`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ wishlist: wishlist })
+                    }).catch(e => console.error(e));
+                }
+            });
+        }
+
+        // Share logic
+        const btnShare = document.getElementById('btnShare');
+        if (btnShare) {
+            btnShare.addEventListener('click', () => {
+                if (navigator.share) {
+                    navigator.share({
+                        title: product.name,
+                        url: window.location.href
+                    }).catch(console.error);
+                } else {
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                        alert('Product link copied to clipboard!');
+                    });
+                }
+            });
+        }
+
         // Fetch related products
         let relatedRes = await fetch(`${API_BASE}/api/products?category=${encodeURIComponent(product.category)}&status=active&limit=8`);
         let relatedData = await relatedRes.json();

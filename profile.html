@@ -33,7 +33,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="styles.css?v=4.0">
+    <link rel="stylesheet" href="styles.css?v=5.0">
 </head>
 <body>
     <!-- Desktop Header (Solid) -->
@@ -384,19 +384,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="main.js?v=4.0"></script>
-    <script>
-        // Profile Tab Switching Logic
-        function switchTab(event, tabId) {
-            // Update active state on buttons
-            document.querySelectorAll('.profile-tab').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-
-            // Hide all sections and show the target section
-            document.querySelectorAll('.profile-content-section').forEach(sec => sec.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-        }
-    </script>
-    <script src="/js/customer-auth.js?v=4.0"></script>
+    <script src="main.js?v=5.0"></script>
+    <script src="js/profile.js?v=5.0"></script>
+    <script src="/js/customer-auth.js?v=5.0"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/checkout.css?v=4.5">
+    <link rel="stylesheet" href="css/checkout.css?v=5.0">
 </head>
 <body>
     <header class="checkout-header">
@@ -62,6 +62,13 @@
             <!-- Shipping Section -->
             <section class="shipping-section">
                 <h2>Shipping Address</h2>
+                <div id="savedAddressContainer" style="display: none; margin-bottom: 1.5rem; background: var(--bg-secondary); padding: 1rem; border-radius: 6px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="useSavedAddress" onchange="toggleSavedAddress(this)">
+                        <span style="font-weight: 500;">Use saved address</span>
+                    </label>
+                    <p id="savedAddressPreview" style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary); margin-left: 24px;"></p>
+                </div>
                 <form id="checkoutForm">
                     <div class="form-grid">
                         <div class="form-group full-width">
@@ -95,6 +102,12 @@
                         <div class="form-group full-width">
                             <label for="notes">Delivery Notes (Optional)</label>
                             <textarea id="notes" name="notes" placeholder="Leave at the front door..."></textarea>
+                        </div>
+                        <div class="form-group full-width" style="margin-top: -10px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 400; color: var(--text-secondary);">
+                                <input type="checkbox" id="saveAddressCheckbox" checked>
+                                <span>Save this address for future orders</span>
+                            </label>
                         </div>
                     </div>
                 </form>
@@ -164,7 +177,7 @@
         </button>
     </div>
 
-    <script src="js/checkout.js?v=4.5"></script>
+    <script src="js/checkout.js?v=5.0"></script>
     <script>
         lucide.createIcons();
         function toggleMobileSummary() {

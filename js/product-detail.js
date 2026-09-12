@@ -254,6 +254,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
+        function triggerToast(msg) {
+            if (typeof window.showToast === 'function') {
+                window.showToast(msg);
+            } else {
+                let toast = document.getElementById('global-toast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'global-toast';
+                    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#111;color:#fff;padding:12px 20px;border-radius:6px;font-size:14px;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:opacity 0.3s;';
+                    document.body.appendChild(toast);
+                }
+                toast.textContent = msg;
+                toast.style.opacity = '1';
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.style.display = 'none', 300); }, 2500);
+            }
+        }
+
         // Wishlist logic
         const btnWishlist = document.getElementById('btnWishlist');
         const wishlistIcon = document.getElementById('wishlistIcon');
@@ -271,7 +289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (exists >= 0) {
                     wishlist.splice(exists, 1);
                     wishlistIcon.removeAttribute('fill');
-                    showToast('Removed from Wishlist');
+                    triggerToast('Removed from Wishlist');
                 } else {
                     const image = (product.images && product.images.length > 0) ? (product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0]) : '';
                     wishlist.push({
@@ -281,7 +299,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         image: image
                     });
                     wishlistIcon.setAttribute('fill', 'var(--accent-sage-dark)');
-                    showToast('Added to Wishlist');
+                    triggerToast('Added to Wishlist');
                 }
                 localStorage.setItem('sonal_wishlist', JSON.stringify(wishlist));
                 

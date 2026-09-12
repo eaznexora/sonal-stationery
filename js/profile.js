@@ -32,6 +32,19 @@ window.switchTab = function(event, tabId) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Redirect if no auth
+    const rawUser = localStorage.getItem('customer_user') || 
+                    localStorage.getItem('customer_data') || 
+                    localStorage.getItem('sonal_user') || 
+                    localStorage.getItem('user');
+    const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken');
+    
+    if (!rawUser && !token) {
+        alert('Please log in to view your profile.');
+        window.location.href = 'index.html?login=true';
+        return;
+    }
+
     // Ensure overview tab is open by default
     const defaultTab = document.getElementById('tab-overview');
     if (defaultTab) defaultTab.style.display = 'block';
@@ -44,15 +57,121 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadProfileDetails() {
-    const user = JSON.parse(localStorage.getItem('sonal_user') || '{}');
+    const rawUser = localStorage.getItem('customer_user') || 
+                    localStorage.getItem('customer_data') || 
+                    localStorage.getItem('sonal_user') || 
+                    localStorage.getItem('user');
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    
     const nameEl = document.querySelector('.profile-name') || document.getElementById('profileName');
     const emailEl = document.querySelector('.profile-email') || document.getElementById('profileEmail');
     const phoneEl = document.querySelector('.profile-phone') || document.getElementById('profilePhone');
 
-    if (nameEl && user.name) nameEl.textContent = user.name;
-    if (emailEl && user.email) emailEl.textContent = user.email;
-    if (phoneEl && user.phone) phoneEl.textContent = user.phone;
+    if (user) {
+        if (nameEl) nameEl.textContent = user.name || user.fullName || 'Valued Customer';
+        if (emailEl) emailEl.textContent = user.email || '';
+        if (phoneEl) phoneEl.textContent = user.phone || user.mobile || 'Not set';
+    }
 }
+
+// Edit Profile Modal Logic
+window.openEditProfileModal = function() {
+    const modal = document.getElementById('editProfileModal');
+    if (modal) {
+        const rawUser = localStorage.getItem('customer_user') || localStorage.getItem('customer_data') || localStorage.getItem('sonal_user') || localStorage.getItem('user');
+        const user = rawUser ? JSON.parse(rawUser) : {};
+        document.getElementById('editName').value = user.name || user.fullName || '';
+        document.getElementById('editPhone').value = user.phone || user.mobile || '';
+        document.getElementById('editEmail').value = user.email || '';
+        modal.style.display = 'flex';
+    }
+};
+
+window.closeEditProfileModal = function() {
+    const modal = document.getElementById('editProfileModal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.saveEditProfile = function(event) {
+    if (event) event.preventDefault();
+    const name = document.getElementById('editName').value;
+    const phone = document.getElementById('editPhone').value;
+    const email = document.getElementById('editEmail').value;
+
+    const rawUser = localStorage.getItem('customer_user') || localStorage.getItem('customer_data') || localStorage.getItem('sonal_user') || localStorage.getItem('user');
+    const user = rawUser ? JSON.parse(rawUser) : {};
+    user.name = name;
+    user.phone = phone;
+    user.email = email;
+
+    localStorage.setItem('sonal_user', JSON.stringify(user));
+    localStorage.setItem('customer_user', JSON.stringify(user));
+    
+    // Opportunistic API push
+    const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken');
+    if (token) {
+        fetch('/api/customer/profile', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ name, phone })
+        }).catch(e => console.error(e));
+    }
+
+    loadProfileDetails();
+    closeEditProfileModal();
+    if (typeof triggerToast === 'function') { triggerToast('Profile updated successfully!'); } 
+    else { alert('Profile updated successfully!'); }
+};
+
+function triggerToast(msg) {
+    let toast = document.getElementById('global-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'global-toast';
+        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#111;color:#fff;padding:12px 20px;border-radius:6px;font-size:14px;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:opacity 0.3s;';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.style.display = 'none', 300); }, 2500);
+}
+
+// Add Address Modal Logic
+window.openAddAddressModal = function() {
+    const modal = document.getElementById('addAddressModal');
+    if (modal) modal.style.display = 'flex';
+};
+
+window.closeAddAddressModal = function() {
+    const modal = document.getElementById('addAddressModal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.saveNewAddress = function(event) {
+    if (event) event.preventDefault();
+    
+    const addressData = {
+        fullName: document.getElementById('addFullName').value,
+        phone: document.getElementById('addPhone').value,
+        address: document.getElementById('addStreet').value,
+        city: document.getElementById('addCity').value,
+        state: document.getElementById('addState').value,
+        pinCode: document.getElementById('addPincode').value
+    };
+
+    localStorage.setItem('sonal_saved_address', JSON.stringify(addressData));
+    
+    // Also save to an array if needed, but the requirements just specify sonal_saved_address
+    const allAddresses = JSON.parse(localStorage.getItem('sonal_saved_addresses') || '[]');
+    allAddresses.push(addressData);
+    localStorage.setItem('sonal_saved_addresses', JSON.stringify(allAddresses));
+
+    loadSavedAddresses();
+    closeAddAddressModal();
+    if (typeof triggerToast === 'function') { triggerToast('Address saved successfully!'); } 
+    else { alert('Address saved successfully!'); }
+};
 
 function loadOrderHistory() {
     const container = document.querySelector('#tab-orders .orders-container') || document.getElementById('tab-orders');
@@ -122,12 +241,20 @@ window.removeFromWishlist = function(id) {
 };
 
 function bindLogout() {
-    const logoutBtn = document.querySelector('.profile-tab[style*="ef4444"]');
+    const logoutBtn = document.querySelector('.profile-tab[style*="ef4444"]') || document.getElementById('btnLogout');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('customer_token');
-            localStorage.removeItem('sonal_user');
-            window.location.href = 'index.html';
-        });
+        logoutBtn.addEventListener('click', window.handleLogout);
     }
 }
+
+window.handleLogout = function() {
+    if (confirm('Are you sure you want to log out?')) {
+        localStorage.removeItem('customer_token');
+        localStorage.removeItem('customerToken');
+        localStorage.removeItem('customer_user');
+        localStorage.removeItem('customer_data');
+        localStorage.removeItem('sonal_user');
+        localStorage.removeItem('user');
+        window.location.href = 'index.html';
+    }
+};

@@ -2842,8 +2842,9 @@ button {
     align-items: center;
     justify-content: center;
     min-height: 65vh;
-    padding: 140px 20px 80px 20px !important;
     text-align: center;
+    margin-top: 100px !important;
+    padding: 60px 20px !important;
 }
 
 .profile-main,
@@ -2861,15 +2862,23 @@ footer,
 
 
 
-/* Fixed Max-Width Profile Container */
+/* Dynamic & Safe Clearance for Fixed Header */
 .profile-main,
 #profileMainContainer {
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 140px 24px 80px 24px !important;
+  margin: 120px auto 80px auto !important; /* 120px clears the fixed header completely */
+  padding: 0 24px !important;
   box-sizing: border-box;
   flex: 1 0 auto;
+}
+
+@media (max-width: 768px) {
+  .profile-main,
+  #profileMainContainer {
+    margin-top: 90px !important;
+    padding: 0 16px !important;
+  }
 }
 
 .profile-layout {
@@ -2943,7 +2952,8 @@ footer,
   background: #ffffff;
   border: 1px solid #eee8df;
   border-radius: 12px;
-  padding: 36px;
+  padding: 32px !important;
+  margin-top: 0 !important;
   box-shadow: 0 2px 8px rgba(0,0,0,0.02);
   min-height: 440px;
 }

@@ -1,23 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {
-  registerUser,
-  loginUser,
-  getUsers,
-  updateUserStatus,
-  deleteUser,
-} = require('../controllers/userController');
+const { adminAuth } = require('../middleware/adminAuth');
+const userController = require('../controllers/userController');
 
-router.post('/register', registerUser);
-router.post('/login', loginUser);
+router.use(adminAuth); // Enforce admin-only access across all user routes
 
-router.route('/')
-  .get(getUsers);
-
-router.route('/:id/status')
-  .put(updateUserStatus);
-
-router.route('/:id')
-  .delete(deleteUser);
+router.get('/', userController.getUsers);
+router.patch('/:id/block', userController.toggleBlockStatus);
+router.delete('/:id', userController.deleteUser);
 
 module.exports = router;

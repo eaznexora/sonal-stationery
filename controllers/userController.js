@@ -91,12 +91,13 @@ exports.loginUser = async (req, res) => {
 exports.getUsers = async (req, res) => {
   try {
     const { search, status, page = 1, limit = 10 } = req.query;
-    const query = {};
+    const query = { isDeleted: { $ne: true }, role: { $ne: 'admin' } };
 
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } }
       ];
     }
 
@@ -127,7 +128,7 @@ exports.getUsers = async (req, res) => {
 // @desc    Toggle user status (block/unblock)
 // @route   PUT /api/users/:id/status
 // @access  Private/Admin
-exports.updateUserStatus = async (req, res) => {
+exports.toggleBlockStatus = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -155,7 +156,10 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    await User.findByIdAndDelete(req.params.id);
+    user.isDeleted = true;
+    user.isBlocked = true;
+    await user.save();
+    
     res.json({ message: 'User removed successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

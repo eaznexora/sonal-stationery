@@ -53,6 +53,11 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   {
     timestamps: true,

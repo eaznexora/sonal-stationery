@@ -146,6 +146,13 @@ exports.getMe = async (req, res) => {
       return res.json({ success: false, authenticated: false });
     }
 
+    if (user.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been suspended. Please contact support.'
+      });
+    }
+
     res.json({ success: true, authenticated: true, user });
   } catch (error) {
     res.json({ success: false, authenticated: false });

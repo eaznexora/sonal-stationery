@@ -151,9 +151,17 @@
 
     function finalizeLogin(user) {
         closeModal();
+        
+        // Ensure user is persistently stored in localStorage synchronously
+        localStorage.setItem('sonal_user', JSON.stringify(user));
+        
         updateHeaderIcon(user);
-        showToast(`✓ Welcome to Sonal Stationery, ${user.name}!`);
-        if (pendingCallback) pendingCallback();
+        showToast(`✓ Welcome to Sonal Stationery, ${user.name || 'User'}!`);
+        
+        // Global Auth Hooks
+        if (pendingCallback) pendingCallback(user);
+        if (window._authSuccessCallback) window._authSuccessCallback(user);
+        window.dispatchEvent(new CustomEvent('customer:authenticated', { detail: user }));
     }
 
     function renderGoogleButton() {

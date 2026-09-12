@@ -31,39 +31,64 @@ window.switchTab = function(event, tabId) {
     }
 };
 
-function getActiveSession() {
-    const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
-    const rawUser = localStorage.getItem('customer_user') || localStorage.getItem('customer_data') || localStorage.getItem('sonal_user') || localStorage.getItem('user');
+async function checkProfileAccess() {
+    const gate = document.getElementById('profileAuthGate');
+    const main = document.getElementById('profileMainContainer') || document.querySelector('.profile-main');
+    
+    // 1. Check local storage first for instant render
     let user = null;
-    try { user = rawUser ? JSON.parse(rawUser) : null; } catch(e) { user = null; }
-    return { token, user };
-}
+    try {
+        user = JSON.parse(
+            localStorage.getItem('customer_user') ||
+            localStorage.getItem('customer_data') ||
+            localStorage.getItem('sonal_user') ||
+            localStorage.getItem('user') ||
+            'null'
+        );
+    } catch(e) {}
 
-function checkProfileAccess() {
-    const { token, user } = getActiveSession();
-    const mainContainer = document.getElementById('profileMainContainer') || document.querySelector('.profile-main');
-    const gateContainer = document.getElementById('profileAuthGate');
+    // 2. Also check backend session via /api/auth/customer/me
+    if (!user) {
+        try {
+            const res = await fetch('/api/auth/customer/me');
+            const data = await res.json();
+            if (data.success && data.authenticated && data.user) {
+                user = data.user;
+                localStorage.setItem('sonal_user', JSON.stringify(data.user));
+                if (data.token) localStorage.setItem('customer_token', data.token);
+            }
+        } catch (err) {
+            console.error("Session check failed", err);
+        }
+    }
 
-    // CASE 1: LOGGED OUT
-    if (!token && !user) {
-        if (mainContainer) mainContainer.style.display = 'none';
-        if (gateContainer) gateContainer.style.display = 'block';
+    // 3. Evaluate state
+    if (user) {
+        if (gate) {
+            gate.style.setProperty('display', 'none', 'important');
+        }
+        if (main) {
+            main.style.setProperty('display', 'block', 'important');
+        }
+        
+        // Ensure overview tab is open by default
+        const defaultTab = document.getElementById('tab-overview');
+        if (defaultTab) defaultTab.style.display = 'block';
 
+        hydrateAllProfileData(user);
+        return true;
+    } else {
+        if (main) {
+            main.style.setProperty('display', 'none', 'important');
+        }
+        if (gate) {
+            gate.style.setProperty('display', 'flex', 'important');
+        }
+        
         // Automatically trigger auth modal
         triggerAuthModal();
         return false;
     }
-
-    // CASE 2: LOGGED IN
-    if (gateContainer) gateContainer.style.display = 'none';
-    if (mainContainer) mainContainer.style.display = 'block';
-    
-    // Ensure overview tab is open by default
-    const defaultTab = document.getElementById('tab-overview');
-    if (defaultTab) defaultTab.style.display = 'block';
-    
-    hydrateAllProfileData();
-    return true;
 }
 
 window.triggerAuthModal = function(e) {
@@ -302,3 +327,7 @@ window.handleLogout = function() {
         window.location.href = 'profile.html';
     }
 };
+
+window.addEventListener('customer:authenticated', (e) => {
+    checkProfileAccess();
+});

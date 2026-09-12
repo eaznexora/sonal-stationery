@@ -2842,7 +2842,7 @@ button {
     align-items: center;
     justify-content: center;
     min-height: 65vh;
-    padding: 80px 20px;
+    padding: 140px 20px 80px 20px !important;
     text-align: center;
 }
 
@@ -2866,8 +2866,8 @@ footer,
 #profileMainContainer {
   width: 100%;
   max-width: 1200px;
-  margin: 140px auto 80px auto;
-  padding: 0 24px;
+  margin: 0 auto;
+  padding: 140px 24px 80px 24px !important;
   box-sizing: border-box;
   flex: 1 0 auto;
 }

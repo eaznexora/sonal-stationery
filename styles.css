@@ -49,6 +49,10 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -2827,5 +2831,31 @@ button {
         border-radius: 4px;
         cursor: pointer;
     }
+}
+
+
+/* Profile specific flex layout to stick footer to bottom */
+#profileAuthGate {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 65vh;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.profile-main,
+#profileMainContainer {
+    flex: 1 0 auto;
+    min-height: 65vh;
+}
+
+footer,
+.site-footer,
+.main-footer {
+    margin-top: auto;
+    width: 100%;
 }
 

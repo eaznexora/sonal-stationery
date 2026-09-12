@@ -66,17 +66,24 @@ function checkProfileAccess() {
     return true;
 }
 
-window.triggerAuthModal = function() {
-    if (typeof window.openAuthModal === 'function') {
+window.triggerAuthModal = function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    // Check available modal triggers
+    if (typeof window.openCustomerAuthModal === 'function') {
+        window.openCustomerAuthModal(() => {
+            if (typeof checkProfileAccess === 'function') checkProfileAccess();
+        });
+    } else if (typeof window.openAuthModal === 'function') {
         window.openAuthModal(() => {
-            checkProfileAccess();
+            if (typeof checkProfileAccess === 'function') checkProfileAccess();
         });
     } else if (typeof window.requireCustomerAuth === 'function') {
         window.requireCustomerAuth(() => {
-            checkProfileAccess();
-        }, 'Please log in to view your profile.');
+            if (typeof checkProfileAccess === 'function') checkProfileAccess();
+        });
     } else {
-        // Fallback redirect if modal function is missing
+        // Fallback to home page login parameter
         window.location.href = 'index.html?login=true';
     }
 };

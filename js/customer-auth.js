@@ -137,27 +137,38 @@
         });
     }
 
+    function showProfileCompletionStep(customer) {
+        document.getElementById('authStep1').style.display = 'none';
+        document.getElementById('authStep2').style.display = 'none';
+        document.getElementById('authStep3').style.display = 'block';
+        
+        const customerName = customer.name || customer.fullName || '';
+        const customerPhone = customer.phone || customer.mobile || '';
+        
+        const nameInput = document.getElementById('authNameInput') || document.getElementById('completeName');
+        const phoneInput = document.getElementById('authPhoneInput') || document.getElementById('completePhone');
+        const emailInput = document.getElementById('completeEmail');
+        
+        if (nameInput) nameInput.value = customerName;
+        if (phoneInput) phoneInput.value = customerPhone;
+        if (emailInput) emailInput.value = customer.email || '';
+    }
+
     function handleAuthSuccess(user) {
         authenticatedUser = user;
-        const customerName = user.name || user.fullName || '';
-        const customerPhone = user.phone || user.mobile || '';
-        
-        const hasExistingProfile = user && customerName && customerName.trim() !== '' && customerName !== 'Valued Customer' && customerPhone;
+        const customer = user;
+        const hasCompletedProfile = customer && 
+            customer.name && 
+            customer.name.trim() !== '' && 
+            customer.name !== 'Valued Customer' &&
+            (customer.phone || customer.mobile);
 
-        if (hasExistingProfile) {
-            finalizeLogin(user);
+        if (hasCompletedProfile) {
+            // Returning customer with full profile: complete immediately
+            finalizeLogin(customer);
         } else {
-            document.getElementById('authStep1').style.display = 'none';
-            document.getElementById('authStep2').style.display = 'none';
-            document.getElementById('authStep3').style.display = 'block';
-            
-            const nameInput = document.getElementById('authNameInput') || document.getElementById('completeName');
-            const phoneInput = document.getElementById('authPhoneInput') || document.getElementById('completePhone');
-            const emailInput = document.getElementById('completeEmail');
-            
-            if (nameInput) nameInput.value = customerName;
-            if (phoneInput) phoneInput.value = customerPhone;
-            if (emailInput) emailInput.value = user.email || '';
+            // First-time or incomplete user: prompt profile completion step
+            showProfileCompletionStep(customer);
         }
     }
 

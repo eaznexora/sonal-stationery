@@ -159,10 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (cart.length === 0) {
             cartDrawerBody.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">Your bag is currently empty.</div>';
-            if (cartDrawerSubtotal) cartDrawerSubtotal.innerText = '$0.00';
+            if (cartDrawerSubtotal) cartDrawerSubtotal.innerText = '₹0.00';
             if (freeShippingProgress) {
                 freeShippingProgress.innerHTML = `
-                    <p>Add <strong>$150.00</strong> more for Free Shipping!</p>
+                    <p>Add <strong>₹1500.00</strong> more to unlock Free Shipping!</p>
                     <div class="progress-bar-container"><div class="progress-bar-fill" style="width: 0%;"></div></div>
                 `;
             }
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h4>${item.title}</h4>
                     <span class="cart-item-variant">Variant: ${item.variant}</span>
                     ${item.giftNote ? `<span class="cart-item-gift">Gift Note Included</span>` : ''}
-                    <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                    <div class="cart-item-price">₹${item.price.toFixed(2)}</div>
                     <div class="cart-qty-control">
                         <button class="qty-btn" onclick="updateItemQty(${index}, -1)">-</button>
                         <span class="qty-num">${item.qty}</span>
@@ -190,19 +190,19 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }).join('');
 
-        if (cartDrawerSubtotal) cartDrawerSubtotal.innerText = '$' + subtotal.toFixed(2);
+        if (cartDrawerSubtotal) cartDrawerSubtotal.innerText = '₹' + subtotal.toFixed(2);
         
         if (freeShippingProgress) {
-            const threshold = 150;
-            const remaining = Math.max(0, threshold - subtotal);
-            const percentage = Math.min(100, (subtotal / threshold) * 100);
+            const FREE_SHIPPING_THRESHOLD = 1500;
+            const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+            const percentage = Math.min(100, Math.max(0, (subtotal / FREE_SHIPPING_THRESHOLD) * 100));
             
             if (remaining === 0) {
-                freeShippingProgress.innerHTML = `<p style="color: var(--accent-sage-dark); font-weight: 500;">You've unlocked Free Shipping!</p>
+                freeShippingProgress.innerHTML = `<p style="color: var(--accent-sage-dark); font-weight: 500;">🎉 You've unlocked Free Shipping!</p>
                 <div class="progress-bar-container"><div class="progress-bar-fill" style="width: 100%;"></div></div>`;
             } else {
                 freeShippingProgress.innerHTML = `
-                    <p>Add <strong>$${remaining.toFixed(2)}</strong> more for Free Shipping!</p>
+                    <p>Add <strong>₹${remaining.toFixed(2)}</strong> more to unlock Free Shipping!</p>
                     <div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${percentage}%;"></div></div>
                 `;
             }
@@ -308,9 +308,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (cart.length === 0) {
             cartPageItems.innerHTML = '<div style="padding: 4rem; text-align: center; color: var(--text-secondary); background: var(--bg-secondary); border-radius: 8px;">Your shopping bag is empty.<br><a href="index.html" style="color: var(--text-primary); text-decoration: underline; margin-top: 1rem; display: inline-block;">Continue Shopping</a></div>';
-            if (cartPageSubtotal) cartPageSubtotal.innerText = '$0.00';
-            if (cartPageShipping) cartPageShipping.innerText = '$0.00';
-            if (cartPageTotal) cartPageTotal.innerText = '$0.00';
+            if (cartPageSubtotal) cartPageSubtotal.innerText = '₹0.00';
+            if (cartPageShipping) cartPageShipping.innerText = '₹0.00';
+            if (cartPageTotal) cartPageTotal.innerText = '₹0.00';
             return;
         }
 
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="qty-num">${item.qty}</span>
                             <button class="qty-btn" onclick="updateItemQty(${index}, 1)">+</button>
                         </div>
-                        <div class="cart-page-price">$${(item.price * item.qty).toFixed(2)}</div>
+                        <div class="cart-page-price">₹${(item.price * item.qty).toFixed(2)}</div>
                     </div>
                     <button class="btn-remove-text" style="align-self: flex-start; margin-top: 1rem;" onclick="removeItem(${index})">Remove</button>
                 </div>
@@ -338,19 +338,19 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }).join('');
 
-        if (cartPageSubtotal) cartPageSubtotal.innerText = '$' + subtotal.toFixed(2);
+        if (cartPageSubtotal) cartPageSubtotal.innerText = '₹' + subtotal.toFixed(2);
         
-        let shipping = 10;
-        if (subtotal >= 150) {
+        let shipping = 50; // default shipping
+        if (subtotal >= 1500) {
             shipping = 0;
         }
         
         if (cartPageShipping) {
-            cartPageShipping.innerText = shipping === 0 ? 'Free' : '$' + shipping.toFixed(2);
+            cartPageShipping.innerText = shipping === 0 ? 'Free' : '₹' + shipping.toFixed(2);
         }
         
         if (cartPageTotal) {
-            cartPageTotal.innerText = '$' + (subtotal + shipping).toFixed(2);
+            cartPageTotal.innerText = '₹' + (subtotal + shipping).toFixed(2);
         }
     };
 
@@ -365,6 +365,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof lucide !== 'undefined') {
         if (window.lucide) { try { lucide.createIcons(); } catch(e) { console.warn(e); } }
     }
+    
+    // Setup checkout buttons
+    document.querySelectorAll('.btn-checkout').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (typeof window.requireCustomerAuth === 'function') {
+                window.requireCustomerAuth(() => {
+                    window.location.href = 'checkout.html';
+                }, 'Login to proceed to checkout');
+            } else {
+                window.location.href = 'checkout.html';
+            }
+        });
+    });
 });
 
 // Expose mobile menu toggle globally

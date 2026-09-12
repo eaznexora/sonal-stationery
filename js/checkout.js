@@ -19,20 +19,34 @@ async function loadOrderSummary() {
     const urlParams = new URLSearchParams(window.location.search);
     const isBuyNow = urlParams.get('buyNow') === 'true';
 
+    checkoutItems = [];
+
     if (isBuyNow) {
-        const directItemStr = sessionStorage.getItem('direct_checkout_item');
-        if (directItemStr) {
-            checkoutItems = [JSON.parse(directItemStr)];
-        }
-    } else {
-        // Normally load from cart (localStorage for this template)
-        const cartStr = localStorage.getItem('sonal_cart');
-        if (cartStr) {
-            checkoutItems = JSON.parse(cartStr);
+        const directItem = sessionStorage.getItem('direct_checkout_item');
+        if (directItem) {
+            try {
+                checkoutItems = [JSON.parse(directItem)];
+            } catch (e) {
+                console.error("Error parsing direct_checkout_item", e);
+            }
         }
     }
 
-    if (!checkoutItems || checkoutItems.length === 0) {
+    if (!checkoutItems.length) {
+        // Read the exact key used by main.js with fallbacks
+        const savedCart = localStorage.getItem('sonal_stationary_cart') || 
+                          localStorage.getItem('cart') || 
+                          localStorage.getItem('sonal_cart');
+        if (savedCart) {
+            try {
+                checkoutItems = JSON.parse(savedCart);
+            } catch (e) {
+                console.error("Error parsing cart from storage", e);
+            }
+        }
+    }
+
+    if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
         alert("Your cart is empty. Redirecting to home.");
         window.location.href = 'index.html';
         return;
@@ -50,7 +64,9 @@ function renderItems() {
     subtotal = 0;
 
     checkoutItems.forEach(item => {
-        const itemTotal = item.price * item.quantity;
+        const qty = item.qty || item.quantity || 1;
+        const price = Number(item.price) || 0;
+        const itemTotal = price * qty;
         subtotal += itemTotal;
         const img = item.image || 'https://via.placeholder.com/64';
 
@@ -58,7 +74,7 @@ function renderItems() {
             <div class="summary-item">
                 <div class="summary-item-img">
                     <img src="${img}" alt="${item.title}">
-                    <span class="summary-item-qty">${item.quantity}</span>
+                    <span class="summary-item-qty">${qty}</span>
                 </div>
                 <div class="summary-item-info">
                     <div class="summary-item-title">${item.title}</div>

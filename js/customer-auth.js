@@ -139,13 +139,25 @@
 
     function handleAuthSuccess(user) {
         authenticatedUser = user;
-        if (!user.name || !user.phone || user.name.trim() === '') {
+        const customerName = user.name || user.fullName || '';
+        const customerPhone = user.phone || user.mobile || '';
+        
+        const hasExistingProfile = user && customerName && customerName.trim() !== '' && customerName !== 'Valued Customer' && customerPhone;
+
+        if (hasExistingProfile) {
+            finalizeLogin(user);
+        } else {
             document.getElementById('authStep1').style.display = 'none';
             document.getElementById('authStep2').style.display = 'none';
             document.getElementById('authStep3').style.display = 'block';
-            if (user.name) document.getElementById('authNameInput').value = user.name;
-        } else {
-            finalizeLogin(user);
+            
+            const nameInput = document.getElementById('authNameInput') || document.getElementById('completeName');
+            const phoneInput = document.getElementById('authPhoneInput') || document.getElementById('completePhone');
+            const emailInput = document.getElementById('completeEmail');
+            
+            if (nameInput) nameInput.value = customerName;
+            if (phoneInput) phoneInput.value = customerPhone;
+            if (emailInput) emailInput.value = user.email || '';
         }
     }
 
@@ -183,7 +195,7 @@
             });
             const data = await res.json();
             if (data.success) {
-                handleAuthSuccess(data.user);
+                handleAuthSuccess(data.user || data.customer);
             } else {
                 showError(data.message || 'Google login failed');
             }
@@ -284,7 +296,7 @@
             });
             const data = await res.json();
             if (data.success) {
-                handleAuthSuccess(data.user);
+                handleAuthSuccess(data.user || data.customer);
             } else {
                 showError(data.message || 'Invalid OTP');
             }

@@ -40,8 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken');
     
     if (!rawUser && !token) {
-        alert('Please log in to view your profile.');
-        window.location.href = 'index.html?login=true';
+        if (typeof window.requireCustomerAuth === 'function') {
+            window.requireCustomerAuth(() => {
+                window.location.reload();
+            }, 'Please log in to view your profile.');
+        } else {
+            window.location.href = 'index.html?login=true';
+        }
         return;
     }
 

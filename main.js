@@ -397,3 +397,15 @@ window.toggleMobileMenu = function() {
     const menu = document.getElementById('mobileMenu');
     if (menu) menu.classList.toggle('active');
 };
+
+// Handle ?login=true globally
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('login') === 'true') {
+    if (typeof window.requireCustomerAuth === 'function') {
+        window.requireCustomerAuth(() => {
+            const cleanUrl = window.location.href.split('?')[0];
+            window.history.replaceState({}, document.title, cleanUrl);
+            window.location.reload();
+        }, 'Please log in to continue.');
+    }
+}

@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${item.image}" alt="${item.title}">
                 <div class="cart-item-details">
                     <h4>${item.title}</h4>
-                    ${item.variant && item.variant !== 'null' && item.variant !== 'Default' ? `<span class="cart-item-variant">Variant: ${item.variant}</span>` : ''}
+                    ${item.variant && !item.variant.includes('rgb') && !item.variant.includes('var(') && item.variant !== 'null' && item.variant !== 'Default' ? `<span class="cart-item-variant">Variant: ${item.variant}</span>` : ''}
                     ${item.giftNote ? `<span class="cart-item-gift">Gift Note Included</span>` : ''}
                     <div class="cart-item-pricing" style="margin-top: 4px; margin-bottom: 8px;">
                         <span class="item-line-total" style="font-weight: 600;">₹${(item.price * item.qty).toFixed(2)}</span>
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${item.image}" alt="${item.title}">
                 <div class="cart-page-details">
                     <h3>${item.title}</h3>
-                    ${item.variant && item.variant !== 'null' && item.variant !== 'Default' ? `<p class="cart-page-variant">Variant: ${item.variant}</p>` : ''}
+                    ${item.variant && !item.variant.includes('rgb') && !item.variant.includes('var(') && item.variant !== 'null' && item.variant !== 'Default' ? `<p class="cart-page-variant">Variant: ${item.variant}</p>` : ''}
                     ${item.giftNote ? `<p class="cart-page-variant" style="color: var(--accent-sage-dark);">Gift Note: "${item.giftNote}"</p>` : ''}
                     
                     <div class="cart-page-actions">
@@ -379,31 +379,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Setup checkout buttons
-    function handleProceedToCheckout(e) {
-        if (e) e.preventDefault();
-
-        // Check cart items
-        const cart = JSON.parse(localStorage.getItem('sonal_stationary_cart') || '[]');
-        if (!cart || cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-
-        // Check if user is authenticated
-        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
-        if (token) {
-            window.location.href = 'checkout.html';
-        } else if (typeof window.requireCustomerAuth === 'function') {
-            window.requireCustomerAuth(() => {
-                window.location.href = 'checkout.html';
-            }, 'Login to proceed to checkout');
-        } else {
-            window.location.href = 'checkout.html';
-        }
-    }
-
     document.querySelectorAll('.btn-checkout').forEach(btn => {
-        btn.addEventListener('click', handleProceedToCheckout);
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const cart = JSON.parse(localStorage.getItem('sonal_stationary_cart') || '[]');
+            if (!cart.length) {
+                alert('Your bag is empty!');
+                return;
+            }
+            window.location.href = 'checkout.html';
+        });
     });
 });
 

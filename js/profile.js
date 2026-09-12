@@ -32,33 +32,56 @@ window.switchTab = function(event, tabId) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Redirect if no auth
-    const rawUser = localStorage.getItem('customer_user') || 
-                    localStorage.getItem('customer_data') || 
-                    localStorage.getItem('sonal_user') || 
-                    localStorage.getItem('user');
+    // Default to overview tab
+    const defaultTab = document.getElementById('tab-overview');
+    if (defaultTab) defaultTab.style.display = 'block';
+
+    function getStoredUser() {
+        try {
+            return JSON.parse(
+                localStorage.getItem('customer_user') ||
+                localStorage.getItem('customer_data') ||
+                localStorage.getItem('sonal_user') ||
+                localStorage.getItem('user') ||
+                'null'
+            );
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function hydrateAllProfileData() {
+        loadProfileDetails();
+        loadOrderHistory();
+        loadSavedAddresses();
+        loadWishlist();
+        bindLogout();
+    }
+
+    const user = getStoredUser();
     const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken');
-    
-    if (!rawUser && !token) {
+
+    if (!user && !token) {
+        // Open auth modal WITHOUT triggering a page reload
         if (typeof window.requireCustomerAuth === 'function') {
             window.requireCustomerAuth(() => {
-                window.location.reload();
+                // Verify credentials actually exist before hydrating
+                const authedUser = getStoredUser();
+                const authedToken = localStorage.getItem('customer_token') || localStorage.getItem('customerToken');
+                if (authedUser || authedToken) {
+                    hydrateAllProfileData();
+                }
             }, 'Please log in to view your profile.');
-        } else {
-            window.location.href = 'index.html?login=true';
+        } else if (typeof window.openAuthModal === 'function') {
+            window.openAuthModal(() => {
+                hydrateAllProfileData();
+            });
         }
         return;
     }
 
-    // Ensure overview tab is open by default
-    const defaultTab = document.getElementById('tab-overview');
-    if (defaultTab) defaultTab.style.display = 'block';
-
-    loadProfileDetails();
-    loadOrderHistory();
-    loadSavedAddresses();
-    loadWishlist();
-    bindLogout();
+    // Already authenticated: hydrate immediately
+    hydrateAllProfileData();
 });
 
 function loadProfileDetails() {

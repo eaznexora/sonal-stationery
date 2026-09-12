@@ -47,11 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Dummy Search filtering
     const dummyProducts = [
-        { title: 'Plush Teddy Bear', category: 'Toys', price: '$45.00', img: 'https://picsum.photos/100/100?random=50' },
-        { title: 'Leather Crossbody Bag', category: 'Purses', price: '$120.00', img: 'https://picsum.photos/100/100?random=51' },
-        { title: 'Personalized Spa Hamper', category: 'Gifts', price: '$85.00', img: 'https://picsum.photos/100/100?random=52' },
-        { title: 'Sleepy Bear Companion', category: 'Toys', price: '$38.00', img: 'https://picsum.photos/100/100?random=53' },
-        { title: 'Organic Linen Tote', category: 'Purses', price: '$65.00', img: 'https://picsum.photos/100/100?random=54' }
+        { title: 'Plush Teddy Bear', category: 'Toys', price: '₹45.00', img: 'https://picsum.photos/100/100?random=50' },
+        { title: 'Leather Crossbody Bag', category: 'Purses', price: '₹120.00', img: 'https://picsum.photos/100/100?random=51' },
+        { title: 'Personalized Spa Hamper', category: 'Gifts', price: '₹85.00', img: 'https://picsum.photos/100/100?random=52' },
+        { title: 'Sleepy Bear Companion', category: 'Toys', price: '₹38.00', img: 'https://picsum.photos/100/100?random=53' },
+        { title: 'Organic Linen Tote', category: 'Purses', price: '₹65.00', img: 'https://picsum.photos/100/100?random=54' }
     ];
 
     if (searchInput) {
@@ -367,17 +367,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Setup checkout buttons
-    document.querySelectorAll('.btn-checkout').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof window.requireCustomerAuth === 'function') {
-                window.requireCustomerAuth(() => {
-                    window.location.href = 'checkout.html';
-                }, 'Login to proceed to checkout');
-            } else {
+    function handleProceedToCheckout(e) {
+        if (e) e.preventDefault();
+
+        // Check cart items
+        const cart = JSON.parse(localStorage.getItem('sonal_stationary_cart') || '[]');
+        if (!cart || cart.length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+
+        // Check if user is authenticated
+        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+        if (token) {
+            window.location.href = 'checkout.html';
+        } else if (typeof window.requireCustomerAuth === 'function') {
+            window.requireCustomerAuth(() => {
                 window.location.href = 'checkout.html';
-            }
-        });
+            }, 'Login to proceed to checkout');
+        } else {
+            window.location.href = 'checkout.html';
+        }
+    }
+
+    document.querySelectorAll('.btn-checkout').forEach(btn => {
+        btn.addEventListener('click', handleProceedToCheckout);
     });
 });
 

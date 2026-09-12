@@ -164,32 +164,6 @@ async function renderMegaMenu() {
                 </div>
             `).join('');
         }
-
-        const navLeft = document.querySelector('.nav-left');
-        if (navLeft) {
-            const existingLinks = navLeft.querySelectorAll('a.nav-link:not(.dropdown-toggle)');
-            existingLinks.forEach(link => {
-                const text = link.textContent.trim().toLowerCase();
-                if (text !== 'home' && text !== 'about') {
-                    link.remove();
-                }
-            });
-
-            const aboutLink = Array.from(navLeft.querySelectorAll('a.nav-link')).find(el => el.textContent.trim().toLowerCase() === 'about');
-            
-            categories.slice(0, 3).forEach(cat => {
-                const a = document.createElement('a');
-                a.href = `category-products.html?cat=${encodeURIComponent(cat.name)}`;
-                a.className = 'nav-link';
-                a.textContent = cat.name;
-                
-                if (aboutLink) {
-                    navLeft.insertBefore(a, aboutLink);
-                } else {
-                    navLeft.appendChild(a);
-                }
-            });
-        }
     } catch(e) {
         console.error(e);
     }

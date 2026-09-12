@@ -358,4 +358,9 @@
             openModal(callback, promptMessage); // On error, fallback to login
         }
     };
+    // Expose direct synchronous opener on window
+    window.openCustomerAuthModal = function(callback, promptMessage) {
+        openModal(callback, promptMessage);
+    };
+    window.openAuthModal = window.openCustomerAuthModal;
 })();

@@ -1,6 +1,7 @@
 /* Premium Luxury Customer Auth Modal */
 #customerAuthModal {
-    display: none;
+    display: none !important;
+    pointer-events: none !important;
     position: fixed;
     top: 0;
     left: 0;
@@ -15,7 +16,8 @@
 }
 
 #customerAuthModal.active {
-    display: flex;
+    display: flex !important;
+    pointer-events: auto !important;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

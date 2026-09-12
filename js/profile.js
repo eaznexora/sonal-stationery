@@ -68,22 +68,21 @@ function checkProfileAccess() {
 
 window.triggerAuthModal = function(e) {
     if (e && e.preventDefault) e.preventDefault();
+    
+    const onAuthSuccess = () => {
+        if (typeof checkProfileAccess === 'function') {
+            checkProfileAccess();
+        }
+    };
 
-    // Check available modal triggers
+    // Directly call the opened modal without waiting on /api/auth/customer/me network requests
     if (typeof window.openCustomerAuthModal === 'function') {
-        window.openCustomerAuthModal(() => {
-            if (typeof checkProfileAccess === 'function') checkProfileAccess();
-        });
+        window.openCustomerAuthModal(onAuthSuccess, 'Please sign in to access your profile.');
     } else if (typeof window.openAuthModal === 'function') {
-        window.openAuthModal(() => {
-            if (typeof checkProfileAccess === 'function') checkProfileAccess();
-        });
+        window.openAuthModal(onAuthSuccess, 'Please sign in to access your profile.');
     } else if (typeof window.requireCustomerAuth === 'function') {
-        window.requireCustomerAuth(() => {
-            if (typeof checkProfileAccess === 'function') checkProfileAccess();
-        });
+        window.requireCustomerAuth(onAuthSuccess, 'Please sign in to access your profile.');
     } else {
-        // Fallback to home page login parameter
         window.location.href = 'index.html?login=true';
     }
 };

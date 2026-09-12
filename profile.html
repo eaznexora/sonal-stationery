@@ -33,7 +33,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="styles.css?v=5.3">
+    <link rel="stylesheet" href="styles.css?v=5.4">
 </head>
 <body>
     <!-- Desktop Header (Solid) -->
@@ -118,7 +118,12 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="profile-main">
+    <div id="profileAuthGate" style="display: none; text-align: center; padding: 80px 20px;">
+        <h2 style="font-size: 1.8rem; margin-bottom: 12px; font-family: serif;">Account Login Required</h2>
+        <p style="color: #666; margin-bottom: 24px;">Please sign in or create an account to view your profile, orders, and saved addresses.</p>
+        <button onclick="triggerAuthModal()" style="padding: 12px 32px; background: #111; color: #fff; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">Sign In / Register</button>
+    </div>
+    <main class="profile-main" id="profileMainContainer" style="display: none;">
         <div class="profile-layout">
             <!-- Sidebar Tabs -->
             <aside class="profile-sidebar">
@@ -138,15 +143,15 @@
                     <div class="profile-info-grid">
                         <div class="info-group">
                             <label>Full Name</label>
-                            <p>Jane Doe</p>
+                            <p><span id="profileName"></span></p>
                         </div>
                         <div class="info-group">
                             <label>Email Address</label>
-                            <p>jane.doe@example.com</p>
+                            <p><span id="profileEmail"></span></p>
                         </div>
                         <div class="info-group">
                             <label>Phone Number</label>
-                            <p>+1 (555) 123-4567</p>
+                            <p><span id="profilePhone"></span></p>
                         </div>
                     </div>
                     <button class="btn-primary" onclick="openEditProfileModal()">Edit Profile</button>
@@ -452,8 +457,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="main.js?v=5.3"></script>
-    <script src="js/profile.js?v=5.3"></script>
-    <script src="/js/customer-auth.js?v=5.3"></script>
+    <script src="main.js?v=5.4"></script>
+    <script src="js/profile.js?v=5.4"></script>
+    <script src="/js/customer-auth.js?v=5.4"></script>
 </body>
 </html>

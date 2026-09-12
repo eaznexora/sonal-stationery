@@ -31,57 +31,66 @@ window.switchTab = function(event, tabId) {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Default to overview tab
+function getActiveSession() {
+    const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
+    const rawUser = localStorage.getItem('customer_user') || localStorage.getItem('customer_data') || localStorage.getItem('sonal_user') || localStorage.getItem('user');
+    let user = null;
+    try { user = rawUser ? JSON.parse(rawUser) : null; } catch(e) { user = null; }
+    return { token, user };
+}
+
+function checkProfileAccess() {
+    const { token, user } = getActiveSession();
+    const mainContainer = document.getElementById('profileMainContainer') || document.querySelector('.profile-main');
+    const gateContainer = document.getElementById('profileAuthGate');
+
+    // CASE 1: LOGGED OUT
+    if (!token && !user) {
+        if (mainContainer) mainContainer.style.display = 'none';
+        if (gateContainer) gateContainer.style.display = 'block';
+
+        // Automatically trigger auth modal
+        triggerAuthModal();
+        return false;
+    }
+
+    // CASE 2: LOGGED IN
+    if (gateContainer) gateContainer.style.display = 'none';
+    if (mainContainer) mainContainer.style.display = 'block';
+    
+    // Ensure overview tab is open by default
     const defaultTab = document.getElementById('tab-overview');
     if (defaultTab) defaultTab.style.display = 'block';
-
-    function getStoredUser() {
-        try {
-            return JSON.parse(
-                localStorage.getItem('customer_user') ||
-                localStorage.getItem('customer_data') ||
-                localStorage.getItem('sonal_user') ||
-                localStorage.getItem('user') ||
-                'null'
-            );
-        } catch (e) {
-            return null;
-        }
-    }
-
-    function hydrateAllProfileData() {
-        loadProfileDetails();
-        loadOrderHistory();
-        loadSavedAddresses();
-        loadWishlist();
-        bindLogout();
-    }
-
-    const user = getStoredUser();
-    const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken');
-
-    if (!user && !token) {
-        // Open auth modal WITHOUT triggering a page reload
-        if (typeof window.requireCustomerAuth === 'function') {
-            window.requireCustomerAuth(() => {
-                // Verify credentials actually exist before hydrating
-                const authedUser = getStoredUser();
-                const authedToken = localStorage.getItem('customer_token') || localStorage.getItem('customerToken');
-                if (authedUser || authedToken) {
-                    hydrateAllProfileData();
-                }
-            }, 'Please log in to view your profile.');
-        } else if (typeof window.openAuthModal === 'function') {
-            window.openAuthModal(() => {
-                hydrateAllProfileData();
-            });
-        }
-        return;
-    }
-
-    // Already authenticated: hydrate immediately
+    
     hydrateAllProfileData();
+    return true;
+}
+
+window.triggerAuthModal = function() {
+    if (typeof window.openAuthModal === 'function') {
+        window.openAuthModal(() => {
+            checkProfileAccess();
+        });
+    } else if (typeof window.requireCustomerAuth === 'function') {
+        window.requireCustomerAuth(() => {
+            checkProfileAccess();
+        }, 'Please log in to view your profile.');
+    } else {
+        // Fallback redirect if modal function is missing
+        window.location.href = 'index.html?login=true';
+    }
+};
+
+function hydrateAllProfileData() {
+    loadProfileDetails();
+    loadOrderHistory();
+    loadSavedAddresses();
+    loadWishlist();
+    bindLogout();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkProfileAccess();
 });
 
 function loadProfileDetails() {
@@ -279,10 +288,11 @@ window.handleLogout = function() {
     if (confirm('Are you sure you want to log out?')) {
         localStorage.removeItem('customer_token');
         localStorage.removeItem('customerToken');
+        localStorage.removeItem('token');
         localStorage.removeItem('customer_user');
         localStorage.removeItem('customer_data');
         localStorage.removeItem('sonal_user');
         localStorage.removeItem('user');
-        window.location.href = 'index.html';
+        window.location.href = 'profile.html';
     }
 };

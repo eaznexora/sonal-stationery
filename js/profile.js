@@ -315,17 +315,50 @@ function bindLogout() {
     }
 }
 
-window.handleLogout = function() {
-    if (confirm('Are you sure you want to log out?')) {
-        localStorage.removeItem('customer_token');
-        localStorage.removeItem('customerToken');
-        localStorage.removeItem('token');
-        localStorage.removeItem('customer_user');
-        localStorage.removeItem('customer_data');
-        localStorage.removeItem('sonal_user');
-        localStorage.removeItem('user');
-        window.location.href = 'profile.html';
+window.handleLogout = async function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    try {
+        // 1. Invalidate session on server (clears HTTP-only session cookie)
+        await fetch('/api/auth/customer/logout', { 
+            method: 'POST',
+            credentials: 'include' 
+        });
+    } catch (err) {
+        console.warn('Server logout request failed, proceeding with client purge:', err);
     }
+
+    // 2. Wipe client-side storage keys
+    const authKeys = [
+        'customer_token',
+        'customerToken',
+        'token',
+        'customer_user',
+        'customer_data',
+        'sonal_user',
+        'user'
+    ];
+    authKeys.forEach(key => localStorage.removeItem(key));
+
+    // 3. Clear client-accessible fallback cookies
+    document.cookie = "customer_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+    // 4. Update Header Profile Icon back to logged-out state
+    const avatarEl = document.querySelector('.header-profile-icon, .user-avatar, #headerUserIcon, .icon-btn[aria-label="Account"]');
+    if (avatarEl) {
+        avatarEl.innerHTML = '<i data-lucide="user"></i>';
+        if (window.lucide) lucide.createIcons();
+    }
+
+    // 5. Instantly switch DOM view to Auth Gate
+    const main = document.getElementById('profileMainContainer') || document.querySelector('.profile-main');
+    const gate = document.getElementById('profileAuthGate');
+    if (main) main.style.setProperty('display', 'none', 'important');
+    if (gate) gate.style.setProperty('display', 'flex', 'important');
+
+    // 6. Redirect to clean profile URL to prevent stale state
+    window.location.href = 'profile.html?v=5.8';
 };
 
 window.addEventListener('customer:authenticated', (e) => {

@@ -6,6 +6,15 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+    orderNumber: {
+      type: String,
+      unique: true,
+      default: () => 'SN-' + Math.floor(100000 + Math.random() * 900000)
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
     customer: {
       name: String,
       email: String,

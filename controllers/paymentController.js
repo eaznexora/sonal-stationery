@@ -44,6 +44,8 @@ exports.createOrder = async (req, res) => {
 
             const order = new Order({
                 orderId: orderIdStr,
+                orderNumber: orderIdStr,
+                user: user._id,
                 customer: {
                     name: shippingAddress?.name,
                     email: shippingAddress?.email,
@@ -69,7 +71,7 @@ exports.createOrder = async (req, res) => {
             user.walletHistory.push({
                 amount: deduction,
                 type: 'debit',
-                description: `Used on order ${orderIdStr}`,
+                description: `Used on order #${order.orderNumber || orderIdStr}`,
                 orderId: order._id
             });
             
@@ -80,7 +82,7 @@ exports.createOrder = async (req, res) => {
             user.walletHistory.push({
                 amount: earnedCashback,
                 type: 'credit',
-                description: `Cashback for order ${orderIdStr}`,
+                description: `Cashback for Order #${order.orderNumber || orderIdStr}`,
                 orderId: order._id
             });
             await user.save();
@@ -150,6 +152,7 @@ exports.verifyPayment = async (req, res) => {
 
             const order = new Order({
                 orderId: orderIdStr,
+                orderNumber: orderIdStr,
                 customer: {
                     name: shippingAddress?.name,
                     email: shippingAddress?.email,
@@ -184,6 +187,7 @@ exports.verifyPayment = async (req, res) => {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);
                     const user = await User.findById(decoded.id);
                     if (user) {
+                        order.user = user._id;
                         const deduction = applyWallet ? Math.min(user.walletBalance, totalAmount) : 0;
                         order.walletDiscount = deduction;
                         order.finalPaidAmount = totalAmount - deduction;
@@ -193,7 +197,7 @@ exports.verifyPayment = async (req, res) => {
                             user.walletHistory.push({
                                 amount: deduction,
                                 type: 'debit',
-                                description: `Used on order ${orderIdStr}`,
+                                description: `Used on order #${order.orderNumber || orderIdStr}`,
                                 orderId: order._id
                             });
                         }
@@ -205,7 +209,7 @@ exports.verifyPayment = async (req, res) => {
                         user.walletHistory.push({
                             amount: earnedCashback,
                             type: 'credit',
-                            description: `Cashback for order ${orderIdStr}`,
+                            description: `Cashback for Order #${order.orderNumber || orderIdStr}`,
                             orderId: order._id
                         });
                         
@@ -219,7 +223,7 @@ exports.verifyPayment = async (req, res) => {
             
             await order.save();
 
-            res.json({ success: true, orderId: order._id, earnedCashback, newWalletBalance });
+            res.json({ success: true, orderId: order.orderNumber || order._id, earnedCashback, newWalletBalance });
         } else {
             res.status(400).json({ success: false, message: "Payment verification failed" });
         }

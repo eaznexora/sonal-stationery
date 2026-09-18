@@ -182,6 +182,11 @@ async function handlePlaceOrder() {
         return;
     }
 
+    const paymentInput = document.querySelector('input[name="paymentMethod"]:checked') ||
+                         document.querySelector('input[name="payment"]:checked') ||
+                         document.querySelector('input[name="payment_method"]:checked');
+    const paymentMethodValue = paymentInput ? paymentInput.value.toLowerCase() : 'cod';
+
     const formData = new FormData(form);
     const orderData = {
         customer: {
@@ -195,7 +200,7 @@ async function handlePlaceOrder() {
             notes: formData.get('notes')
         },
         items: checkoutItems,
-        paymentMethod: formData.get('paymentMethod'),
+        paymentMethod: paymentMethodValue,
         total: subtotal + (subtotal > 500 ? 0 : 50)
     };
 
@@ -221,7 +226,10 @@ async function handlePlaceOrder() {
         }
     }
 
-    if (orderData.paymentMethod === 'online') {
+    const methodUpper = (orderData.paymentMethod || '').toUpperCase();
+    const isOnline = methodUpper === 'ONLINE' || methodUpper === 'RAZORPAY' || methodUpper === 'PREPAID';
+
+    if (isOnline) {
         try {
             const res = await fetch(`${API_BASE}/api/payments/razorpay/create-order`, {
                 method: 'POST',
@@ -290,7 +298,7 @@ async function handlePlaceOrder() {
     } else {
         // COD or other flow
         console.log("Order Placed (COD)!", orderData);
-        alert(`Order Placed Successfully!\nTotal: ₹${orderData.total.toFixed(2)}\nPayment Method: ${orderData.paymentMethod.toUpperCase()}`);
+        alert(`Order Placed Successfully!\nTotal: ₹${orderData.total.toFixed(2)}\nPayment Method: ${(orderData.paymentMethod || 'COD').toUpperCase()}`);
         
         sessionStorage.removeItem('direct_checkout_item');
         const urlParams = new URLSearchParams(window.location.search);

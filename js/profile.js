@@ -112,11 +112,12 @@ window.triggerAuthModal = function(e) {
     }
 };
 
-function hydrateAllProfileData() {
+function hydrateAllProfileData(user) {
     loadProfileDetails();
     loadOrderHistory();
     loadSavedAddresses();
     loadWishlist();
+    loadWallet(user);
     bindLogout();
 }
 
@@ -308,6 +309,71 @@ window.removeFromWishlist = function(id) {
     loadWishlist();
 };
 
+async function loadWallet(user) {
+    const balanceDisplay = document.getElementById('walletBalanceDisplay');
+    const historyContainer = document.getElementById('walletHistoryContainer');
+    
+    if (!balanceDisplay || !historyContainer) return;
+    
+    if (user && user.walletBalance !== undefined) {
+        balanceDisplay.textContent = `₹${parseFloat(user.walletBalance).toFixed(2)}`;
+    }
+    
+    try {
+        const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
+        if (!token) return;
+        
+        const res = await fetch('/api/auth/customer/me', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (data.success && data.user) {
+            const latestUser = data.user;
+            balanceDisplay.textContent = `₹${parseFloat(latestUser.walletBalance || 0).toFixed(2)}`;
+            
+            localStorage.setItem('sonal_user', JSON.stringify(latestUser));
+            
+            if (latestUser.walletHistory && latestUser.walletHistory.length > 0) {
+                const history = [...latestUser.walletHistory].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                historyContainer.innerHTML = history.map(item => {
+                    const isCredit = item.type === 'credit';
+                    const icon = isCredit ? 'arrow-down-left' : 'arrow-up-right';
+                    const color = isCredit ? '#16a34a' : '#dc2626';
+                    const bg = isCredit ? '#f0fdf4' : '#fef2f2';
+                    const sign = isCredit ? '+' : '-';
+                    const date = new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    
+                    return `
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background: white;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="background: ${bg}; color: ${color}; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="${icon}" style="width: 20px; height: 20px;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 500; color: #1f2937;">${item.description || 'Transaction'}</div>
+                                    <div style="font-size: 0.85rem; color: #6b7280; margin-top: 2px;">${date}</div>
+                                </div>
+                            </div>
+                            <div style="font-weight: 600; color: ${color}; font-size: 1.1rem;">
+                                ${sign}₹${parseFloat(item.amount).toFixed(2)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                if (window.lucide) lucide.createIcons();
+            } else {
+                historyContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: #666; background: #f9fafb; border-radius: 8px;">No wallet transactions yet.</div>`;
+            }
+        }
+    } catch (err) {
+        console.error("Failed to load wallet history", err);
+        historyContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: #dc2626;">Failed to load wallet history.</div>`;
+    }
+}
+
 function bindLogout() {
     const logoutBtn = document.querySelector('.profile-tab[style*="ef4444"]') || document.getElementById('btnLogout');
     if (logoutBtn) {
@@ -357,8 +423,7 @@ window.handleLogout = async function(e) {
     if (main) main.style.setProperty('display', 'none', 'important');
     if (gate) gate.style.setProperty('display', 'flex', 'important');
 
-    // 6. Redirect to clean profile URL to prevent stale state
-    window.location.href = 'profile.html?v=5.8';
+    window.location.href = 'profile.html?v=7.0';
 };
 
 window.addEventListener('customer:authenticated', (e) => {

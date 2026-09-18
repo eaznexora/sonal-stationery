@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -765,6 +765,7 @@
                             <th>Status</th>
                             <th>Payment Status</th>
                             <th>Amount</th>
+                            <th>Wallet Used</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -781,6 +782,7 @@
                             </td>
                             <td><span class="status-pill status-paid">Paid</span></td>
                             <td>₹1,250.00</td>
+                            <td style="color:#15803d; font-weight:500;">-₹50.00</td>
                             <td>
                                 <div class="action-links">
                                     <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
@@ -801,6 +803,7 @@
                             </td>
                             <td><span class="status-pill status-paid">Paid</span></td>
                             <td>₹890.00</td>
+                            <td style="color:#15803d; font-weight:500;">₹0.00</td>
                             <td>
                                 <div class="action-links">
                                     <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
@@ -821,6 +824,7 @@
                             </td>
                             <td><span class="status-pill status-pending">Pending</span></td>
                             <td>₹450.00</td>
+                            <td style="color:#15803d; font-weight:500;">₹0.00</td>
                             <td>
                                 <div class="action-links">
                                     <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
@@ -841,6 +845,7 @@
                             </td>
                             <td><span class="status-pill status-paid">Paid</span></td>
                             <td>₹1,500.00</td>
+                            <td style="color:#15803d; font-weight:500;">-₹120.00</td>
                             <td>
                                 <div class="action-links">
                                     <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
@@ -861,6 +866,7 @@
                             </td>
                             <td><span class="status-pill status-paid">Paid</span></td>
                             <td>₹350.00</td>
+                            <td style="color:#15803d; font-weight:500;">₹0.00</td>
                             <td>
                                 <div class="action-links">
                                     <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
@@ -881,6 +887,7 @@
                             </td>
                             <td><span class="status-pill status-failed">Failed</span></td>
                             <td>₹600.00</td>
+                            <td style="color:#15803d; font-weight:500;">₹0.00</td>
                             <td>
                                 <div class="action-links">
                                     <a href="#" class="action-link track-order-link"><i class="ph ph-truck"></i> Track Order</a>
@@ -969,7 +976,7 @@
                 tbody.innerHTML = '';
                 if (filteredRows.length === 0) {
                     const emptyRow = document.createElement('tr');
-                    emptyRow.innerHTML = `<td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No orders found matching your criteria.</td>`;
+                    emptyRow.innerHTML = `<td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No orders found matching your criteria.</td>`;
                     tbody.appendChild(emptyRow);
                 } else {
                     filteredRows.forEach(row => tbody.appendChild(row));

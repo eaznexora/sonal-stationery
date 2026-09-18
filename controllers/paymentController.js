@@ -1,6 +1,8 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Order = require('../models/Order');
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -9,9 +11,89 @@ const razorpay = new Razorpay({
 
 exports.createOrder = async (req, res) => {
     try {
-        const { amount, receipt, orderDetails } = req.body;
+        const { amount, receipt, orderDetails, applyWallet, items, shippingAddress } = req.body;
         
-        const amountInPaise = Math.round(amount * 100);
+        let user = null;
+        const token = req.cookies?.customer_token || 
+                      req.cookies?.token || 
+                      (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
+                      
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                user = await User.findById(decoded.id);
+            } catch (err) {
+                console.error("JWT verify error in createOrder:", err);
+            }
+        }
+
+        const deduction = (applyWallet && user) ? Math.min(user.walletBalance, amount) : 0;
+        const finalPaidAmount = amount - deduction;
+
+        if (applyWallet && finalPaidAmount < 1) {
+            // Zero payment bypass
+            const orderIdStr = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+            
+            const mappedItems = items ? items.map(item => ({
+                product: item.productId || item._id || null,
+                name: item.title || item.name,
+                price: Number(item.price),
+                quantity: item.qty || item.quantity || 1,
+                image: item.image
+            })) : [];
+
+            const order = new Order({
+                orderId: orderIdStr,
+                customer: {
+                    name: shippingAddress?.name,
+                    email: shippingAddress?.email,
+                    phone: shippingAddress?.phone,
+                    address: {
+                        street: shippingAddress?.address,
+                        city: shippingAddress?.city,
+                        state: shippingAddress?.state,
+                        pinCode: shippingAddress?.pinCode,
+                        notes: shippingAddress?.notes
+                    }
+                },
+                items: mappedItems,
+                totalAmount: amount,
+                walletDiscount: deduction,
+                finalPaidAmount: 0,
+                orderStatus: 'processing',
+                paymentStatus: 'paid'
+            });
+            await order.save();
+
+            user.walletBalance -= deduction;
+            user.walletHistory.push({
+                amount: deduction,
+                type: 'debit',
+                description: `Used on order ${orderIdStr}`,
+                orderId: order._id
+            });
+            
+            const previousOrdersCount = await Order.countDocuments({ 'customer.email': user.email, orderStatus: { $in: ['processing', 'manifested', 'completed'] } });
+            const earnedCashback = previousOrdersCount === 0 ? 2 : 1;
+            
+            user.walletBalance += earnedCashback;
+            user.walletHistory.push({
+                amount: earnedCashback,
+                type: 'credit',
+                description: `Cashback for order ${orderIdStr}`,
+                orderId: order._id
+            });
+            await user.save();
+
+            return res.json({
+                success: true,
+                zeroPayment: true,
+                orderId: order._id,
+                earnedCashback
+            });
+        }
+
+        const amountInPaise = Math.round(finalPaidAmount * 100);
 
         const rzpOrder = await razorpay.orders.create({
             amount: amountInPaise,
@@ -22,7 +104,8 @@ exports.createOrder = async (req, res) => {
         res.json({
             success: true,
             order: rzpOrder,
-            key: process.env.RAZORPAY_KEY_ID
+            key: process.env.RAZORPAY_KEY_ID,
+            deduction
         });
     } catch (error) {
         console.error("Razorpay Create Order Error:", error);
@@ -32,7 +115,7 @@ exports.createOrder = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
     try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, items, shippingAddress } = req.body;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, items, shippingAddress, applyWallet } = req.body;
 
         const expectedSignature = crypto
             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
@@ -81,15 +164,62 @@ exports.verifyPayment = async (req, res) => {
                 },
                 items: mappedItems,
                 totalAmount: totalAmount,
+                walletDiscount: 0,
+                finalPaidAmount: totalAmount,
                 orderStatus: 'processing',
                 paymentStatus: 'paid',
                 razorpay_order_id,
                 razorpay_payment_id
             });
 
+            let earnedCashback = 0;
+            let newWalletBalance = 0;
+
+            const token = req.cookies?.customer_token || 
+                          req.cookies?.token || 
+                          (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
+            
+            if (token) {
+                try {
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                    const user = await User.findById(decoded.id);
+                    if (user) {
+                        const deduction = applyWallet ? Math.min(user.walletBalance, totalAmount) : 0;
+                        order.walletDiscount = deduction;
+                        order.finalPaidAmount = totalAmount - deduction;
+                        
+                        if (deduction > 0) {
+                            user.walletBalance -= deduction;
+                            user.walletHistory.push({
+                                amount: deduction,
+                                type: 'debit',
+                                description: `Used on order ${orderIdStr}`,
+                                orderId: order._id
+                            });
+                        }
+                        
+                        const previousOrdersCount = await Order.countDocuments({ 'customer.email': user.email, orderStatus: { $in: ['processing', 'manifested', 'completed'] } });
+                        earnedCashback = previousOrdersCount === 0 ? 2 : 1;
+                        
+                        user.walletBalance += earnedCashback;
+                        user.walletHistory.push({
+                            amount: earnedCashback,
+                            type: 'credit',
+                            description: `Cashback for order ${orderIdStr}`,
+                            orderId: order._id
+                        });
+                        
+                        await user.save();
+                        newWalletBalance = user.walletBalance;
+                    }
+                } catch (err) {
+                    console.error("JWT verify error in verifyPayment:", err);
+                }
+            }
+            
             await order.save();
 
-            res.json({ success: true, orderId: order._id });
+            res.json({ success: true, orderId: order._id, earnedCashback, newWalletBalance });
         } else {
             res.status(400).json({ success: false, message: "Payment verification failed" });
         }

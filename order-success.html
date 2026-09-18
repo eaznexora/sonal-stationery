@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Successful | SONAL Stationary</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --sage-dark: #3A4D39;
+            --sage-light: #4F6F52;
+            --bg-cream: #FDFAF4;
+            --white: #FFFFFF;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-cream);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            color: #1a1a1a;
+        }
+        .success-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            max-width: 400px;
+            width: 90%;
+        }
+        .success-icon {
+            color: var(--sage-dark);
+            margin-bottom: 24px;
+            width: 64px;
+            height: 64px;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--sage-dark);
+            margin-bottom: 12px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .btn-home {
+            display: inline-block;
+            background: var(--sage-dark);
+            color: var(--white);
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .btn-home:hover {
+            background: var(--sage-light);
+        }
+        
+        /* Reward Modal */
+        #rewardModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .reward-content {
+            background: #fff;
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 320px;
+            width: 90%;
+        }
+        .reward-icon {
+            width: 64px;
+            height: 64px;
+            background: #f0fdf4;
+            color: #16a34a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .reward-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #166534;
+            margin-bottom: 8px;
+        }
+        .reward-desc {
+            color: #4b5563;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+        .reward-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="success-card">
+        <i data-lucide="check-circle" class="success-icon"></i>
+        <h1>Order Confirmed!</h1>
+        <p>Thank you for shopping at SONAL Stationary. Your order <strong id="orderIdText"></strong> has been received and is being processed.</p>
+        <a href="index.html" class="btn-home">Continue Shopping</a>
+    </div>
+
+    <!-- Reward Modal -->
+    <div id="rewardModal">
+        <div class="reward-content" id="rewardContent">
+            <div class="reward-icon">
+                <i data-lucide="coins" style="width:32px; height:32px;"></i>
+            </div>
+            <div class="reward-title">₹<span id="cashbackAmount">0</span> Cashback!</div>
+            <div class="reward-desc">Added to your Sonal Wallet. Use it on your next stationery purchase.</div>
+            <button class="reward-btn" onclick="closeRewardModal()">Awesome!</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get('orderId');
+            const earnedCashback = params.get('earnedCashback');
+            
+            if (orderId) {
+                document.getElementById('orderIdText').textContent = orderId;
+            }
+            
+            if (earnedCashback && parseFloat(earnedCashback) > 0) {
+                document.getElementById('cashbackAmount').textContent = earnedCashback;
+                
+                // Fire confetti
+                const duration = 3000;
+                const end = Date.now() + duration;
+                
+                (function frame() {
+                    confetti({
+                        particleCount: 5,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: ['#3A4D39', '#4F6F52', '#E8DFCA', '#16a34a', '#fbbf24']
+                    });
+                    confetti({
+                        particleCount: 5,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: ['#3A4D39', '#4F6F52', '#E8DFCA', '#16a34a', '#fbbf24']
+                    });
+                
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+                
+                // Show modal
+                setTimeout(() => {
+                    const modal = document.getElementById('rewardModal');
+                    const content = document.getElementById('rewardContent');
+                    modal.style.display = 'flex';
+                    // Trigger reflow
+                    void modal.offsetWidth;
+                    modal.style.opacity = '1';
+                    content.style.transform = 'scale(1)';
+                }, 500);
+            }
+        });
+        
+        function closeRewardModal() {
+            const modal = document.getElementById('rewardModal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+    </script>
+</body>
+</html>

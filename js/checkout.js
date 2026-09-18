@@ -6,6 +6,8 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
 
 let checkoutItems = [];
 let subtotal = 0;
+let customerWalletBalance = 0;
+let applyWallet = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadOrderSummary();
@@ -102,9 +104,21 @@ function renderItems() {
 }
 
 function updateTotals() {
-    // Assuming Free Shipping for now or calculated later. Keeping it simple.
     const shipping = subtotal > 500 ? 0 : 50; 
-    const total = subtotal + shipping;
+    let total = subtotal + shipping;
+
+    let walletDeduction = 0;
+    if (applyWallet && customerWalletBalance > 0) {
+        walletDeduction = Math.min(customerWalletBalance, total);
+        total -= walletDeduction;
+        document.getElementById('desktopWalletRow').style.display = 'flex';
+        document.getElementById('mobileWalletRow').style.display = 'flex';
+        document.getElementById('desktopWalletDiscount').textContent = `-₹${walletDeduction.toFixed(2)}`;
+        document.getElementById('mobileWalletDiscount').textContent = `-₹${walletDeduction.toFixed(2)}`;
+    } else {
+        document.getElementById('desktopWalletRow').style.display = 'none';
+        document.getElementById('mobileWalletRow').style.display = 'none';
+    }
 
     const formattedSubtotal = `₹${subtotal.toFixed(2)}`;
     const formattedShipping = shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`;
@@ -137,7 +151,17 @@ async function tryAutoFillCustomer() {
         });
 
         if (res.ok) {
-            const customer = await res.json();
+            const customerData = await res.json();
+            const customer = customerData.user || customerData;
+            
+            if (customer.walletBalance > 0) {
+                customerWalletBalance = customer.walletBalance;
+                document.getElementById('desktopWalletContainer').style.display = 'flex';
+                document.getElementById('mobileWalletContainer').style.display = 'flex';
+                document.getElementById('desktopWalletBalanceTxt').textContent = `₹${customerWalletBalance.toFixed(2)} Available`;
+                document.getElementById('mobileWalletBalanceTxt').textContent = `₹${customerWalletBalance.toFixed(2)} Available`;
+            }
+
             if (customer.name) document.getElementById('fullName').value = customer.name;
             if (customer.email) document.getElementById('email').value = customer.email;
             if (customer.phone) document.getElementById('phone').value = customer.phone;
@@ -173,6 +197,13 @@ window.toggleSavedAddress = function(checkbox) {
             tryAutoFillCustomer(); // Re-fill from API if unchecked
         }
     } catch(e) {}
+}
+
+window.toggleWallet = function(checked) {
+    applyWallet = checked;
+    document.getElementById('desktopApplyWallet').checked = checked;
+    document.getElementById('mobileApplyWallet').checked = checked;
+    updateTotals();
 }
 
 async function handlePlaceOrder() {
@@ -231,14 +262,29 @@ async function handlePlaceOrder() {
 
     if (isOnline) {
         try {
+            const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
             const res = await fetch(`${API_BASE}/api/payments/razorpay/create-order`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: orderData.total, items: checkoutItems, shippingAddress: orderData.customer })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                },
+                body: JSON.stringify({ amount: orderData.total, items: checkoutItems, shippingAddress: orderData.customer, applyWallet })
             });
-            const { order, key, success } = await res.json();
+            const { order, key, success, zeroPayment, orderId, earnedCashback } = await res.json();
             
-            if (!success) throw new Error("Could not create Razorpay order");
+            if (!success) throw new Error("Could not create Razorpay order or bypass");
+            
+            if (zeroPayment) {
+                sessionStorage.removeItem('direct_checkout_item');
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('buyNow') !== 'true') {
+                    localStorage.removeItem('sonal_cart');
+                    localStorage.removeItem('sonal_stationary_cart');
+                }
+                window.location.href = `order-success.html?orderId=${orderId}&earnedCashback=${earnedCashback}`;
+                return;
+            }
 
             const options = {
                 key: key || "rzp_live_TdaCKWrSGGXaBf",
@@ -261,13 +307,17 @@ async function handlePlaceOrder() {
                     try {
                         const verifyRes = await fetch(`${API_BASE}/api/payments/razorpay/verify`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Authorization': token ? `Bearer ${token}` : ''
+                            },
                             body: JSON.stringify({
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_signature: response.razorpay_signature,
                                 shippingAddress: orderData.customer,
-                                items: checkoutItems
+                                items: checkoutItems,
+                                applyWallet
                             })
                         });
                         const verifyData = await verifyRes.json();
@@ -278,7 +328,11 @@ async function handlePlaceOrder() {
                                 localStorage.removeItem('sonal_cart');
                                 localStorage.removeItem('sonal_stationary_cart');
                             }
-                            window.location.href = `index.html`; // Or order-success.html?orderId=${verifyData.orderId || order.id}
+                            let successUrl = `order-success.html?orderId=${verifyData.orderId || order.id}`;
+                            if (verifyData.earnedCashback > 0) {
+                                successUrl += `&earnedCashback=${verifyData.earnedCashback}`;
+                            }
+                            window.location.href = successUrl;
                         } else {
                             alert('Payment verification failed. Please contact support.');
                         }

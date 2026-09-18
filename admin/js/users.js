@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const initial = user.name ? user.name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : '?');
             const dateJoined = new Date(user.createdAt).toLocaleDateString();
             const phone = user.phone || '—';
+            const walletBalance = user.walletBalance !== undefined ? `₹${parseFloat(user.walletBalance).toFixed(2)}` : '₹0.00';
             
             const tr = document.createElement('div');
             tr.className = 'user-card';
@@ -141,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="user-email">${user.email}</div>
                 <div class="user-phone">${phone}</div>
                 <div class="user-date">${dateJoined}</div>
+                <div class="user-wallet" style="color:#15803d; font-weight:600;">${walletBalance}</div>
                 <div class="user-actions">
                     <button class="action-btn toggle-block-btn" data-id="${user._id}" data-blocked="${user.isBlocked}" title="${user.isBlocked ? 'Unblock User' : 'Block User'}">
                         <i class="ph ${user.isBlocked ? 'ph-check-circle' : 'ph-prohibit'}"></i>

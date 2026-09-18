@@ -53,6 +53,18 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    walletBalance: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    walletHistory: [{
+      amount: Number,
+      type: { type: String, enum: ['credit', 'debit'] },
+      description: String,
+      orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+      createdAt: { type: Date, default: Date.now }
+    }],
     isDeleted: {
       type: Boolean,
       default: false,

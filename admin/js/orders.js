@@ -1,3 +1,6 @@
+let allOrders = [];
+window.allOrders = allOrders;
+
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('ordersBody');
     const searchInput = document.getElementById('searchOrder');
@@ -5,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortSelect = document.getElementById('sortFilter');
     const resetBtn = document.getElementById('resetFilters');
 
-    let allOrders = [];
 
     // Check auth via localStorage/cookie usually, but we use the API
     async function fetchOrders() {
@@ -30,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const fetchedOrders = Array.isArray(data) ? data : (data.orders || data.data || []);
             
             allOrders = fetchedOrders;
+            window.allOrders = fetchedOrders;
             updateOrderKPIs(allOrders);
             applyFilters();
         } catch (err) {
@@ -191,113 +194,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Modal Logic
 window.openOrderModal = function(orderId) {
-    const order = (allOrders || []).find(o => o._id === orderId);
-    if (!order) return;
-    
-    document.getElementById('modalOrderTitle').textContent = `Order #${order.orderNumber || order._id}`;
-    
-    const status = (order.orderStatus || order.status || 'pending').toLowerCase();
-    const pStatus = (order.paymentStatus || 'pending').toLowerCase();
-    
-    const statusClass = (status === 'completed' || status === 'delivered') ? 'status-completed' :
-                        status === 'processing' ? 'status-processing' :
-                        status === 'manifested' ? 'status-manifested' :
-                        status === 'cancelled' ? 'status-cancelled' : 'status-pending';
+  const ordersList = window.allOrders || allOrders || [];
+  const order = ordersList.find(o => String(o._id) === String(orderId) || String(o.orderNumber) === String(orderId));
+  if (!order) {
+    console.error('[MODAL] Order not found for ID:', orderId);
+    return;
+  }
 
-    const pStatusClass = pStatus === 'paid' ? 'status-paid' :
-                         pStatus === 'failed' ? 'status-failed' : 'status-pending';
+  const modal = document.getElementById('orderDetailsModal');
+  const content = document.getElementById('modalOrderContent');
+  if (!modal || !content) return;
 
-    const dateStr = new Date(order.createdAt || new Date()).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    
-    const customer = order.customer || order.shippingAddress || {};
-    
-    let itemsHtml = '<ul style="list-style:none; padding:0; margin:0;">';
-    if (order.items && order.items.length > 0) {
-        order.items.forEach(item => {
-            const img = item.image || item.productImage || 'https://via.placeholder.com/40';
-            const name = item.name || item.productName || 'Product';
-            const qty = item.quantity || item.qty || 1;
-            const price = parseFloat(item.price || item.unitPrice || 0);
-            const total = qty * price;
-            itemsHtml += `
-                <li style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img src="${img}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
-                        <div>
-                            <div style="font-weight:500;">${name}</div>
-                            <div style="font-size:0.85rem; color:#666;">Qty: ${qty} × ₹${price.toFixed(2)}</div>
-                        </div>
-                    </div>
-                    <div style="font-weight:600;">₹${total.toFixed(2)}</div>
-                </li>
-            `;
-        });
-    } else {
-        itemsHtml += '<li>No items found</li>';
-    }
-    itemsHtml += '</ul>';
+  // Render order details safely
+  const customerName = order.shippingAddress?.fullName || order.customer?.name || order.user?.name || 'Customer';
+  const phone = order.shippingAddress?.phone || order.phone || order.customer?.phone || 'N/A';
+  const address = order.shippingAddress ? `${order.shippingAddress.addressLine || ''}, ${order.shippingAddress.city || ''}, ${order.shippingAddress.state || ''} - ${order.shippingAddress.pincode || order.shippingAddress.zipCode || ''}` : 
+                  (order.customer ? `${order.customer.address || ''} ${order.customer.city || ''} ${order.customer.state || ''} ${order.customer.pinCode || ''}` : 'N/A');
+  const status = (order.orderStatus || order.status || 'pending').toLowerCase();
+  const pStatus = (order.paymentStatus || 'pending').toLowerCase();
 
-    const subtotal = parseFloat(order.itemsPrice || order.subtotal || order.totalAmount || 0);
-    const shipping = parseFloat(order.shippingPrice || order.shippingFee || 0);
-    const walletUsed = parseFloat(order.walletDiscount || 0);
-    const finalAmount = parseFloat(order.finalPaidAmount || order.total || order.totalAmount || 0);
-    
-    let cashbackEarned = order.cashbackEarned || 0;
-    if (!cashbackEarned) {
-        cashbackEarned = walletUsed > 0 ? 1 : 2; 
-    }
+  const itemsHtml = (order.items || []).map(item => `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        ${item.image ? `<img src="${item.image}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;" />` : `<div style="width:40px; height:40px; background:#ddd; border-radius:6px;"></div>`}
+        <div>
+          <div style="font-weight:600; font-size:14px;">${item.name || item.title || 'Product'}</div>
+          <div style="font-size:12px; color:#666;">Qty: ${item.quantity || item.qty || 1} × ₹${parseFloat(item.price || item.unitPrice || 0).toFixed(2)}</div>
+        </div>
+      </div>
+      <div style="font-weight:600;">₹${((item.quantity || item.qty || 1) * parseFloat(item.price || item.unitPrice || 0)).toFixed(2)}</div>
+    </div>
+  `).join('');
+  
+  const subtotal = parseFloat(order.itemsPrice || order.subtotal || order.totalAmount || 0);
+  const shipping = parseFloat(order.shippingPrice || order.shippingFee || 0);
+  const walletUsed = parseFloat(order.walletDiscount || 0);
+  const finalAmount = parseFloat(order.finalPaidAmount || order.total || order.totalAmount || 0);
+  const cashbackEarned = order.cashbackEarned || (walletUsed > 0 ? 1 : 2);
 
-    document.getElementById('modalOrderContent').innerHTML = `
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <div>
-                <p style="margin:0; font-size:0.9rem; color:#666;">Placed on ${dateStr}</p>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <span class="status-pill ${statusClass}">${status.toUpperCase()}</span>
-                <span class="status-pill ${pStatusClass}">${pStatus.toUpperCase()}</span>
-            </div>
-        </div>
-        
-        <div style="margin-bottom:20px; padding:15px; background:#f9fafb; border-radius:8px;">
-            <h4 style="margin-top:0; margin-bottom:10px; font-size:1rem;">Customer Details</h4>
-            <p style="margin:0 0 5px 0;"><strong>Name:</strong> ${customer.name || customer.fullName || 'Guest'}</p>
-            <p style="margin:0 0 5px 0;"><strong>Email:</strong> ${customer.email || 'N/A'}</p>
-            <p style="margin:0 0 5px 0;"><strong>Phone:</strong> ${customer.phone || 'N/A'}</p>
-            <p style="margin:0 0 0 0;"><strong>Address:</strong> ${customer.address || customer.street || ''} ${customer.city || ''} ${customer.state || ''} ${customer.pinCode || customer.zipCode || ''}</p>
-        </div>
-        
-        <div style="margin-bottom:20px;">
-            <h4 style="margin-top:0; margin-bottom:10px; font-size:1rem;">Items Ordered</h4>
-            ${itemsHtml}
-        </div>
-        
-        <div style="padding:15px; background:#f0fdf4; border-radius:8px; border:1px solid #bbf7d0;">
-            <h4 style="margin-top:0; margin-bottom:10px; font-size:1rem;">Reward & Payment Breakdown</h4>
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span>Item Subtotal:</span>
-                <span>₹${subtotal.toFixed(2)}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span>Shipping Fee:</span>
-                <span>₹${shipping.toFixed(2)}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#b91c1c;">
-                <span>Cashback / Wallet Spent (Deduction):</span>
-                <span>-₹${walletUsed.toFixed(2)}</span>
-            </div>
-            <hr style="border:none; border-top:1px solid #d1d5db; margin:10px 0;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:bold; font-size:1.1rem;">
-                <span>Net Amount Paid:</span>
-                <span>₹${finalAmount.toFixed(2)}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; color:#15803d; font-weight:600; font-size:0.9rem; background:#dcfce3; padding:8px; border-radius:4px;">
-                <span>Cashback Rewarded (Earned):</span>
-                <span>+₹${cashbackEarned} credited to wallet</span>
-            </div>
-        </div>
-    `;
+  content.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <p><strong>Order ID:</strong> #${order.orderNumber || order._id}</p>
+      <p><strong>Customer:</strong> ${customerName} (${phone})</p>
+      <p><strong>Delivery Address:</strong> ${address}</p>
+      <p><strong>Status:</strong> ${status.toUpperCase()} | <strong>Payment:</strong> ${pStatus.toUpperCase()}</p>
+    </div>
     
-    document.getElementById('orderDetailsModal').style.display = 'flex';
+    <div style="margin-bottom:20px;">
+      <h4 style="margin-top:0; margin-bottom:10px; font-size:1rem;">Items Ordered</h4>
+      ${itemsHtml || '<p>No items found</p>'}
+    </div>
+    
+    <div style="padding:15px; background:#f0fdf4; border-radius:8px; border:1px solid #bbf7d0;">
+        <h4 style="margin-top:0; margin-bottom:10px; font-size:1rem;">Reward & Payment Breakdown</h4>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            <span>Item Subtotal:</span>
+            <span>₹${subtotal.toFixed(2)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            <span>Shipping Fee:</span>
+            <span>₹${shipping.toFixed(2)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#b91c1c;">
+            <span>Cashback / Wallet Spent:</span>
+            <span>-₹${walletUsed.toFixed(2)}</span>
+        </div>
+        <hr style="border:none; border-top:1px solid #d1d5db; margin:10px 0;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:bold; font-size:1.1rem;">
+            <span>Net Amount Paid:</span>
+            <span>₹${finalAmount.toFixed(2)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:#15803d; font-weight:600; font-size:0.9rem; background:#dcfce3; padding:8px; border-radius:4px;">
+            <span>Cashback Rewarded:</span>
+            <span>+₹${cashbackEarned} credited to wallet</span>
+        </div>
+    </div>
+  `;
+  
+  modal.style.display = 'flex';
 }
 
 window.closeOrderModal = function() {

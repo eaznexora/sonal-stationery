@@ -245,14 +245,18 @@ async function handlePlaceOrder() {
                 amount: order.amount,
                 currency: order.currency || "INR",
                 name: "Sonal Stationery",
-                description: "Order Payment",
+                description: "Order Checkout",
+                image: "https://sonalstationary.in/images/logo.png",
                 order_id: order.id,
                 prefill: {
                     name: orderData.customer.name,
                     email: orderData.customer.email,
                     contact: orderData.customer.phone
                 },
-                theme: { color: "#111111" },
+                theme: { 
+                    color: "#111111",
+                    backdrop_color: "rgba(0, 0, 0, 0.65)"
+                },
                 handler: async function (response) {
                     try {
                         const verifyRes = await fetch(`${API_BASE}/api/payments/razorpay/verify`, {
@@ -284,8 +288,9 @@ async function handlePlaceOrder() {
                     }
                 },
                 modal: {
-                    ondismiss: function() {
-                        console.log('Payment checkout closed by user');
+                    confirm_close: true,
+                    ondismiss: function () {
+                        console.log("Payment window dismissed");
                     }
                 }
             };

@@ -140,14 +140,13 @@ function updateTotals() {
 }
 
 async function tryAutoFillCustomer() {
-    const token = localStorage.getItem('customerToken');
-    if (!token) return;
-
+    const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
+    
+    // We still try to fetch even if token is null, because the cookie might be present.
     try {
         const res = await fetch(`${API_BASE}/api/auth/customer/me`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            credentials: 'include'
         });
 
         if (res.ok) {
@@ -247,7 +246,7 @@ async function handlePlaceOrder() {
             pinCode: orderData.customer.pinCode
         }));
         
-        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+        const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
         if (token) {
             fetch(`${API_BASE}/api/customer/profile`, {
                 method: 'PUT',
@@ -262,13 +261,14 @@ async function handlePlaceOrder() {
 
     if (isOnline) {
         try {
-            const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+            const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
             const res = await fetch(`${API_BASE}/api/payments/razorpay/create-order`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                 },
+                credentials: 'include',
                 body: JSON.stringify({ amount: orderData.total, items: checkoutItems, shippingAddress: orderData.customer, applyWallet })
             });
             const { order, key, success, zeroPayment, orderId, earnedCashback } = await res.json();
@@ -309,8 +309,9 @@ async function handlePlaceOrder() {
                             method: 'POST',
                             headers: { 
                                 'Content-Type': 'application/json',
-                                'Authorization': token ? `Bearer ${token}` : ''
+                                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                             },
+                            credentials: 'include',
                             body: JSON.stringify({
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,

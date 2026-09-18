@@ -178,6 +178,9 @@ exports.verifyPayment = async (req, res) => {
             let earnedCashback = 0;
             let newWalletBalance = 0;
 
+            console.log('[WALLET DEBUG] Received verification. Cookies:', req.cookies, 'Headers:', req.headers.authorization);
+
+            let userId = null;
             const token = req.cookies?.customer_token || 
                           req.cookies?.token || 
                           (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
@@ -185,40 +188,55 @@ exports.verifyPayment = async (req, res) => {
             if (token) {
                 try {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                    const user = await User.findById(decoded.id);
-                    if (user) {
-                        order.user = user._id;
-                        const deduction = applyWallet ? Math.min(user.walletBalance, totalAmount) : 0;
-                        order.walletDiscount = deduction;
-                        order.finalPaidAmount = totalAmount - deduction;
-                        
-                        if (deduction > 0) {
-                            user.walletBalance -= deduction;
-                            user.walletHistory.push({
-                                amount: deduction,
-                                type: 'debit',
-                                description: `Used on order #${order.orderNumber || orderIdStr}`,
-                                orderId: order._id
-                            });
-                        }
-                        
-                        const previousOrdersCount = await Order.countDocuments({ 'customer.email': user.email, orderStatus: { $in: ['processing', 'manifested', 'completed'] } });
-                        earnedCashback = previousOrdersCount === 0 ? 2 : 1;
-                        
-                        user.walletBalance += earnedCashback;
-                        user.walletHistory.push({
-                            amount: earnedCashback,
-                            type: 'credit',
-                            description: `Cashback for Order #${order.orderNumber || orderIdStr}`,
-                            orderId: order._id
-                        });
-                        
-                        await user.save();
-                        newWalletBalance = user.walletBalance;
-                    }
+                    userId = decoded.id || decoded._id || decoded.userId;
                 } catch (err) {
-                    console.error("JWT verify error in verifyPayment:", err);
+                    console.error('[WALLET DEBUG] Token decode failed:', err.message);
                 }
+            }
+
+            if (!userId && req.body.userId) {
+                userId = req.body.userId;
+            }
+
+            if (userId) {
+                const user = await User.findById(userId);
+                if (user) {
+                    order.user = user._id;
+                    const deduction = applyWallet ? Math.min(Number(user.walletBalance) || 0, totalAmount) : 0;
+                    order.walletDiscount = deduction;
+                    order.finalPaidAmount = totalAmount - deduction;
+                    
+                    if (deduction > 0) {
+                        user.walletBalance = (Number(user.walletBalance) || 0) - deduction;
+                        user.walletHistory.push({
+                            amount: deduction,
+                            type: 'debit',
+                            description: `Used on order #${order.orderNumber || orderIdStr}`,
+                            orderId: order._id,
+                            createdAt: new Date()
+                        });
+                    }
+                    
+                    const previousOrdersCount = await Order.countDocuments({ user: user._id, orderStatus: { $ne: 'cancelled' } });
+                    earnedCashback = previousOrdersCount === 0 ? 2 : 1;
+                    
+                    user.walletBalance = (Number(user.walletBalance) || 0) + earnedCashback;
+                    user.walletHistory.push({
+                        amount: earnedCashback,
+                        type: 'credit',
+                        description: `Cashback for Order #${order.orderNumber || orderIdStr}`,
+                        orderId: order._id,
+                        createdAt: new Date()
+                    });
+                    
+                    await user.save();
+                    newWalletBalance = user.walletBalance;
+                    console.log(`[WALLET DEBUG] Successfully credited ₹${earnedCashback}. New Balance: ₹${user.walletBalance} for user ${user._id}`);
+                } else {
+                    console.error('[WALLET DEBUG] User not found for ID:', userId);
+                }
+            } else {
+                console.error('[WALLET DEBUG] No userId identified! Cashback could not be credited to database.');
             }
             
             await order.save();

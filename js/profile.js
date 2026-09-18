@@ -320,11 +320,11 @@ async function loadWallet(user) {
     }
     
     try {
-        const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
-        if (!token) return;
+        let token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
         
         const res = await fetch('/api/auth/customer/me', {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            credentials: 'include'
         });
         const data = await res.json();
         
@@ -343,7 +343,7 @@ async function loadWallet(user) {
                     const color = isCredit ? '#16a34a' : '#dc2626';
                     const bg = isCredit ? '#f0fdf4' : '#fef2f2';
                     const sign = isCredit ? '+' : '-';
-                    const date = new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
                     
                     return `
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background: white;">
@@ -365,8 +365,10 @@ async function loadWallet(user) {
                 
                 if (window.lucide) lucide.createIcons();
             } else {
-                historyContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: #666; background: #f9fafb; border-radius: 8px;">No wallet transactions yet.</div>`;
+                historyContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: #666; background: #f9fafb; border-radius: 8px;"><p class="text-muted">No transactions yet.</p></div>`;
             }
+        } else {
+            historyContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: #666; background: #f9fafb; border-radius: 8px;"><p class="text-muted">No transactions yet.</p></div>`;
         }
     } catch (err) {
         console.error("Failed to load wallet history", err);

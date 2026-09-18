@@ -175,7 +175,7 @@ window.toggleSavedAddress = function(checkbox) {
     } catch(e) {}
 }
 
-function handlePlaceOrder() {
+async function handlePlaceOrder() {
     const form = document.getElementById('checkoutForm');
     if (!form.checkValidity()) {
         form.reportValidity();
@@ -221,17 +221,84 @@ function handlePlaceOrder() {
         }
     }
 
-    console.log("Order Placed!", orderData);
-    
-    // Simulate successful order
-    alert(`Order Placed Successfully!\nTotal: ₹${orderData.total.toFixed(2)}\nPayment Method: ${orderData.paymentMethod.toUpperCase()}`);
-    
-    // Clear cart/session
-    sessionStorage.removeItem('direct_checkout_item');
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('buyNow') !== 'true') {
-        localStorage.removeItem('sonal_cart');
+    if (orderData.paymentMethod === 'online') {
+        try {
+            const res = await fetch(`${API_BASE}/api/payments/razorpay/create-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: orderData.total, items: checkoutItems, shippingAddress: orderData.customer })
+            });
+            const { order, key, success } = await res.json();
+            
+            if (!success) throw new Error("Could not create Razorpay order");
+
+            const options = {
+                key: key || "rzp_live_TdaCKWrSGGXaBf",
+                amount: order.amount,
+                currency: order.currency || "INR",
+                name: "Sonal Stationery",
+                description: "Order Payment",
+                order_id: order.id,
+                prefill: {
+                    name: orderData.customer.name,
+                    email: orderData.customer.email,
+                    contact: orderData.customer.phone
+                },
+                theme: { color: "#111111" },
+                handler: async function (response) {
+                    try {
+                        const verifyRes = await fetch(`${API_BASE}/api/payments/razorpay/verify`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                shippingAddress: orderData.customer,
+                                items: checkoutItems
+                            })
+                        });
+                        const verifyData = await verifyRes.json();
+                        if (verifyData.success) {
+                            sessionStorage.removeItem('direct_checkout_item');
+                            const urlParams = new URLSearchParams(window.location.search);
+                            if (urlParams.get('buyNow') !== 'true') {
+                                localStorage.removeItem('sonal_cart');
+                                localStorage.removeItem('sonal_stationary_cart');
+                            }
+                            window.location.href = `index.html`; // Or order-success.html?orderId=${verifyData.orderId || order.id}
+                        } else {
+                            alert('Payment verification failed. Please contact support.');
+                        }
+                    } catch (err) {
+                        console.error('Verify error:', err);
+                        alert('Error verifying payment.');
+                    }
+                },
+                modal: {
+                    ondismiss: function() {
+                        console.log('Payment checkout closed by user');
+                    }
+                }
+            };
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+        } catch (error) {
+            console.error("Razorpay Error:", error);
+            alert("Payment could not be initiated. Try again later.");
+        }
+    } else {
+        // COD or other flow
+        console.log("Order Placed (COD)!", orderData);
+        alert(`Order Placed Successfully!\nTotal: ₹${orderData.total.toFixed(2)}\nPayment Method: ${orderData.paymentMethod.toUpperCase()}`);
+        
+        sessionStorage.removeItem('direct_checkout_item');
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('buyNow') !== 'true') {
+            localStorage.removeItem('sonal_cart');
+            localStorage.removeItem('sonal_stationary_cart');
+        }
+        
+        window.location.href = 'index.html';
     }
-    
-    window.location.href = 'index.html';
 }

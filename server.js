@@ -37,6 +37,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/auth/customer', require('./routes/customerAuthRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
 
 // Admin static route protection
 app.use('/admin', (req, res, next) => {

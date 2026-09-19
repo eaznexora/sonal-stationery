@@ -269,6 +269,14 @@ async function handlePlaceOrder() {
         }
     } catch(e) {}
 
+    if (!referralCode) {
+        const referredItem = checkoutItems.find(i => i.referralCode);
+        if (referredItem) {
+            referralCode = referredItem.referralCode;
+            referredProductId = referredItem.id || referredItem.productId || referredItem._id;
+        }
+    }
+
     if (isOnline) {
         try {
             const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');

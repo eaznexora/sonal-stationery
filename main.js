@@ -241,6 +241,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             e.stopPropagation();
             if (!btn.dataset.id) return; // ignore dummy buttons
+            let activeRef = null;
+            try {
+                activeRef = JSON.parse(localStorage.getItem('sonal_active_ref'));
+            } catch (e) {}
+
             const item = {
                 id: btn.dataset.id,
                 title: btn.dataset.title,
@@ -248,7 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 image: btn.dataset.image,
                 variant: (btn.dataset.variant && btn.dataset.variant !== 'Default' && !btn.dataset.variant.includes('rgb(')) ? btn.dataset.variant : null,
                 giftNote: '',
-                qty: 1
+                qty: 1,
+                referralCode: (activeRef && String(activeRef.productId) === String(btn.dataset.id)) ? activeRef.code : null
             };
             addToCart(item);
         });
@@ -286,6 +292,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 giftNote = giftMessage.value.trim();
             }
             
+            let activeRef = null;
+            try {
+                activeRef = JSON.parse(localStorage.getItem('sonal_active_ref'));
+            } catch (e) {}
+
             const item = {
                 id: btn.dataset.id,
                 title: btn.dataset.title,
@@ -293,7 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 image: btn.dataset.image,
                 variant: variant,
                 giftNote: giftNote,
-                qty: qty
+                qty: qty,
+                referralCode: (activeRef && String(activeRef.productId) === String(btn.dataset.id)) ? activeRef.code : null
             };
             addToCart(item);
         });

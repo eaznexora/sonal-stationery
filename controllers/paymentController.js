@@ -27,9 +27,9 @@ exports.createOrder = async (req, res) => {
             }
         }
         
-        console.log('[REFERRAL DEBUG] Incoming order check:', {
-            referralCode: req.body.referralCode,
-            referredProductId: req.body.referredProductId,
+        console.log('[REFERRAL TRACE]', {
+            bodyRefCode: req.body.referralCode,
+            bodyReferredProdId: req.body.referredProductId,
             buyerUserId: user ? String(user._id) : 'Guest'
         });
 
@@ -72,25 +72,36 @@ exports.createOrder = async (req, res) => {
                 paymentStatus: 'paid'
             });
 
-            if (referralCode) {
-                const referrer = await User.findOne({ referralCode });
-                if (referrer && (!user || String(referrer._id) !== String(user._id))) {
-                    const boughtReferredItem = !referredProductId || mappedItems.some(it => String(it.product) === String(referredProductId));
-                    if (boughtReferredItem) {
-                        referrer.walletBalance = (referrer.walletBalance || 0) + 1;
-                        referrer.referralEarnings = (referrer.referralEarnings || 0) + 1;
+            if (referralCode && referralCode !== 'undefined' && referralCode !== 'null') {
+                const referrer = await User.findOne({ referralCode: referralCode.trim() });
+                if (!referrer) {
+                    console.warn(`[REFERRAL TRACE] No referrer found for code: "${referralCode}"`);
+                } else if (user && String(referrer._id) === String(user._id)) {
+                    console.warn(`[REFERRAL TRACE] Self-referral rejected for user: ${user._id}`);
+                } else {
+                    const referredProdId = referredProductId ? String(referredProductId) : null;
+                    const itemMatched = !referredProdId || mappedItems.some(item => {
+                        const id = String(item.product || item.productId || item._id || item.id || '');
+                        return id === referredProdId;
+                    });
+
+                    if (itemMatched) {
+                        referrer.walletBalance = (Number(referrer.walletBalance) || 0) + 1;
+                        referrer.referralEarnings = (Number(referrer.referralEarnings) || 0) + 1;
                         referrer.walletHistory.push({
                             amount: 1,
                             type: 'credit',
-                            description: `Referral reward for Order #${order.orderNumber || orderIdStr}`,
+                            description: `Referral Reward: Friend ordered product via your link (#${order.orderNumber || orderIdStr})`,
                             orderId: order._id,
                             createdAt: new Date()
                         });
                         await referrer.save();
                         order.referredBy = referrer._id;
-                        order.referralRewardProcessed = true;
                         order.referralCode = referralCode;
-                        console.log(`[REFERRAL REWARD] Credited ₹1 to referrer ${referrer._id} for order ${order._id}`);
+                        order.referralRewardProcessed = true;
+                        console.log(`[REFERRAL TRACE] SUCCESS! Credited ₹1 to ${referrer.email || referrer._id}. New balance: ₹${referrer.walletBalance}`);
+                    } else {
+                        console.warn(`[REFERRAL TRACE] Referred product ${referredProdId} was NOT found in order items:`, mappedItems.map(i => i.product || i._id));
                     }
                 }
             }
@@ -228,9 +239,9 @@ exports.verifyPayment = async (req, res) => {
                 userId = req.body.userId;
             }
 
-            console.log('[REFERRAL DEBUG] Incoming order check:', {
-                referralCode: req.body.referralCode,
-                referredProductId: req.body.referredProductId,
+            console.log('[REFERRAL TRACE]', {
+                bodyRefCode: req.body.referralCode,
+                bodyReferredProdId: req.body.referredProductId,
                 buyerUserId: userId ? String(userId) : 'Guest'
             });
 
@@ -275,25 +286,36 @@ exports.verifyPayment = async (req, res) => {
                 console.error('[WALLET DEBUG] No userId identified! Cashback could not be credited to database.');
             }
             
-            if (referralCode) {
-                const referrer = await User.findOne({ referralCode });
-                if (referrer && (!userId || String(referrer._id) !== String(userId))) {
-                    const boughtReferredItem = !referredProductId || mappedItems.some(it => String(it.product) === String(referredProductId));
-                    if (boughtReferredItem) {
-                        referrer.walletBalance = (referrer.walletBalance || 0) + 1;
-                        referrer.referralEarnings = (referrer.referralEarnings || 0) + 1;
+            if (referralCode && referralCode !== 'undefined' && referralCode !== 'null') {
+                const referrer = await User.findOne({ referralCode: referralCode.trim() });
+                if (!referrer) {
+                    console.warn(`[REFERRAL TRACE] No referrer found for code: "${referralCode}"`);
+                } else if (userId && String(referrer._id) === String(userId)) {
+                    console.warn(`[REFERRAL TRACE] Self-referral rejected for user: ${userId}`);
+                } else {
+                    const referredProdId = referredProductId ? String(referredProductId) : null;
+                    const itemMatched = !referredProdId || mappedItems.some(item => {
+                        const id = String(item.product || item.productId || item._id || item.id || '');
+                        return id === referredProdId;
+                    });
+
+                    if (itemMatched) {
+                        referrer.walletBalance = (Number(referrer.walletBalance) || 0) + 1;
+                        referrer.referralEarnings = (Number(referrer.referralEarnings) || 0) + 1;
                         referrer.walletHistory.push({
                             amount: 1,
                             type: 'credit',
-                            description: `Referral reward for Order #${order.orderNumber || orderIdStr}`,
+                            description: `Referral Reward: Friend ordered product via your link (#${order.orderNumber || orderIdStr})`,
                             orderId: order._id,
                             createdAt: new Date()
                         });
                         await referrer.save();
                         order.referredBy = referrer._id;
-                        order.referralRewardProcessed = true;
                         order.referralCode = referralCode;
-                        console.log(`[REFERRAL REWARD] Credited ₹1 to referrer ${referrer._id} for order ${order._id}`);
+                        order.referralRewardProcessed = true;
+                        console.log(`[REFERRAL TRACE] SUCCESS! Credited ₹1 to ${referrer.email || referrer._id}. New balance: ₹${referrer.walletBalance}`);
+                    } else {
+                        console.warn(`[REFERRAL TRACE] Referred product ${referredProdId} was NOT found in order items:`, mappedItems.map(i => i.product || i._id));
                     }
                 }
             }

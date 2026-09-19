@@ -242,13 +242,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const image = (product.images && product.images.length > 0) ? (product.images[0].startsWith('http') ? product.images[0] : API_BASE + product.images[0]) : '';
                 
+                let activeRef = null;
+                try {
+                    activeRef = JSON.parse(localStorage.getItem('sonal_active_ref'));
+                } catch (e) {}
+
                 const item = {
                     id: product._id,
                     title: product.name,
                     price: product.price,
                     image: image,
                     variant: variant,
-                    quantity: qty
+                    quantity: qty,
+                    referralCode: (activeRef && String(activeRef.productId) === String(product._id)) ? activeRef.code : null
                 };
                 
                 sessionStorage.setItem('direct_checkout_item', JSON.stringify(item));

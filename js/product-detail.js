@@ -362,50 +362,63 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <p style="margin:0; font-weight:700; font-size:13px; color:#854d0e;">🎁 Share & Earn ₹1.00</p>
                   <p style="margin:2px 0 0; font-size:12px; color:#a16207;">Earn ₹1 in your Sonal Wallet when a friend buys this item.</p>
                 </div>
-                <button id="btnShareProduct" class="btn-share" style="background:#2b4c3f; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; white-space:nowrap; margin-left:10px;">
+                <button type="button" id="btnShareProduct" class="btn-share" style="background:#2b4c3f; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; white-space:nowrap; margin-left:10px;">
                   Share Link
                 </button>
               </div>
             `;
             productActions.parentNode.insertBefore(shareCard, productActions.nextSibling);
 
-            document.getElementById('btnShareProduct').addEventListener('click', async () => {
-                let user = null;
-                try {
-                    user = JSON.parse(localStorage.getItem('sonal_user') || 'null');
-                    if (!user || !user.referralCode) {
-                        const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
-                        if (token) {
-                            const res = await fetch('/api/auth/customer/me', { headers: { 'Authorization': 'Bearer ' + token } });
-                            const data = await res.json();
-                            if (data.success && data.user) {
-                                user = data.user;
-                                localStorage.setItem('sonal_user', JSON.stringify(user));
-                            }
-                        }
-                    }
-                } catch(e) {}
-                
-                if (!user || !user.referralCode) {
-                    if (typeof window.requireCustomerAuth === 'function') {
-                        window.requireCustomerAuth(() => window.location.reload(), 'Login to share and earn rewards');
-                    } else {
-                        triggerToast('Please login to use Share & Earn');
-                    }
-                    return;
-                }
+            document.getElementById('btnShareProduct').addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-                const shareUrl = `${window.location.origin}/product.html?id=${productId}&ref=${user.referralCode}`;
-                
-                if (navigator.share) {
-                    navigator.share({
-                        title: product.name,
-                        url: shareUrl
-                    }).catch(console.error);
-                } else {
-                    navigator.clipboard.writeText(shareUrl).then(() => {
-                        triggerToast('Link copied! Share it with friends to earn ₹1 when they buy.');
+                try {
+                    let refCode = null;
+                    const token = localStorage.getItem('customerToken') || localStorage.getItem('customer_token') || localStorage.getItem('token');
+
+                    const res = await fetch('/api/auth/customer/me', {
+                        credentials: 'include',
+                        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
                     });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const user = data.user || data.customer || data;
+                        refCode = user.referralCode;
+                    }
+
+                    if (!refCode) {
+                        alert('Please log in to your account first to generate your referral link and earn ₹1!');
+                        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+                        return;
+                    }
+
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('ref', refCode);
+                    const shareUrl = currentUrl.toString();
+
+                    const shareBtn = document.getElementById('btnShareProduct');
+                    if (navigator.share) {
+                        await navigator.share({
+                            title: document.title || 'Sonal Stationery',
+                            text: 'Check out this product on Sonal Stationery!',
+                            url: shareUrl
+                        });
+                    } else {
+                        await navigator.clipboard.writeText(shareUrl);
+                        const originalText = shareBtn.innerText;
+                        shareBtn.innerText = 'Copied! ✓';
+                        shareBtn.style.background = '#15803d';
+                        setTimeout(() => {
+                            shareBtn.innerText = originalText;
+                            shareBtn.style.background = '#2b4c3f';
+                        }, 2500);
+                    }
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('[SHARE ERROR]', err);
+                    }
                 }
             });
         }

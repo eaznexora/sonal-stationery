@@ -58,6 +58,9 @@ const orderSchema = new mongoose.Schema(
     trackingId: String,
     razorpay_order_id: String,
     razorpay_payment_id: String,
+    referralCode: { type: String, default: null },
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    referralRewardProcessed: { type: Boolean, default: false }
   },
   {
     timestamps: true,

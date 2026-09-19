@@ -259,6 +259,16 @@ async function handlePlaceOrder() {
     const methodUpper = (orderData.paymentMethod || '').toUpperCase();
     const isOnline = methodUpper === 'ONLINE' || methodUpper === 'RAZORPAY' || methodUpper === 'PREPAID';
 
+    let referralCode = null;
+    let referredProductId = null;
+    try {
+        const refData = JSON.parse(localStorage.getItem('sonal_active_ref'));
+        if (refData && refData.code && (Date.now() - refData.timestamp < 30 * 24 * 60 * 60 * 1000)) {
+            referralCode = refData.code;
+            referredProductId = refData.productId;
+        }
+    } catch(e) {}
+
     if (isOnline) {
         try {
             const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
@@ -269,7 +279,7 @@ async function handlePlaceOrder() {
                     ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                 },
                 credentials: 'include',
-                body: JSON.stringify({ amount: orderData.total, items: checkoutItems, shippingAddress: orderData.customer, applyWallet })
+                body: JSON.stringify({ amount: orderData.total, items: checkoutItems, shippingAddress: orderData.customer, applyWallet, referralCode, referredProductId })
             });
             const { order, key, success, zeroPayment, orderId, earnedCashback } = await res.json();
             
@@ -282,6 +292,7 @@ async function handlePlaceOrder() {
                     localStorage.removeItem('sonal_cart');
                     localStorage.removeItem('sonal_stationary_cart');
                 }
+                localStorage.removeItem('sonal_active_ref');
                 window.location.href = `order-success.html?orderId=${orderId}&earnedCashback=${earnedCashback}`;
                 return;
             }
@@ -318,7 +329,9 @@ async function handlePlaceOrder() {
                                 razorpay_signature: response.razorpay_signature,
                                 shippingAddress: orderData.customer,
                                 items: checkoutItems,
-                                applyWallet
+                                applyWallet,
+                                referralCode,
+                                referredProductId
                             })
                         });
                         const verifyData = await verifyRes.json();
@@ -329,6 +342,7 @@ async function handlePlaceOrder() {
                                 localStorage.removeItem('sonal_cart');
                                 localStorage.removeItem('sonal_stationary_cart');
                             }
+                            localStorage.removeItem('sonal_active_ref');
                             let successUrl = `order-success.html?orderId=${verifyData.orderId || order.id}`;
                             if (verifyData.earnedCashback > 0) {
                                 successUrl += `&earnedCashback=${verifyData.earnedCashback}`;
@@ -366,6 +380,7 @@ async function handlePlaceOrder() {
             localStorage.removeItem('sonal_cart');
             localStorage.removeItem('sonal_stationary_cart');
         }
+        localStorage.removeItem('sonal_active_ref');
         
         window.location.href = 'index.html';
     }

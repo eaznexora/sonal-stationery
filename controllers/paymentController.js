@@ -11,7 +11,7 @@ const razorpay = new Razorpay({
 
 exports.createOrder = async (req, res) => {
     try {
-        const { amount, receipt, orderDetails, applyWallet, items, shippingAddress } = req.body;
+        const { amount, receipt, orderDetails, applyWallet, items, shippingAddress, referralCode, referredProductId } = req.body;
         
         let user = null;
         const token = req.cookies?.customer_token || 
@@ -65,6 +65,30 @@ exports.createOrder = async (req, res) => {
                 orderStatus: 'processing',
                 paymentStatus: 'paid'
             });
+
+            if (referralCode) {
+                const referrer = await User.findOne({ referralCode });
+                if (referrer && (!user || String(referrer._id) !== String(user._id))) {
+                    const boughtReferredItem = !referredProductId || mappedItems.some(it => String(it.product) === String(referredProductId));
+                    if (boughtReferredItem) {
+                        referrer.walletBalance = (referrer.walletBalance || 0) + 1;
+                        referrer.referralEarnings = (referrer.referralEarnings || 0) + 1;
+                        referrer.walletHistory.push({
+                            amount: 1,
+                            type: 'credit',
+                            description: `Referral reward for Order #${order.orderNumber || orderIdStr}`,
+                            orderId: order._id,
+                            createdAt: new Date()
+                        });
+                        await referrer.save();
+                        order.referredBy = referrer._id;
+                        order.referralRewardProcessed = true;
+                        order.referralCode = referralCode;
+                        console.log(`[REFERRAL REWARD] Credited ₹1 to referrer ${referrer._id} for order ${order._id}`);
+                    }
+                }
+            }
+
             await order.save();
 
             user.walletBalance -= deduction;
@@ -117,7 +141,7 @@ exports.createOrder = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
     try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, items, shippingAddress, applyWallet } = req.body;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, items, shippingAddress, applyWallet, referralCode, referredProductId } = req.body;
 
         const expectedSignature = crypto
             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
@@ -239,6 +263,29 @@ exports.verifyPayment = async (req, res) => {
                 console.error('[WALLET DEBUG] No userId identified! Cashback could not be credited to database.');
             }
             
+            if (referralCode) {
+                const referrer = await User.findOne({ referralCode });
+                if (referrer && (!userId || String(referrer._id) !== String(userId))) {
+                    const boughtReferredItem = !referredProductId || mappedItems.some(it => String(it.product) === String(referredProductId));
+                    if (boughtReferredItem) {
+                        referrer.walletBalance = (referrer.walletBalance || 0) + 1;
+                        referrer.referralEarnings = (referrer.referralEarnings || 0) + 1;
+                        referrer.walletHistory.push({
+                            amount: 1,
+                            type: 'credit',
+                            description: `Referral reward for Order #${order.orderNumber || orderIdStr}`,
+                            orderId: order._id,
+                            createdAt: new Date()
+                        });
+                        await referrer.save();
+                        order.referredBy = referrer._id;
+                        order.referralRewardProcessed = true;
+                        order.referralCode = referralCode;
+                        console.log(`[REFERRAL REWARD] Credited ₹1 to referrer ${referrer._id} for order ${order._id}`);
+                    }
+                }
+            }
+
             await order.save();
 
             res.json({ success: true, orderId: order.orderNumber || order._id, earnedCashback, newWalletBalance });

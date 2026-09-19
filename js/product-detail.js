@@ -117,6 +117,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
+    const ref = urlParams.get('ref');
+    if (ref) {
+        localStorage.setItem('sonal_active_ref', JSON.stringify({
+            code: ref,
+            productId: productId || null,
+            timestamp: Date.now()
+        }));
+    }
     if (!productId) return;
 
     const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -321,15 +329,82 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Share logic
         const btnShare = document.getElementById('btnShare');
         if (btnShare) {
-            btnShare.addEventListener('click', () => {
+            btnShare.addEventListener('click', async () => {
+                let shareUrl = window.location.href;
+                try {
+                    let user = JSON.parse(localStorage.getItem('sonal_user') || 'null');
+                    if (user && user.referralCode) {
+                        shareUrl = `${window.location.origin}/product.html?id=${productId}&ref=${user.referralCode}`;
+                    }
+                } catch(e) {}
                 if (navigator.share) {
                     navigator.share({
                         title: product.name,
-                        url: window.location.href
+                        url: shareUrl
                     }).catch(console.error);
                 } else {
-                    navigator.clipboard.writeText(window.location.href).then(() => {
-                        alert('Product link copied to clipboard!');
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        triggerToast('Product link copied to clipboard!');
+                    });
+                }
+            });
+        }
+
+        // Share & Earn Banner Injection
+        const productActions = document.querySelector('.product-actions');
+        if (productActions) {
+            const shareCard = document.createElement('div');
+            shareCard.className = 'share-earn-box';
+            shareCard.style.cssText = 'background:#fefce8; border:1px dashed #ca8a04; border-radius:10px; padding:12px; margin-top:16px; width: 100%;';
+            shareCard.innerHTML = `
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <p style="margin:0; font-weight:700; font-size:13px; color:#854d0e;">🎁 Share & Earn ₹1.00</p>
+                  <p style="margin:2px 0 0; font-size:12px; color:#a16207;">Earn ₹1 in your Sonal Wallet when a friend buys this item.</p>
+                </div>
+                <button id="btnShareProduct" class="btn-share" style="background:#2b4c3f; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; white-space:nowrap; margin-left:10px;">
+                  Share Link
+                </button>
+              </div>
+            `;
+            productActions.parentNode.insertBefore(shareCard, productActions.nextSibling);
+
+            document.getElementById('btnShareProduct').addEventListener('click', async () => {
+                let user = null;
+                try {
+                    user = JSON.parse(localStorage.getItem('sonal_user') || 'null');
+                    if (!user || !user.referralCode) {
+                        const token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
+                        if (token) {
+                            const res = await fetch('/api/auth/customer/me', { headers: { 'Authorization': 'Bearer ' + token } });
+                            const data = await res.json();
+                            if (data.success && data.user) {
+                                user = data.user;
+                                localStorage.setItem('sonal_user', JSON.stringify(user));
+                            }
+                        }
+                    }
+                } catch(e) {}
+                
+                if (!user || !user.referralCode) {
+                    if (typeof window.requireCustomerAuth === 'function') {
+                        window.requireCustomerAuth(() => window.location.reload(), 'Login to share and earn rewards');
+                    } else {
+                        triggerToast('Please login to use Share & Earn');
+                    }
+                    return;
+                }
+
+                const shareUrl = `${window.location.origin}/product.html?id=${productId}&ref=${user.referralCode}`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: product.name,
+                        url: shareUrl
+                    }).catch(console.error);
+                } else {
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        triggerToast('Link copied! Share it with friends to earn ₹1 when they buy.');
                     });
                 }
             });

@@ -153,6 +153,11 @@ exports.getMe = async (req, res) => {
       });
     }
 
+    if (!user.referralCode) {
+      user.referralCode = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      await user.save();
+    }
+
     res.json({ success: true, authenticated: true, user });
   } catch (error) {
     res.json({ success: false, authenticated: false });

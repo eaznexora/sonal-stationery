@@ -232,6 +232,23 @@ window.openOrderModal = function(orderId) {
   const finalAmount = parseFloat(order.finalPaidAmount || order.total || order.totalAmount || 0);
   const cashbackEarned = order.cashbackEarned || (walletUsed > 0 ? 1 : 2);
 
+  let referralInfoHtml = '';
+  if (order.referredBy || order.referralCode) {
+      let refName = order.referralCode;
+      if (order.referredBy && order.referredBy.name) {
+          refName = `${order.referredBy.name} (${order.referralCode})`;
+      } else if (typeof order.referredBy === 'string') {
+          refName = order.referralCode || order.referredBy;
+      }
+      const refRewardStr = order.referralRewardProcessed ? '₹1.00 Paid' : 'Pending';
+      referralInfoHtml = `
+        <div style="display:flex; justify-content:space-between; color:#854d0e; font-weight:600; font-size:0.9rem; background:#fefce8; padding:8px; border-radius:4px; margin-top:8px; border:1px dashed #ca8a04;">
+            <span>Referred By: ${refName || 'Unknown'}</span>
+            <span>Referral Reward: ${refRewardStr}</span>
+        </div>
+      `;
+  }
+
   content.innerHTML = `
     <div style="margin-bottom:16px;">
       <p><strong>Order ID:</strong> #${order.orderNumber || order._id}</p>
@@ -268,6 +285,7 @@ window.openOrderModal = function(orderId) {
             <span>Cashback Rewarded:</span>
             <span>+₹${cashbackEarned} credited to wallet</span>
         </div>
+        ${referralInfoHtml}
     </div>
   `;
   

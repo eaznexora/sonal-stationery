@@ -318,6 +318,14 @@ async function loadWallet(user) {
     if (user && user.walletBalance !== undefined) {
         balanceDisplay.textContent = `₹${parseFloat(user.walletBalance).toFixed(2)}`;
     }
+    if (user && user.referralCode) {
+        const refCodeEl = document.getElementById('profileReferralCode');
+        if (refCodeEl) refCodeEl.textContent = user.referralCode;
+    }
+    if (user && user.referralEarnings !== undefined) {
+        const refEarnEl = document.getElementById('profileReferralEarnings');
+        if (refEarnEl) refEarnEl.textContent = `₹${parseFloat(user.referralEarnings).toFixed(2)}`;
+    }
     
     try {
         let token = localStorage.getItem('customer_token') || localStorage.getItem('customerToken') || localStorage.getItem('token');
@@ -373,6 +381,19 @@ async function loadWallet(user) {
     } catch (err) {
         console.error("Failed to load wallet history", err);
         historyContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: #dc2626;">Failed to load wallet history.</div>`;
+    }
+}
+
+window.copyReferralCode = function() {
+    const refCodeEl = document.getElementById('profileReferralCode');
+    if (refCodeEl && refCodeEl.textContent && refCodeEl.textContent !== 'Loading...') {
+        navigator.clipboard.writeText(refCodeEl.textContent).then(() => {
+            if (typeof triggerToast === 'function') {
+                triggerToast('Referral code copied!');
+            } else {
+                alert('Referral code copied!');
+            }
+        });
     }
 }
 

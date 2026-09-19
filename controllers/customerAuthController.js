@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { Resend } = require('resend');
+const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -154,11 +155,27 @@ exports.getMe = async (req, res) => {
     }
 
     if (!user.referralCode) {
-      user.referralCode = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      user.referralCode = 'REF' + crypto.randomBytes(3).toString('hex').toUpperCase();
+      if (typeof user.referralEarnings !== 'number') user.referralEarnings = 0;
       await user.save();
+      console.log(`[REFERRAL BACKFILL] Assigned code ${user.referralCode} to user ${user._id}`);
     }
 
-    res.json({ success: true, authenticated: true, user });
+    res.json({ 
+      success: true, 
+      authenticated: true, 
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        walletBalance: user.walletBalance || 0,
+        referralCode: user.referralCode,
+        referralEarnings: user.referralEarnings || 0,
+        walletHistory: user.walletHistory || []
+      } 
+    });
   } catch (error) {
     res.json({ success: false, authenticated: false });
   }

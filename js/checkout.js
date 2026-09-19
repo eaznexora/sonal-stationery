@@ -263,7 +263,7 @@ async function handlePlaceOrder() {
     let referredProductId = null;
     try {
         const refData = JSON.parse(localStorage.getItem('sonal_active_ref'));
-        if (refData && refData.code && (Date.now() - refData.timestamp < 30 * 24 * 60 * 60 * 1000)) {
+        if (refData && refData.code && refData.code !== 'undefined' && refData.code !== 'null' && (Date.now() - refData.timestamp < 30 * 24 * 60 * 60 * 1000)) {
             referralCode = refData.code;
             referredProductId = refData.productId;
         }

@@ -116,14 +116,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     startSlideShow();
 
     const urlParams = new URLSearchParams(window.location.search);
+    const urlRef = urlParams.get('ref');
     const productId = urlParams.get('id');
-    const ref = urlParams.get('ref');
-    if (ref) {
+    if (urlRef && urlRef !== 'undefined' && urlRef !== 'null') {
         localStorage.setItem('sonal_active_ref', JSON.stringify({
-            code: ref,
-            productId: productId || null,
+            code: urlRef.trim(),
+            productId: productId,
             timestamp: Date.now()
         }));
+        console.log('[REFERRAL TRACK] Stored active referral:', urlRef, 'for product:', productId);
     }
     if (!productId) return;
 

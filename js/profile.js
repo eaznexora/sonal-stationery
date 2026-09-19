@@ -340,6 +340,11 @@ async function loadWallet(user) {
             const latestUser = data.user;
             balanceDisplay.textContent = `₹${parseFloat(latestUser.walletBalance || 0).toFixed(2)}`;
             
+            const refCodeEl = document.getElementById('profileReferralCode');
+            const refEarningsEl = document.getElementById('profileReferralEarnings');
+            if (refCodeEl) refCodeEl.innerText = latestUser.referralCode || 'N/A';
+            if (refEarningsEl) refEarningsEl.innerText = `₹${(latestUser.referralEarnings || 0).toFixed(2)}`;
+            
             localStorage.setItem('sonal_user', JSON.stringify(latestUser));
             
             if (latestUser.walletHistory && latestUser.walletHistory.length > 0) {
@@ -386,9 +391,14 @@ async function loadWallet(user) {
 
 window.copyReferralCode = function() {
     const refCodeEl = document.getElementById('profileReferralCode');
+    const copyBtn = (window.event && window.event.currentTarget) ? window.event.currentTarget : null;
     if (refCodeEl && refCodeEl.textContent && refCodeEl.textContent !== 'Loading...') {
         navigator.clipboard.writeText(refCodeEl.textContent).then(() => {
-            if (typeof triggerToast === 'function') {
+            if (copyBtn) {
+                const origText = copyBtn.innerText;
+                copyBtn.innerText = 'Copied! ✓';
+                setTimeout(() => { copyBtn.innerText = origText; }, 2000);
+            } else if (typeof triggerToast === 'function') {
                 triggerToast('Referral code copied!');
             } else {
                 alert('Referral code copied!');

@@ -26,6 +26,12 @@ exports.createOrder = async (req, res) => {
                 console.error("JWT verify error in createOrder:", err);
             }
         }
+        
+        console.log('[REFERRAL DEBUG] Incoming order check:', {
+            referralCode: req.body.referralCode,
+            referredProductId: req.body.referredProductId,
+            buyerUserId: user ? String(user._id) : 'Guest'
+        });
 
         const deduction = (applyWallet && user) ? Math.min(user.walletBalance, amount) : 0;
         const finalPaidAmount = amount - deduction;
@@ -221,6 +227,12 @@ exports.verifyPayment = async (req, res) => {
             if (!userId && req.body.userId) {
                 userId = req.body.userId;
             }
+
+            console.log('[REFERRAL DEBUG] Incoming order check:', {
+                referralCode: req.body.referralCode,
+                referredProductId: req.body.referredProductId,
+                buyerUserId: userId ? String(userId) : 'Guest'
+            });
 
             if (userId) {
                 const user = await User.findById(userId);

@@ -358,8 +358,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Share & Earn Banner Injection
+        const isReferredVisit = urlParams.has('ref') && urlParams.get('ref') !== 'undefined' && urlParams.get('ref') !== 'null';
         const productActions = document.querySelector('.product-actions');
-        if (productActions) {
+        if (productActions && !isReferredVisit) {
             const shareCard = document.createElement('div');
             shareCard.className = 'share-earn-box';
             shareCard.style.cssText = 'background:#fefce8; border:1px dashed #ca8a04; border-radius:10px; padding:12px; margin-top:16px; width: 100%;';

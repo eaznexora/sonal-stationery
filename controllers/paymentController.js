@@ -100,10 +100,11 @@ exports.createOrder = async (req, res) => {
                     if (itemMatched) {
                         referrer.walletBalance = (Number(referrer.walletBalance) || 0) + 1;
                         referrer.referralEarnings = (Number(referrer.referralEarnings) || 0) + 1;
+                        const buyerName = order.shippingAddress?.fullName || order.customer?.name || (order.user ? (await User.findById(order.user).select('name'))?.name : null) || 'A friend';
                         referrer.walletHistory.push({
                             amount: 1,
                             type: 'credit',
-                            description: `Referral Reward: Friend ordered product via your link (#${order.orderNumber || orderIdStr})`,
+                            description: `Referral Reward: ${buyerName} ordered via your link`,
                             orderId: order._id,
                             createdAt: new Date()
                         });
@@ -326,10 +327,11 @@ exports.verifyPayment = async (req, res) => {
                     if (itemMatched) {
                         referrer.walletBalance = (Number(referrer.walletBalance) || 0) + 1;
                         referrer.referralEarnings = (Number(referrer.referralEarnings) || 0) + 1;
+                        const buyerName = order.shippingAddress?.fullName || order.customer?.name || (order.user ? (await User.findById(order.user).select('name'))?.name : null) || 'A friend';
                         referrer.walletHistory.push({
                             amount: 1,
                             type: 'credit',
-                            description: `Referral Reward: Friend ordered product via your link (#${order.orderNumber || orderIdStr})`,
+                            description: `Referral Reward: ${buyerName} ordered via your link`,
                             orderId: order._id,
                             createdAt: new Date()
                         });

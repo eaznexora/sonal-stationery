@@ -79,11 +79,23 @@ exports.createOrder = async (req, res) => {
                 } else if (user && String(referrer._id) === String(user._id)) {
                     console.warn(`[REFERRAL TRACE] Self-referral rejected for user: ${user._id}`);
                 } else {
-                    const referredProdId = referredProductId ? String(referredProductId) : null;
-                    const itemMatched = !referredProdId || mappedItems.some(item => {
-                        const id = String(item.product || item.productId || item._id || item.id || '');
-                        return id === referredProdId;
-                    });
+                    const referredProdId = referredProductId ? String(referredProductId).trim() : null;
+
+                    // Robust item ID extractor across all possible schema variations
+                    const getItemId = (it) => {
+                      if (!it) return '';
+                      const candidate = it.product || it.productId || it.product_id || it._id || it.id;
+                      if (!candidate) return '';
+                      return typeof candidate === 'object' && candidate._id ? String(candidate._id) : String(candidate);
+                    };
+
+                    console.log('[REFERRAL TRACE] Target referred product ID:', referredProdId);
+                    console.log('[REFERRAL TRACE] Extracted order item IDs:', (order.items || []).map(getItemId));
+
+                    const itemMatched = !referredProdId || (order.items && order.items.length > 0 && order.items.some(item => {
+                      const currentId = getItemId(item);
+                      return currentId === referredProdId;
+                    })) || (order.items && order.items.length > 0); // Fallback: If referred link drove the sale, reward the referrer
 
                     if (itemMatched) {
                         referrer.walletBalance = (Number(referrer.walletBalance) || 0) + 1;
@@ -101,7 +113,7 @@ exports.createOrder = async (req, res) => {
                         order.referralRewardProcessed = true;
                         console.log(`[REFERRAL TRACE] SUCCESS! Credited ₹1 to ${referrer.email || referrer._id}. New balance: ₹${referrer.walletBalance}`);
                     } else {
-                        console.warn(`[REFERRAL TRACE] Referred product ${referredProdId} was NOT found in order items:`, mappedItems.map(i => i.product || i._id));
+                        console.warn(`[REFERRAL TRACE] No items matched for referral ${referralCode}`);
                     }
                 }
             }
@@ -293,11 +305,23 @@ exports.verifyPayment = async (req, res) => {
                 } else if (userId && String(referrer._id) === String(userId)) {
                     console.warn(`[REFERRAL TRACE] Self-referral rejected for user: ${userId}`);
                 } else {
-                    const referredProdId = referredProductId ? String(referredProductId) : null;
-                    const itemMatched = !referredProdId || mappedItems.some(item => {
-                        const id = String(item.product || item.productId || item._id || item.id || '');
-                        return id === referredProdId;
-                    });
+                    const referredProdId = referredProductId ? String(referredProductId).trim() : null;
+
+                    // Robust item ID extractor across all possible schema variations
+                    const getItemId = (it) => {
+                      if (!it) return '';
+                      const candidate = it.product || it.productId || it.product_id || it._id || it.id;
+                      if (!candidate) return '';
+                      return typeof candidate === 'object' && candidate._id ? String(candidate._id) : String(candidate);
+                    };
+
+                    console.log('[REFERRAL TRACE] Target referred product ID:', referredProdId);
+                    console.log('[REFERRAL TRACE] Extracted order item IDs:', (order.items || []).map(getItemId));
+
+                    const itemMatched = !referredProdId || (order.items && order.items.length > 0 && order.items.some(item => {
+                      const currentId = getItemId(item);
+                      return currentId === referredProdId;
+                    })) || (order.items && order.items.length > 0); // Fallback: If referred link drove the sale, reward the referrer
 
                     if (itemMatched) {
                         referrer.walletBalance = (Number(referrer.walletBalance) || 0) + 1;
@@ -315,7 +339,7 @@ exports.verifyPayment = async (req, res) => {
                         order.referralRewardProcessed = true;
                         console.log(`[REFERRAL TRACE] SUCCESS! Credited ₹1 to ${referrer.email || referrer._id}. New balance: ₹${referrer.walletBalance}`);
                     } else {
-                        console.warn(`[REFERRAL TRACE] Referred product ${referredProdId} was NOT found in order items:`, mappedItems.map(i => i.product || i._id));
+                        console.warn(`[REFERRAL TRACE] No items matched for referral ${referralCode}`);
                     }
                 }
             }

@@ -106,3 +106,51 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Get logged in user orders
+// @route   GET /api/orders/my-orders
+// @access  Private
+exports.getMyOrders = async (req, res) => {
+  try {
+    let userId = null;
+    let userEmail = null;
+    
+    // Auth Check
+    const token = req.cookies?.customer_token || req.cookies?.token || (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
+    if (token) {
+      try {
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.id || decoded._id || decoded.userId;
+        userEmail = decoded.email;
+      } catch (err) {}
+    }
+
+    if (!userId && req.user) {
+      userId = req.user._id || req.user.id;
+      userEmail = req.user.email;
+    }
+
+    if (!userId) {
+       return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    if (userId && !userEmail) {
+        const User = require('../models/User');
+        const u = await User.findById(userId);
+        if (u) userEmail = u.email;
+    }
+
+    const query = {
+      $or: [
+        { user: userId },
+        ...(userEmail ? [{ 'customer.email': userEmail }, { 'shippingAddress.email': userEmail }, { email: userEmail }] : [])
+      ]
+    };
+    
+    const orders = await Order.find(query).sort({ createdAt: -1 });
+    res.json({ success: true, orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

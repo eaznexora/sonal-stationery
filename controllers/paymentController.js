@@ -14,6 +14,7 @@ exports.createOrder = async (req, res) => {
         const { amount, receipt, orderDetails, applyWallet, items, shippingAddress, referralCode, referredProductId } = req.body;
         
         let user = null;
+        let buyerUserId = null;
         const token = req.cookies?.customer_token || 
                       req.cookies?.token || 
                       (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
@@ -21,11 +22,13 @@ exports.createOrder = async (req, res) => {
         if (token) {
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                user = await User.findById(decoded.id);
+                buyerUserId = decoded.id || decoded._id || decoded.userId;
+                user = await User.findById(buyerUserId);
             } catch (err) {
                 console.error("JWT verify error in createOrder:", err);
             }
         }
+        if (!buyerUserId && req.body.userId) buyerUserId = req.body.userId;
         
         console.log('[REFERRAL TRACE]', {
             bodyRefCode: req.body.referralCode,
@@ -51,7 +54,7 @@ exports.createOrder = async (req, res) => {
             const order = new Order({
                 orderId: orderIdStr,
                 orderNumber: orderIdStr,
-                user: user._id,
+                user: buyerUserId || null,
                 customer: {
                     name: shippingAddress?.name,
                     email: shippingAddress?.email,
@@ -234,7 +237,7 @@ exports.verifyPayment = async (req, res) => {
 
             console.log('[WALLET DEBUG] Received verification. Cookies:', req.cookies, 'Headers:', req.headers.authorization);
 
-            let userId = null;
+            let buyerUserId = null;
             const token = req.cookies?.customer_token || 
                           req.cookies?.token || 
                           (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
@@ -242,15 +245,18 @@ exports.verifyPayment = async (req, res) => {
             if (token) {
                 try {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                    userId = decoded.id || decoded._id || decoded.userId;
+                    buyerUserId = decoded.id || decoded._id || decoded.userId;
                 } catch (err) {
                     console.error('[WALLET DEBUG] Token decode failed:', err.message);
                 }
             }
 
-            if (!userId && req.body.userId) {
-                userId = req.body.userId;
+            if (!buyerUserId && req.body.userId) {
+                buyerUserId = req.body.userId;
             }
+
+            order.user = buyerUserId || null;
+            let userId = buyerUserId;
 
             console.log('[REFERRAL TRACE]', {
                 bodyRefCode: req.body.referralCode,

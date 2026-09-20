@@ -242,16 +242,89 @@ window.saveNewAddress = function(event) {
     else { alert('Address saved successfully!'); }
 };
 
-function loadOrderHistory() {
+async function loadOrderHistory() {
     const container = document.querySelector('#tab-orders .orders-container') || document.getElementById('tab-orders');
     if (!container) return;
 
-    container.innerHTML = `
-        <div style="text-align: center; padding: 48px 20px; color: #64748b;">
-            <p style="font-size: 1.05rem; margin-bottom: 12px;">You haven't placed any orders yet.</p>
-            <a href="index.html" style="display: inline-block; padding: 10px 22px; background: #111; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 500;">Start Shopping</a>
-        </div>
-    `;
+    try {
+        const token = localStorage.getItem('customerToken') || localStorage.getItem('customer_token');
+        const res = await fetch('/api/orders/my-orders', {
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            }
+        });
+
+        const data = await res.json();
+        const orders = Array.isArray(data) ? data : (data.orders || data.data || []);
+
+        if (orders.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 48px 20px; color: #64748b;">
+                    <p style="font-size: 1.05rem; margin-bottom: 12px;">You haven't placed any orders yet.</p>
+                    <a href="index.html" style="display: inline-block; padding: 10px 22px; background: #111; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 500;">Start Shopping</a>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <h2>Order History</h2>
+            <div style="display: flex; flex-direction: column; gap: 20px; margin-top: 20px;">
+                ${orders.map(order => {
+                    const orderId = order.orderNumber || (order._id ? order._id.toString().slice(-6) : 'Unknown');
+                    const orderDate = new Date(order.createdAt || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const status = order.orderStatus || 'Processing';
+                    
+                    const itemsHtml = (order.items || []).map(item => `
+                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f3f4f6;">
+                            <img src="${item.image || '/logo.png'}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" alt="Product">
+                            <div>
+                                <div style="font-size: 0.95rem; font-weight: 500;">${item.name || 'Product'}</div>
+                                <div style="font-size: 0.85rem; color: #666;">Qty: ${item.quantity || 1} × ₹${item.price || 0}</div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    return `
+                        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; background: #fff;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                <div>
+                                    <h4 style="margin: 0 0 4px 0; font-size: 1.1rem;">Order #${orderId}</h4>
+                                    <div style="font-size: 0.85rem; color: #666;">Placed on ${orderDate}</div>
+                                </div>
+                                <span style="background: #f3f4f6; color: #374151; padding: 4px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                                    ${status}
+                                </span>
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                ${itemsHtml}
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px dashed #e5e7eb;">
+                                <div>
+                                    ${order.walletDiscount > 0 ? `<div style="font-size: 0.85rem; color: #16a34a; font-weight: 500;">Wallet Applied: -₹${order.walletDiscount}</div>` : ''}
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.85rem; color: #666;">Total Paid</div>
+                                    <div style="font-size: 1.2rem; font-weight: 700;">₹${order.finalPaidAmount || order.total || order.totalAmount || 0}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    } catch (err) {
+        console.error("Failed to load orders", err);
+        container.innerHTML = `
+            <div style="text-align: center; padding: 48px 20px; color: #dc2626;">
+                <p>Failed to load order history. Please try again later.</p>
+            </div>
+        `;
+    }
 }
 
 function loadSavedAddresses() {

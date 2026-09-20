@@ -4,7 +4,11 @@ const {
   getOrders,
   createOrder,
   updateOrderStatus,
+  getMyOrders
 } = require('../controllers/orderController');
+
+router.route('/my-orders')
+  .get(getMyOrders);
 
 router.route('/')
   .get(getOrders)

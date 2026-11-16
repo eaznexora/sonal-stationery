@@ -1,5 +1,6 @@
 const StoreCustomer = require('../models/StoreCustomer');
 const StoreCustomerOtp = require('../models/StoreCustomerOtp');
+const StoreProTip = require('../models/StoreProTip');
 const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -238,16 +239,16 @@ exports.verifyOtp = async (req, res) => {
 
 /**
  * Live Rank Lookup for Customer
- * GET /api/store-rewards/my-rank?identifier=...
+ * GET /api/store-rewards/my-rank?identifier=... (or phone=..., or email=...)
  */
 exports.getMyRank = async (req, res) => {
   try {
-    const { identifier } = req.query;
-    if (!identifier) {
+    const rawIdentifier = req.query.identifier || req.query.phone || req.query.email;
+    if (!rawIdentifier) {
       return res.status(400).json({ success: false, message: 'Phone number or email is required.' });
     }
 
-    const cleanInput = identifier.trim();
+    const cleanInput = String(rawIdentifier).trim();
     const cleanPhone = cleanPhoneNumber(cleanInput);
     const cleanEmail = cleanInput.toLowerCase();
 
@@ -283,4 +284,23 @@ exports.getMyRank = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to retrieve rank details.' });
   }
 };
+
+/**
+ * Public Active Pro Tips
+ * GET /api/store-rewards/pro-tips
+ */
+exports.getPublicProTips = async (req, res) => {
+  try {
+    await StoreProTip.ensureDefaults();
+    const tips = await StoreProTip.find({ isActive: true }).sort({ order: 1, createdAt: 1 });
+    return res.json({
+      success: true,
+      tips
+    });
+  } catch (error) {
+    console.error('[Public Pro Tips Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to fetch pro tips.' });
+  }
+};
+
 

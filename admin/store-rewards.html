@@ -782,6 +782,9 @@
                 <button class="btn btn-gold" id="btnOpenQrModal">
                     <i class="ph ph-qr-code"></i> Print In-Store QR Flyer
                 </button>
+                <button class="btn btn-outline" id="btnOpenProTipsModal">
+                    <i class="ph ph-sparkle"></i> Manage Pro Tips
+                </button>
                 <button class="btn btn-outline" id="btnOpenTemplatesModal">
                     <i class="ph ph-whatsapp-logo"></i> WhatsApp Templates
                 </button>
@@ -1056,7 +1059,62 @@
         </div>
     </div>
 
-    <!-- 5. Purchase History Modal -->
+    <!-- 5. Manage Pro Tips Modal -->
+    <div class="modal-overlay" id="proTipsModal">
+        <div class="modal-card" style="max-width: 620px;">
+            <div class="modal-header">
+                <h3><i class="ph ph-sparkle" style="color: var(--accent-sage-dark);"></i> Manage In-Store Pro Tips</h3>
+                <button class="modal-close" data-close="proTipsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Add / Edit Pro Tip Form -->
+                <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;" id="tipFormHeading">Add New Pro Tip</h4>
+                    <input type="hidden" id="tipEditId">
+                    <div style="margin-bottom: 0.5rem;">
+                        <textarea id="tipTextInput" rows="3" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; font-family: var(--font-body); font-size: 0.88rem; outline: none; line-height: 1.4;" placeholder="Tip text... Use {phone} to insert customer's mobile number"></textarea>
+                    </div>
+                    <div style="margin-bottom: 0.75rem;">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;">Click to insert:</span>
+                        <span class="tag-pill" id="btnInsertPhone" data-insert-tip="{phone}">{phone}</span>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <label style="font-size: 0.82rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                                Order:
+                                <input type="number" id="tipOrderInput" value="1" min="0" style="width: 60px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem;">
+                            </label>
+                            <label style="font-size: 0.82rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                <input type="checkbox" id="tipActiveInput" checked style="accent-color: var(--accent-sage-dark);">
+                                Active in Carousel
+                            </label>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn btn-outline btn-sm" id="btnCancelTipEdit" style="display:none;">Cancel</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="btnSaveTip">
+                                <i class="ph ph-floppy-disk"></i> Save Tip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing Pro Tips List -->
+                <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                    In-Store Carousel Pro Tips
+                </h4>
+                <div id="proTipsListContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Pro tips rendered dynamically -->
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="proTipsModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Purchase History Modal -->
     <div class="modal-overlay" id="historyModal">
         <div class="modal-card">
             <div class="modal-header">

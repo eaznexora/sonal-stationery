@@ -10,6 +10,7 @@
     // State
     let customers = [];
     let templates = [];
+    let proTips = [];
     let activeCustomer = null;
     let lastPurchaseResult = null;
     let searchDebounceTimer = null;
@@ -76,6 +77,19 @@
         btnCancelTplEdit: document.getElementById('btnCancelTplEdit'),
         templatesListContainer: document.getElementById('templatesListContainer'),
 
+        // Pro Tips Modal Elements
+        btnOpenProTipsModal: document.getElementById('btnOpenProTipsModal'),
+        proTipsModal: document.getElementById('proTipsModal'),
+        tipFormHeading: document.getElementById('tipFormHeading'),
+        tipEditId: document.getElementById('tipEditId'),
+        tipTextInput: document.getElementById('tipTextInput'),
+        tipOrderInput: document.getElementById('tipOrderInput'),
+        tipActiveInput: document.getElementById('tipActiveInput'),
+        btnSaveTip: document.getElementById('btnSaveTip'),
+        btnCancelTipEdit: document.getElementById('btnCancelTipEdit'),
+        proTipsListContainer: document.getElementById('proTipsListContainer'),
+        btnInsertPhone: document.getElementById('btnInsertPhone'),
+
         // History Modal Elements
         historyCustName: document.getElementById('historyCustName'),
         historyCustPhone: document.getElementById('historyCustPhone'),
@@ -101,10 +115,12 @@
         initWhatsAppListeners();
         initQrModalListeners();
         initTemplateManagerListeners();
+        initProTipsManagerListeners();
 
         // Initial data fetches
         loadLeaderboard();
         loadTemplates();
+        loadProTips();
     });
 
     // Mobile Sidebar
@@ -541,10 +557,20 @@
             <option value="${t.code}">${escapeHtml(t.title)}</option>
         `).join('');
 
-        // Smart Auto-selection (Upgrade 3)
-        // If visitCount === 1, auto-select 'first_purchase'; otherwise 'repeat_purchase'
+        // Smart Auto-selection (Expanded ready-to-use template library)
+        const rank = purchaseData?.newRank || customer.rank || 1;
         const visitCount = customer.visitCount || (customer.purchaseHistory ? customer.purchaseHistory.length : 1);
-        let targetCode = visitCount <= 1 ? 'first_purchase' : 'repeat_purchase';
+        let targetCode = 'repeat_purchase';
+
+        if (rank === 1 && templates.some(t => t.code === 'rank_one')) {
+            targetCode = 'rank_one';
+        } else if (rank <= 3 && templates.some(t => t.code === 'top_three')) {
+            targetCode = 'top_three';
+        } else if (visitCount <= 1 && templates.some(t => t.code === 'first_purchase')) {
+            targetCode = 'first_purchase';
+        } else if (templates.some(t => t.code === 'repeat_purchase')) {
+            targetCode = 'repeat_purchase';
+        }
 
         if (templates.some(t => t.code === targetCode)) {
             elements.waTemplateSelect.value = targetCode;
@@ -1048,6 +1074,213 @@
         }
 
         openModal(elements.historyModal);
+    }
+
+    // ==========================================
+    // 7. PRO TIPS MANAGER (CRUD)
+    // ==========================================
+    async function loadProTips() {
+        try {
+            const res = await fetch('/api/admin/store-rewards/pro-tips');
+            const data = await res.json();
+            if (res.ok && data.success) {
+                proTips = data.tips || [];
+                renderProTipsList(proTips);
+            }
+        } catch (err) {
+            console.error('Failed to load pro tips:', err);
+        }
+    }
+
+    function renderProTipsList(list) {
+        if (!elements.proTipsListContainer) return;
+
+        if (!list || list.length === 0) {
+            elements.proTipsListContainer.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.85rem;">No pro tips found. Add one above!</div>';
+            return;
+        }
+
+        elements.proTipsListContainer.innerHTML = list.map(tip => `
+            <div style="background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-family: monospace; font-size: 0.75rem; background: var(--bg-secondary); padding: 2px 7px; border-radius: 4px; font-weight: 600; color: var(--text-secondary);">
+                            Order: #${tip.order}
+                        </span>
+                        <span style="font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: ${tip.isActive ? '#e8f5e9' : '#f5f5f5'}; color: ${tip.isActive ? '#2e7d32' : '#888'};">
+                            ${tip.isActive ? 'Active in Carousel' : 'Hidden / Inactive'}
+                        </span>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <button type="button" class="btn btn-outline btn-sm btn-edit-tip" data-id="${tip._id}" title="Edit Tip" style="padding: 3px 8px; font-size: 0.8rem;">
+                            <i class="ph ph-pencil-simple"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm btn-toggle-tip" data-id="${tip._id}" data-active="${tip.isActive}" title="${tip.isActive ? 'Deactivate' : 'Activate'}" style="padding: 3px 8px; font-size: 0.8rem;">
+                            <i class="ph ${tip.isActive ? 'ph-eye-slash' : 'ph-eye'}"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm btn-del-tip" data-id="${tip._id}" title="Delete Tip" style="padding: 3px 8px; font-size: 0.8rem; color: var(--danger-color);">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div style="font-size: 0.86rem; color: var(--text-primary); line-height: 1.45; background: var(--bg-primary); padding: 8px 10px; border-radius: 6px;">
+                    ${escapeHtml(tip.text).replace(/{phone}/g, '<strong style="color: var(--accent-sage-dark);">{phone}</strong>')}
+                </div>
+            </div>
+        `).join('');
+
+        // Attach listeners
+        elements.proTipsListContainer.querySelectorAll('.btn-edit-tip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const tip = proTips.find(t => t._id === id);
+                if (tip) startEditTip(tip);
+            });
+        });
+
+        elements.proTipsListContainer.querySelectorAll('.btn-toggle-tip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const currActive = btn.getAttribute('data-active') === 'true';
+                toggleTipActive(id, !currActive);
+            });
+        });
+
+        elements.proTipsListContainer.querySelectorAll('.btn-del-tip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                deleteTip(id);
+            });
+        });
+    }
+
+    function initProTipsManagerListeners() {
+        if (elements.btnOpenProTipsModal) {
+            elements.btnOpenProTipsModal.addEventListener('click', () => {
+                resetTipForm();
+                openModal(elements.proTipsModal);
+            });
+        }
+
+        if (elements.btnSaveTip) {
+            elements.btnSaveTip.addEventListener('click', handleSaveTip);
+        }
+
+        if (elements.btnCancelTipEdit) {
+            elements.btnCancelTipEdit.addEventListener('click', resetTipForm);
+        }
+
+        const insertPhoneBtn = document.getElementById('btnInsertPhone');
+        if (insertPhoneBtn && elements.tipTextInput) {
+            insertPhoneBtn.addEventListener('click', () => {
+                insertAtCursor(elements.tipTextInput, '{phone}');
+            });
+        }
+    }
+
+    function startEditTip(tip) {
+        if (!elements.tipFormHeading || !elements.tipTextInput) return;
+
+        elements.tipFormHeading.textContent = 'Edit Pro Tip';
+        elements.tipEditId.value = tip._id;
+        elements.tipTextInput.value = tip.text;
+        if (elements.tipOrderInput) elements.tipOrderInput.value = tip.order || 0;
+        if (elements.tipActiveInput) elements.tipActiveInput.checked = Boolean(tip.isActive);
+
+        if (elements.btnCancelTipEdit) elements.btnCancelTipEdit.style.display = 'inline-block';
+        elements.tipTextInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function resetTipForm() {
+        if (elements.tipFormHeading) elements.tipFormHeading.textContent = 'Add New Pro Tip';
+        if (elements.tipEditId) elements.tipEditId.value = '';
+        if (elements.tipTextInput) elements.tipTextInput.value = '';
+        if (elements.tipOrderInput) elements.tipOrderInput.value = (proTips.length + 1);
+        if (elements.tipActiveInput) elements.tipActiveInput.checked = true;
+        if (elements.btnCancelTipEdit) elements.btnCancelTipEdit.style.display = 'none';
+    }
+
+    async function handleSaveTip() {
+        const text = elements.tipTextInput?.value.trim();
+        const editId = elements.tipEditId?.value.trim();
+        const order = parseInt(elements.tipOrderInput?.value, 10) || 0;
+        const isActive = elements.tipActiveInput ? elements.tipActiveInput.checked : true;
+
+        if (!text) {
+            showToast('Please enter pro tip text', 'error');
+            return;
+        }
+
+        try {
+            elements.btnSaveTip.disabled = true;
+            elements.btnSaveTip.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Saving...';
+
+            let res;
+            if (editId) {
+                // Update
+                res = await fetch(`/api/admin/store-rewards/pro-tips/${editId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, order, isActive })
+                });
+            } else {
+                // Create
+                res = await fetch('/api/admin/store-rewards/pro-tips', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, order, isActive })
+                });
+            }
+
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.message || 'Failed to save pro tip');
+            }
+
+            showToast(editId ? 'Pro tip updated!' : 'Pro tip added!');
+            resetTipForm();
+            await loadProTips();
+        } catch (err) {
+            console.error('Pro tip save error:', err);
+            showToast(err.message, 'error');
+        } finally {
+            if (elements.btnSaveTip) {
+                elements.btnSaveTip.disabled = false;
+                elements.btnSaveTip.innerHTML = '<i class="ph ph-floppy-disk"></i> Save Tip';
+            }
+        }
+    }
+
+    async function toggleTipActive(id, newStatus) {
+        try {
+            const res = await fetch(`/api/admin/store-rewards/pro-tips/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isActive: newStatus })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.message || 'Failed to update status');
+            showToast(newStatus ? 'Tip activated' : 'Tip deactivated');
+            await loadProTips();
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    }
+
+    async function deleteTip(id) {
+        if (!confirm('Are you sure you want to delete this pro tip?')) return;
+
+        try {
+            const res = await fetch(`/api/admin/store-rewards/pro-tips/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.message || 'Failed to delete pro tip');
+            showToast('Pro tip deleted');
+            await loadProTips();
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
     }
 
     // Helper: Escape HTML strings to prevent XSS

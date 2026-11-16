@@ -6,6 +6,7 @@ const storeRewardsController = require('../controllers/storeRewardsController');
 router.post('/send-otp', storeRewardsController.sendOtp);
 router.post('/verify-otp', storeRewardsController.verifyOtp);
 router.get('/my-rank', storeRewardsController.getMyRank);
+router.get('/pro-tips', storeRewardsController.getPublicProTips);
 
 module.exports = router;
 

@@ -1,5 +1,6 @@
 const StoreCustomer = require('../models/StoreCustomer');
 const WhatsappTemplate = require('../models/WhatsappTemplate');
+const StoreProTip = require('../models/StoreProTip');
 
 // Helper: Normalize to clean 10-digit Indian mobile number
 function cleanPhoneNumber(phone) {
@@ -29,7 +30,7 @@ async function calculateCustomerRank(customer) {
   return higherSpendersCount + 1;
 }
 
-// Default Seed Templates
+// Default Seed Templates (Expanded ready-to-use library)
 const DEFAULT_TEMPLATES = [
   {
     title: 'Day 1 / First Purchase',
@@ -38,7 +39,7 @@ const DEFAULT_TEMPLATES = [
     isDefault: true
   },
   {
-    title: 'Repeat Purchase / Rank Up',
+    title: 'Repeat Purchase / Rank Update',
     code: 'repeat_purchase',
     body: 'Hello {name}, thank you for shopping for ₹{amount} at Sonal Stationery! Your total spend is now ₹{total} and your current rank is {rank}.',
     isDefault: true
@@ -48,15 +49,41 @@ const DEFAULT_TEMPLATES = [
     code: 'rank_drop',
     body: 'Hello {name}, someone just moved up the leaderboard at Sonal Stationery! You now hold the {rank} rank. Visit us soon to reclaim your spot!',
     isDefault: true
+  },
+  {
+    title: 'Top 3 Podium Welcome',
+    code: 'top_three',
+    body: "Congratulations {name}! You've broken into the Top 3 at Sonal Stationery! You currently hold the {rank} rank with ₹{total} lifetime spend. Thank you for being a VIP customer!",
+    isDefault: true
+  },
+  {
+    title: '#1 Leaderboard King/Queen',
+    code: 'rank_one',
+    body: 'Amazing news {name}! You are now the #1 Top Spender at Sonal Stationery with ₹{total} total purchases across {visits} visits! Keep shining!',
+    isDefault: true
+  },
+  {
+    title: 'We Miss You / Come Back Nudge',
+    code: 'miss_you',
+    body: "Hello {name}, we haven't seen you at Sonal Stationery in a while! You currently hold the {rank} rank with ₹{total} spend. Drop by soon for new stationery & gifts!",
+    isDefault: true
+  },
+  {
+    title: 'Spending Milestone Reached',
+    code: 'milestone',
+    body: "Woohoo {name}! You've crossed ₹{total} in lifetime shopping at Sonal Stationery ({visits} visits) and sit at {rank} place. Thank you for your love and support!",
+    isDefault: true
   }
 ];
 
-// Ensure default templates exist
+// Ensure default templates exist (seeds missing ones without overwriting custom edits)
 async function ensureDefaultTemplates() {
-  const count = await WhatsappTemplate.countDocuments();
-  if (count === 0) {
-    await WhatsappTemplate.insertMany(DEFAULT_TEMPLATES);
-    console.log('[Store Rewards] Seeded default WhatsApp templates.');
+  for (const tpl of DEFAULT_TEMPLATES) {
+    const exists = await WhatsappTemplate.findOne({ code: tpl.code });
+    if (!exists) {
+      await WhatsappTemplate.create(tpl);
+      console.log(`[Store Rewards] Seeded missing default template: ${tpl.code}`);
+    }
   }
 }
 
@@ -422,4 +449,83 @@ exports.renderMessage = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to generate message preview.' });
   }
 };
+
+/**
+ * Pro Tips Management (Admin)
+ * GET /api/admin/store-rewards/pro-tips
+ */
+exports.getProTips = async (req, res) => {
+  try {
+    await StoreProTip.ensureDefaults();
+    const tips = await StoreProTip.find().sort({ order: 1, createdAt: 1 });
+    return res.json({ success: true, tips });
+  } catch (error) {
+    console.error('[Admin Pro Tips Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to fetch pro tips.' });
+  }
+};
+
+/**
+ * Create Pro Tip
+ * POST /api/admin/store-rewards/pro-tips
+ */
+exports.createProTip = async (req, res) => {
+  try {
+    const { text, order = 0, isActive = true } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ success: false, message: 'Tip text is required.' });
+    }
+    const tip = await StoreProTip.create({
+      text: text.trim(),
+      order: Number(order) || 0,
+      isActive: Boolean(isActive)
+    });
+    return res.status(201).json({ success: true, message: 'Pro tip created successfully.', tip });
+  } catch (error) {
+    console.error('[Create Pro Tip Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to create pro tip.' });
+  }
+};
+
+/**
+ * Update Pro Tip
+ * PUT /api/admin/store-rewards/pro-tips/:id
+ */
+exports.updateProTip = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { text, order, isActive } = req.body;
+    const tip = await StoreProTip.findById(id);
+    if (!tip) {
+      return res.status(404).json({ success: false, message: 'Pro tip not found.' });
+    }
+    if (text !== undefined) tip.text = text.trim();
+    if (order !== undefined) tip.order = Number(order);
+    if (isActive !== undefined) tip.isActive = Boolean(isActive);
+    await tip.save();
+    return res.json({ success: true, message: 'Pro tip updated successfully.', tip });
+  } catch (error) {
+    console.error('[Update Pro Tip Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to update pro tip.' });
+  }
+};
+
+/**
+ * Delete Pro Tip
+ * DELETE /api/admin/store-rewards/pro-tips/:id
+ */
+exports.deleteProTip = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const tip = await StoreProTip.findByIdAndDelete(id);
+    if (!tip) {
+      return res.status(404).json({ success: false, message: 'Pro tip not found.' });
+    }
+    return res.json({ success: true, message: 'Pro tip deleted successfully.' });
+  } catch (error) {
+    console.error('[Delete Pro Tip Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to delete pro tip.' });
+  }
+};
+
 

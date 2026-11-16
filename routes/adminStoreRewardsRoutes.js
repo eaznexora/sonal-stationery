@@ -19,5 +19,11 @@ router.delete('/templates/:id', adminStoreRewardsController.deleteTemplate);
 // Live Message Render & wa.me URL Generator
 router.post('/render-message', adminStoreRewardsController.renderMessage);
 
+// Pro Tips Management
+router.get('/pro-tips', adminStoreRewardsController.getProTips);
+router.post('/pro-tips', adminStoreRewardsController.createProTip);
+router.put('/pro-tips/:id', adminStoreRewardsController.updateProTip);
+router.delete('/pro-tips/:id', adminStoreRewardsController.deleteProTip);
+
 module.exports = router;
 

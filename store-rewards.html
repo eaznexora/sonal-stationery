@@ -414,6 +414,121 @@
             flex-shrink: 0;
         }
 
+        /* Sliding Pro Tips Carousel */
+        .protips-carousel {
+            position: relative;
+            background: #f7f9f7;
+            border: 1px solid #d5dfd6;
+            border-radius: 12px;
+            padding: 1rem 1rem 0.75rem 1rem;
+            margin-top: 1.1rem;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .protips-track-wrapper {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .protips-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            width: 100%;
+        }
+
+        .protip-slide {
+            flex: 0 0 100%;
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #3b503f;
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+
+        .protip-slide i {
+            font-size: 1.25rem;
+            color: #4a6b50;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .protips-dots {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 0.75rem;
+        }
+
+        .protip-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #c3d4c5;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .protip-dot.active {
+            background: #4a6b50;
+            width: 18px;
+            border-radius: 10px;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            color: var(--danger-color);
+            background: rgba(217, 83, 79, 0.08);
+        }
+
+        /* Subtle Mini Toast */
+        .mini-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #2c2c2c;
+            color: #ffffff;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 9999;
+        }
+
+        .mini-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         /* Error / Toast */
         .alert-error {
             background: #fff5f5;
@@ -576,17 +691,33 @@
                     </div>
                 </div>
 
-                <div class="tip-banner">
-                    <i class="ph ph-sparkle"></i>
-                    <div>
-                        <strong>Pro Tip:</strong> Quote your mobile number <strong id="registeredPhoneDisplay">+91 0000000000</strong> at the store counter whenever you shop to climb the ranks!
+                <!-- Sliding Pro Tips Carousel (Admin Managed) -->
+                <div class="protips-carousel" id="protipsCarousel">
+                    <div class="protips-track-wrapper" id="protipsTrackWrapper">
+                        <div class="protips-track" id="protipsTrack">
+                            <div class="protip-slide">
+                                <i class="ph ph-sparkle"></i>
+                                <div>
+                                    <strong>Pro Tip:</strong> Quote your mobile number <strong class="registeredPhoneSpan">+91 0000000000</strong> at the store counter whenever you shop to climb the ranks!
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <div class="protips-dots" id="protipsDots"></div>
                 </div>
 
-                <button type="button" class="btn-submit" style="margin-top: 1.25rem;" onclick="window.location.reload();">
+                <!-- Step 3 Action Buttons: Refresh Rank & Switch Account / Logout -->
+                <button type="button" class="btn-submit" id="btnRefreshRank" style="margin-top: 1.25rem;">
                     <i class="ph ph-arrow-counter-clockwise"></i>
-                    <span>Check Again / Refresh</span>
+                    <span>Refresh Live Rank</span>
                 </button>
+
+                <div style="text-align: center;">
+                    <button type="button" class="btn-logout" id="btnLogoutCustomer">
+                        <i class="ph ph-sign-out"></i>
+                        <span>Switch Account / Log Out</span>
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -598,8 +729,15 @@
 
     </div>
 
+    <!-- Mini Toast Feedback -->
+    <div class="mini-toast" id="miniToast">
+        <i class="ph ph-check-circle" id="miniToastIcon"></i>
+        <span id="miniToastMsg">Updated just now</span>
+    </div>
+
     <script>
         // State variables
+        const STORAGE_KEY = 'sonal_store_reward_user';
         let customerData = {
             name: '',
             phone: '',
@@ -607,6 +745,13 @@
         };
         let resendTimer = null;
         let cooldownSec = 45;
+
+        // Pro Tips Carousel State
+        let proTipsList = [];
+        let currentTipIndex = 0;
+        let tipSlideTimer = null;
+        let touchStartX = 0;
+        let touchEndX = 0;
 
         // DOM elements
         const step1View = document.getElementById('step1View');
@@ -636,6 +781,32 @@
             dot1.className = 'step-dot' + (step >= 1 ? (step === 1 ? ' active' : '') : '');
             dot2.className = 'step-dot' + (step === 2 ? ' active' : '');
             dot3.className = 'step-dot' + (step === 3 ? ' active' : '');
+        }
+
+        function showMiniToast(msg, isError = false) {
+            const toast = document.getElementById('miniToast');
+            const msgEl = document.getElementById('miniToastMsg');
+            const iconEl = document.getElementById('miniToastIcon');
+            if (!toast || !msgEl) return;
+
+            msgEl.textContent = msg;
+            if (iconEl) {
+                iconEl.className = isError ? 'ph ph-warning-circle' : 'ph ph-check-circle';
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         // Clean phone input
@@ -769,9 +940,23 @@
                     return;
                 }
 
-                // Render Step 3
+                // 1. Auto-save session in localStorage (Update 1)
+                const c = data.customer;
+                customerData = {
+                    name: c.name,
+                    phone: c.phone,
+                    email: c.email
+                };
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(customerData));
+                } catch (e) {
+                    console.warn('localStorage save failed:', e);
+                }
+
+                // 2. Render Step 3
                 renderSuccess(data);
                 setStep(3);
+                renderProTipsCarousel();
             } catch (err) {
                 showError('Network error during verification. Please try again.');
             } finally {
@@ -831,7 +1016,6 @@
             document.getElementById('confirmedRank').textContent = data.rankOrdinal || `#${data.rank}`;
             document.getElementById('confirmedSpent').textContent = `₹${Number(customer.totalSpent || 0).toLocaleString('en-IN')}`;
             document.getElementById('confirmedVisits').textContent = customer.visitCount || 0;
-            document.getElementById('registeredPhoneDisplay').textContent = `+91 ${customer.phone}`;
 
             if (data.isNew) {
                 document.getElementById('welcomeHeading').textContent = `Welcome, ${customer.name}!`;
@@ -840,7 +1024,240 @@
                 document.getElementById('welcomeHeading').textContent = `Welcome Back, ${customer.name}!`;
                 document.getElementById('welcomeSubtext').textContent = `You currently hold the ${data.rankOrdinal || ('#' + data.rank)} rank on our leaderboard.`;
             }
+
+            renderProTipsCarousel();
         }
+
+        // 6. In-Place Rank Refresh (Update 1)
+        async function refreshRankInPlace(showFeedback = true) {
+            const identifier = customerData.phone || customerData.email;
+            if (!identifier) return false;
+
+            const btn = document.getElementById('btnRefreshRank');
+            const icon = btn ? btn.querySelector('i') : null;
+            if (icon) icon.classList.add('ph-spin');
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/store-rewards/my-rank?identifier=${encodeURIComponent(identifier)}`);
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    if (showFeedback) showMiniToast('Could not refresh rank', true);
+                    return false;
+                }
+
+                renderSuccess(data);
+
+                // Update stored data with server's latest name
+                if (data.customer?.name) customerData.name = data.customer.name;
+                if (data.customer?.phone) customerData.phone = data.customer.phone;
+                if (data.customer?.email) customerData.email = data.customer.email;
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(customerData));
+                } catch (e) {}
+
+                if (showFeedback) {
+                    showMiniToast('Updated just now');
+                }
+                return true;
+            } catch (err) {
+                if (showFeedback) showMiniToast('Network error while refreshing', true);
+                return false;
+            } finally {
+                if (icon) icon.classList.remove('ph-spin');
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        document.getElementById('btnRefreshRank').addEventListener('click', () => {
+            refreshRankInPlace(true);
+        });
+
+        // 7. Switch Account / Logout (Update 1)
+        document.getElementById('btnLogoutCustomer').addEventListener('click', () => {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (e) {}
+
+            customerData = { name: '', phone: '', email: '' };
+            document.getElementById('custName').value = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('custEmail').value = '';
+
+            const boxes = document.querySelectorAll('.otp-box');
+            boxes.forEach(b => b.value = '');
+
+            setStep(1);
+            showMiniToast('Switched account / Logged out');
+        });
+
+        // 8. Auto-Load Session from localStorage on Page Load (Update 1)
+        async function checkStoredSession() {
+            let savedStr = null;
+            try {
+                savedStr = localStorage.getItem(STORAGE_KEY);
+            } catch (e) {}
+
+            if (!savedStr) return;
+
+            try {
+                const user = JSON.parse(savedStr);
+                if (user && (user.phone || user.email)) {
+                    customerData = user;
+                    // Pre-fill inputs just in case user logs out later
+                    if (user.name) document.getElementById('custName').value = user.name;
+                    if (user.phone) document.getElementById('custPhone').value = user.phone;
+                    if (user.email) document.getElementById('custEmail').value = user.email;
+
+                    // Immediately fetch fresh rank and skip to step 3
+                    const ok = await refreshRankInPlace(false);
+                    if (ok) {
+                        setStep(3);
+                    } else {
+                        // If record doesn't exist anymore on server, clear storage
+                        localStorage.removeItem(STORAGE_KEY);
+                    }
+                }
+            } catch (e) {
+                try { localStorage.removeItem(STORAGE_KEY); } catch (err) {}
+            }
+        }
+
+        // 9. Sliding Pro Tips Carousel (Update 2)
+        async function initProTips() {
+            try {
+                const res = await fetch('/api/store-rewards/pro-tips');
+                const data = await res.json();
+                if (res.ok && data.success && Array.isArray(data.tips) && data.tips.length > 0) {
+                    proTipsList = data.tips;
+                } else {
+                    proTipsList = [
+                        { text: 'Quote your mobile number {phone} at the store counter whenever you shop to climb the ranks!' },
+                        { text: 'Top 3 monthly leaderboard holders unlock exclusive stationery & gift hampers!' },
+                        { text: 'Every in-store purchase gets recorded in real-time on your live leaderboard card!' }
+                    ];
+                }
+            } catch (e) {
+                proTipsList = [
+                    { text: 'Quote your mobile number {phone} at the store counter whenever you shop to climb the ranks!' }
+                ];
+            }
+            renderProTipsCarousel();
+            setupCarouselEvents();
+            startAutoSlide();
+        }
+
+        function getDisplayPhone() {
+            const raw = customerData.phone || '';
+            const digits = raw.replace(/\D/g, '').slice(-10);
+            return digits.length === 10 ? `+91 ${digits}` : '+91 0000000000';
+        }
+
+        function renderProTipsCarousel() {
+            const track = document.getElementById('protipsTrack');
+            const dots = document.getElementById('protipsDots');
+            if (!track || !dots) return;
+
+            const phoneStr = getDisplayPhone();
+
+            if (proTipsList.length === 0) {
+                track.innerHTML = `
+                    <div class="protip-slide" data-index="0">
+                        <i class="ph ph-sparkle"></i>
+                        <div><strong>Pro Tip:</strong> Quote your mobile number <strong>${phoneStr}</strong> at the store counter whenever you shop!</div>
+                    </div>
+                `;
+                dots.innerHTML = '';
+                return;
+            }
+
+            track.innerHTML = proTipsList.map((tip, idx) => {
+                const safeText = escapeHtml(tip.text).replace(/{phone}/g, `<strong>${phoneStr}</strong>`);
+                return `
+                    <div class="protip-slide" data-index="${idx}">
+                        <i class="ph ph-sparkle"></i>
+                        <div><strong>Pro Tip:</strong> ${safeText}</div>
+                    </div>
+                `;
+            }).join('');
+
+            dots.innerHTML = proTipsList.map((_, idx) => `
+                <div class="protip-dot ${idx === currentTipIndex ? 'active' : ''}" data-index="${idx}"></div>
+            `).join('');
+
+            dots.querySelectorAll('.protip-dot').forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const idx = parseInt(dot.getAttribute('data-index'), 10);
+                    goToSlide(idx);
+                    restartAutoSlide();
+                });
+            });
+
+            goToSlide(currentTipIndex);
+        }
+
+        function goToSlide(idx) {
+            if (proTipsList.length === 0) return;
+            currentTipIndex = (idx + proTipsList.length) % proTipsList.length;
+            const track = document.getElementById('protipsTrack');
+            if (track) {
+                track.style.transform = `translateX(-${currentTipIndex * 100}%)`;
+            }
+            const dots = document.querySelectorAll('.protip-dot');
+            dots.forEach((d, i) => {
+                d.classList.toggle('active', i === currentTipIndex);
+            });
+        }
+
+        function nextSlide() {
+            goToSlide(currentTipIndex + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentTipIndex - 1);
+        }
+
+        function startAutoSlide() {
+            clearInterval(tipSlideTimer);
+            if (proTipsList.length > 1) {
+                tipSlideTimer = setInterval(nextSlide, 4000);
+            }
+        }
+
+        function restartAutoSlide() {
+            clearInterval(tipSlideTimer);
+            startAutoSlide();
+        }
+
+        function setupCarouselEvents() {
+            const carousel = document.getElementById('protipsCarousel');
+            if (!carousel) return;
+
+            carousel.addEventListener('mouseenter', () => clearInterval(tipSlideTimer));
+            carousel.addEventListener('mouseleave', () => startAutoSlide());
+
+            carousel.addEventListener('touchstart', (e) => {
+                clearInterval(tipSlideTimer);
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            carousel.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 40) {
+                    if (diff > 0) nextSlide();
+                    else prevSlide();
+                }
+                startAutoSlide();
+            }, { passive: true });
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initProTips();
+            checkStoredSession();
+        });
     </script>
 </body>
 </html>

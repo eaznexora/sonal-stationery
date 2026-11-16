@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sonal Stationary | Admin Dashboard</title>
-    
+
     <!-- Favicons -->
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap"
+        rel="stylesheet">
+
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -32,11 +35,11 @@
             --accent-sage: #9caf9f;
             --accent-sage-dark: #829586;
             --border-color: #e2dfd8;
-            
+
             /* Typography */
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Inter', sans-serif;
-            
+
             /* Layout */
             --sidebar-width: 250px;
         }
@@ -123,11 +126,12 @@
         }
 
         .nav-item.active {
-            background-color: #efeadf; /* Creamy highlight */
+            background-color: #efeadf;
+            /* Creamy highlight */
             color: var(--text-primary);
             border: 1px solid #e1dbcf;
         }
-        
+
         .nav-item .dropdown-icon {
             margin-left: auto;
             font-size: 1rem;
@@ -145,7 +149,7 @@
             transition: grid-template-rows 0.3s ease;
             margin: 0 1rem;
         }
-        
+
         .submenu-container.open {
             grid-template-rows: 1fr;
         }
@@ -208,7 +212,7 @@
             transition: background 0.2s;
             margin: 0 0.5rem;
         }
-        
+
         .logout-btn:hover {
             background-color: #fde8e8;
         }
@@ -240,13 +244,13 @@
             align-items: center;
             gap: 15px;
         }
-        
+
         .header-title h1 {
             font-family: var(--font-body);
             font-size: 1.25rem;
             font-weight: 500;
         }
-        
+
         .header-title h1 span {
             font-weight: 600;
         }
@@ -280,7 +284,7 @@
             width: 280px;
             font-size: 0.9rem;
         }
-        
+
         .search-bar i {
             position: absolute;
             left: 10px;
@@ -321,9 +325,10 @@
         }
 
         .btn-outline:hover {
-            background-color: #eaf1eb; /* very light sage for hover */
+            background-color: #eaf1eb;
+            /* very light sage for hover */
         }
-        
+
         .header-icons {
             display: flex;
             align-items: center;
@@ -332,12 +337,12 @@
             color: var(--text-primary);
             font-size: 1.25rem;
         }
-        
+
         .header-icons i {
             cursor: pointer;
             transition: color 0.2s;
         }
-        
+
         .header-icons i:hover {
             color: var(--accent-sage-dark);
         }
@@ -363,14 +368,14 @@
             border-radius: 10px;
             flex: 1;
             min-width: 140px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
             border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
-        
+
         .card.highlight {
             background-color: #efeadf;
             border-color: #e1dbcf;
@@ -401,7 +406,7 @@
             background-color: var(--bg-white);
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
             border: 1px solid var(--border-color);
         }
 
@@ -411,7 +416,7 @@
             align-items: flex-start;
             margin-bottom: 1rem;
         }
-        
+
         .chart-title-area h3 {
             font-size: 1.1rem;
             display: flex;
@@ -420,7 +425,7 @@
             font-family: var(--font-body);
             font-weight: 600;
         }
-        
+
         .badge-green {
             background-color: #e6f4ea;
             color: #1e8e3e;
@@ -432,7 +437,7 @@
             align-items: center;
             gap: 2px;
         }
-        
+
         .chart-subtitle {
             color: var(--text-secondary);
             font-size: 0.85rem;
@@ -524,7 +529,7 @@
             background-color: var(--bg-white);
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
             border: 1px solid var(--border-color);
         }
 
@@ -547,18 +552,18 @@
             align-items: center;
             font-size: 0.9rem;
         }
-        
+
         .widget-item-val {
             color: var(--accent-sage-dark);
             font-weight: 500;
         }
-        
+
         .customer-stats {
             display: flex;
             flex-direction: column;
             gap: 1.25rem;
         }
-        
+
         .stat-row {
             display: flex;
             justify-content: space-between;
@@ -566,27 +571,27 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.5rem;
         }
-        
+
         .stat-row:last-child {
             border-bottom: none;
             padding-bottom: 0;
         }
-        
+
         .stat-info {
             display: flex;
             flex-direction: column;
         }
-        
+
         .stat-info-title {
             font-size: 0.85rem;
             color: var(--text-primary);
         }
-        
+
         .stat-info-sub {
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
-        
+
         .stat-value {
             font-weight: 600;
             font-size: 0.95rem;
@@ -603,9 +608,11 @@
             .overview-cards {
                 justify-content: flex-start;
             }
+
             .card {
                 flex: 1 1 calc(33.333% - 1rem);
             }
+
             .search-bar input {
                 width: 200px;
             }
@@ -631,12 +638,12 @@
             .header-title h1 {
                 font-size: 1.1rem;
             }
-            
+
             .header-actions .search-bar,
             .header-actions .header-icons {
                 display: none;
             }
-            
+
             .btn {
                 padding: 0.5rem 0.75rem;
                 font-size: 0.85rem;
@@ -645,7 +652,7 @@
             .card {
                 flex: 1 1 calc(50% - 1rem);
             }
-            
+
             .dashboard-body {
                 padding: 1rem;
             }
@@ -655,6 +662,7 @@
             .card {
                 flex: 1 1 100%;
             }
+
             .chart-tabs {
                 flex-wrap: wrap;
             }
@@ -668,7 +676,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             z-index: 99;
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -680,6 +688,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Sidebar Overlay for Mobile -->
@@ -694,6 +703,9 @@
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">
                 <i class="ph ph-squares-four"></i> Dashboard
+            </a>
+            <a href="store-rewards.html" class="nav-item" id="nav-store-rewards">
+                <i class="ph ph-trophy"></i> In-Store Rewards
             </a>
             <a href="categories.html" class="nav-item" id="nav-categories"><i class="ph ph-list-dashes"></i> Categories
             </a>
@@ -748,20 +760,20 @@
                 </button>
                 <h1><span>Sonal Stationary</span> | Admin Dashboard</h1>
             </div>
-            
+
             <div class="header-actions">
                 <div class="search-bar">
                     <i class="ph ph-magnifying-glass"></i>
                     <input type="text" placeholder="Search orders, products, custo.......">
                 </div>
-                
+
                 <a href="add-product.html" class="btn btn-primary">
                     <i class="ph ph-plus"></i> Add Product
                 </a>
                 <a href="orders.html" class="btn btn-outline">
                     View Orders
                 </a>
-                
+
                 <div class="header-icons">
                     <i class="ph ph-magnifying-glass" style="display:none;" id="mobileSearchIcon"></i>
                     <i class="ph ph-user"></i>
@@ -772,7 +784,7 @@
 
         <!-- Dashboard Body -->
         <div class="dashboard-body">
-            
+
             <!-- Overview Cards -->
             <div class="overview-cards">
                 <div class="card highlight">
@@ -796,7 +808,7 @@
 
             <!-- Grid Layout -->
             <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
-                
+
                 <!-- Main Chart Area -->
                 <div class="chart-section">
                     <div class="chart-header" style="display:flex; justify-content:space-between; align-items:center;">
@@ -812,7 +824,7 @@
                         <canvas id="salesTimelineChart"></canvas>
                     </div>
                 </div>
-                
+
                 <!-- Doughnut Chart Area -->
                 <div class="widgets-section">
                     <div class="widget">
@@ -843,12 +855,14 @@
                             </tr>
                         </thead>
                         <tbody id="topProductsBody">
-                            <tr><td colspan="3" style="padding: 1rem; text-align: center;">Loading...</td></tr>
+                            <tr>
+                                <td colspan="3" style="padding: 1rem; text-align: center;">Loading...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            
+
         </div>
     </main>
 
@@ -875,21 +889,21 @@
                 mobileSearchIcon.style.display = 'none';
             }
         }
-        
+
         window.addEventListener('resize', handleResize);
         handleResize(); // Init
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/admin/js/analytics.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const productsToggle = document.getElementById('productsDropdownToggle');
             const productsContainer = document.getElementById('productsSubmenuContainer');
             const currentPath = window.location.pathname;
 
             // Toggle submenu on click
-            if(productsToggle) {
-                productsToggle.addEventListener('click', function(e) {
+            if (productsToggle) {
+                productsToggle.addEventListener('click', function (e) {
                     e.preventDefault();
                     productsToggle.classList.toggle('open');
                     productsContainer.classList.toggle('open');
@@ -898,23 +912,22 @@
 
             // Auto-expand if on related page
             if (currentPath.includes('add-product.html') || currentPath.includes('inventory.html') || currentPath.includes('products.html')) {
-                if(productsToggle && productsContainer) {
+                if (productsToggle && productsContainer) {
                     productsToggle.classList.add('open', 'active');
                     productsContainer.classList.add('open');
                 }
-                
+
                 if (currentPath.includes('add-product.html')) {
                     const addItem = document.getElementById('nav-add-product');
-                    if(addItem) addItem.classList.add('active');
+                    if (addItem) addItem.classList.add('active');
                 } else {
                     const listItem = document.getElementById('nav-product-list');
-                    if(listItem) listItem.classList.add('active');
+                    if (listItem) listItem.classList.add('active');
                 }
             }
         });
     </script>
-<script src="/admin/js/auth-guard.js"></script>
+    <script src="/admin/js/auth-guard.js"></script>
 </body>
+
 </html>
-
-

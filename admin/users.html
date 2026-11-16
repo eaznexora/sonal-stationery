@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sonal Stationary | Admin Users</title>
-    
+
     <!-- Favicons -->
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap"
+        rel="stylesheet">
+
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
@@ -29,11 +32,11 @@
             --accent-sage: #9caf9f;
             --accent-sage-dark: #829586;
             --border-color: #e2dfd8;
-            
+
             /* Typography */
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Inter', sans-serif;
-            
+
             /* Layout */
             --sidebar-width: 250px;
         }
@@ -120,11 +123,12 @@
         }
 
         .nav-item.active {
-            background-color: #efeadf; /* Creamy highlight */
+            background-color: #efeadf;
+            /* Creamy highlight */
             color: var(--text-primary);
             border: 1px solid #e1dbcf;
         }
-        
+
         .nav-item .dropdown-icon {
             margin-left: auto;
             font-size: 1rem;
@@ -142,7 +146,7 @@
             transition: grid-template-rows 0.3s ease;
             margin: 0 1rem;
         }
-        
+
         .submenu-container.open {
             grid-template-rows: 1fr;
         }
@@ -205,7 +209,7 @@
             transition: background 0.2s;
             margin: 0 0.5rem;
         }
-        
+
         .logout-btn:hover {
             background-color: #fde8e8;
         }
@@ -237,7 +241,7 @@
             align-items: center;
             gap: 15px;
         }
-        
+
         .header-title h1 {
             font-family: var(--font-body);
             font-size: 1.25rem;
@@ -246,7 +250,7 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .back-btn {
             background: var(--bg-white);
             border: 1px solid var(--border-color);
@@ -261,7 +265,7 @@
             text-decoration: none;
             font-size: 1.2rem;
         }
-        
+
         .back-btn:hover {
             background: var(--bg-secondary);
         }
@@ -295,7 +299,7 @@
             width: 280px;
             font-size: 0.9rem;
         }
-        
+
         .search-bar i {
             position: absolute;
             left: 10px;
@@ -338,7 +342,7 @@
         .btn-outline:hover {
             background-color: #eaf1eb;
         }
-        
+
         .header-icons {
             display: flex;
             align-items: center;
@@ -347,12 +351,12 @@
             color: var(--text-primary);
             font-size: 1.25rem;
         }
-        
+
         .header-icons i {
             cursor: pointer;
             transition: color 0.2s;
         }
-        
+
         .header-icons i:hover {
             color: var(--accent-sage-dark);
         }
@@ -376,14 +380,14 @@
             background-color: var(--bg-white);
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
             border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
-        
+
         .card-title {
             color: var(--text-primary);
             font-size: 0.9rem;
@@ -396,7 +400,7 @@
             font-weight: 600;
             color: var(--text-primary);
         }
-        
+
         /* Toolbar */
         .toolbar {
             background: var(--bg-white);
@@ -408,7 +412,7 @@
             align-items: flex-end;
             flex-wrap: wrap;
         }
-        
+
         .toolbar-group {
             display: flex;
             flex-direction: column;
@@ -416,14 +420,15 @@
             flex: 1;
             min-width: 200px;
         }
-        
+
         .toolbar-group label {
             font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-primary);
         }
-        
-        .toolbar-input, .toolbar-select {
+
+        .toolbar-input,
+        .toolbar-select {
             padding: 0.6rem 1rem;
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -433,7 +438,7 @@
             background-color: var(--bg-secondary);
             width: 100%;
         }
-        
+
         .toolbar-reset {
             background: none;
             border: none;
@@ -444,7 +449,7 @@
             margin-bottom: 2px;
             transition: color 0.2s;
         }
-        
+
         .toolbar-reset:hover {
             color: var(--text-primary);
         }
@@ -463,7 +468,7 @@
             margin-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-color);
         }
-        
+
         .tab-btn {
             background: none;
             border: none;
@@ -475,15 +480,15 @@
             position: relative;
             font-family: var(--font-body);
         }
-        
+
         .tab-btn:hover {
             color: var(--text-primary);
         }
-        
+
         .tab-btn.active {
             color: var(--text-primary);
         }
-        
+
         .tab-btn.active::after {
             content: '';
             position: absolute;
@@ -517,7 +522,7 @@
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 0.5rem;
         }
-        
+
         .user-card {
             display: grid;
             grid-template-columns: 100px 2fr 2.5fr 2fr 1.5fr 1fr 120px;
@@ -528,12 +533,12 @@
             padding: 1rem;
             transition: box-shadow 0.2s, background-color 0.2s;
         }
-        
+
         .user-card:hover {
             background-color: #fcfbfa;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
-        
+
         .avatar {
             width: 56px;
             height: 56px;
@@ -545,7 +550,7 @@
             font-weight: 500;
             border-radius: 4px;
         }
-        
+
         .avatar img {
             width: 100%;
             height: 100%;
@@ -558,7 +563,9 @@
             color: var(--text-primary);
         }
 
-        .user-email, .user-phone, .user-date {
+        .user-email,
+        .user-phone,
+        .user-date {
             color: var(--text-primary);
             font-size: 0.9rem;
         }
@@ -578,7 +585,7 @@
             justify-content: center;
             transition: transform 0.2s;
         }
-        
+
         .action-btn i {
             background: #1a1a1a;
             color: white;
@@ -586,7 +593,7 @@
             padding: 4px;
             font-size: 1rem;
         }
-        
+
         .action-btn:hover {
             transform: scale(1.1);
         }
@@ -596,6 +603,7 @@
             .overview-cards {
                 grid-template-columns: repeat(2, 1fr);
             }
+
             .search-bar input {
                 width: 200px;
             }
@@ -621,26 +629,26 @@
             .header-title h1 {
                 font-size: 1.1rem;
             }
-            
+
             .header-actions .search-bar,
             .header-actions .header-icons {
                 display: none;
             }
-            
+
             .btn {
                 padding: 0.5rem 0.75rem;
                 font-size: 0.85rem;
             }
-            
+
             .dashboard-body {
                 padding: 1rem;
             }
-            
+
             .toolbar {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .toolbar-reset {
                 align-self: flex-end;
             }
@@ -660,7 +668,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             z-index: 99;
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -672,6 +680,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Sidebar Overlay for Mobile -->
@@ -686,6 +695,9 @@
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">
                 <i class="ph ph-squares-four"></i> Dashboard
+            </a>
+            <a href="store-rewards.html" class="nav-item" id="nav-store-rewards">
+                <i class="ph ph-trophy"></i> In-Store Rewards
             </a>
             <a href="categories.html" class="nav-item" id="nav-categories"><i class="ph ph-list-dashes"></i> Categories
             </a>
@@ -741,20 +753,20 @@
                 <a href="dashboard.html" class="back-btn"><i class="ph ph-caret-left"></i></a>
                 <h1>Users</h1>
             </div>
-            
+
             <div class="header-actions">
                 <div class="search-bar">
                     <i class="ph ph-magnifying-glass"></i>
                     <input type="text" placeholder="Search orders, products, customers...">
                 </div>
-                
+
                 <a href="#" class="btn btn-primary">
                     <i class="ph ph-plus"></i> Add User
                 </a>
                 <a href="#" class="btn btn-outline">
                     Export Users CSV
                 </a>
-                
+
                 <div class="header-icons">
                     <i class="ph ph-magnifying-glass" style="display:none;" id="mobileSearchIcon"></i>
                     <i class="ph ph-user"></i>
@@ -765,7 +777,7 @@
 
         <!-- Dashboard Body -->
         <div class="dashboard-body">
-            
+
             <!-- Overview Cards -->
             <div class="overview-cards">
                 <div class="card">
@@ -785,12 +797,13 @@
                     <div class="card-value">3</div>
                 </div>
             </div>
-            
+
             <!-- Filter & Search Toolbar -->
             <div class="toolbar">
                 <div class="toolbar-group">
                     <label for="searchUser">Search User</label>
-                    <input type="text" id="searchUser" class="toolbar-input" placeholder="Enter Username / email / phone number">
+                    <input type="text" id="searchUser" class="toolbar-input"
+                        placeholder="Enter Username / email / phone number">
                 </div>
                 <div class="toolbar-group">
                     <label for="statusFilter">Status</label>
@@ -822,7 +835,7 @@
                     <button class="tab-btn active" data-tab="all">All Users</button>
                     <button class="tab-btn" data-tab="blocked">Blocked Users</button>
                 </div>
-                
+
                 <!-- Users Table/List -->
                 <div class="users-container">
                     <div class="users-list" id="usersList">
@@ -835,10 +848,14 @@
                             <div>Wallet</div>
                             <div style="text-align: right;">Actions</div>
                         </div>
-                        
+
                         <div id="usersTableBody">
-                            <div id="usersLoader" style="padding: 2rem; text-align: center; color: var(--text-secondary);">Loading users...</div>
-                            <div id="usersEmptyState" class="empty-state" style="display: none; padding: 2rem; text-align: center; color: var(--text-secondary);">No users found matching your criteria.</div>
+                            <div id="usersLoader"
+                                style="padding: 2rem; text-align: center; color: var(--text-secondary);">Loading
+                                users...</div>
+                            <div id="usersEmptyState" class="empty-state"
+                                style="display: none; padding: 2rem; text-align: center; color: var(--text-secondary);">
+                                No users found matching your criteria.</div>
                         </div>
 
                     </div>
@@ -850,14 +867,14 @@
 
     <script src="js/users.js?v=7.0"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const productsToggle = document.getElementById('productsDropdownToggle');
             const productsContainer = document.getElementById('productsSubmenuContainer');
             const currentPath = window.location.pathname;
 
             // Toggle submenu on click
-            if(productsToggle) {
-                productsToggle.addEventListener('click', function(e) {
+            if (productsToggle) {
+                productsToggle.addEventListener('click', function (e) {
                     e.preventDefault();
                     productsToggle.classList.toggle('open');
                     productsContainer.classList.toggle('open');
@@ -866,23 +883,22 @@
 
             // Auto-expand if on related page
             if (currentPath.includes('add-product.html') || currentPath.includes('inventory.html') || currentPath.includes('products.html')) {
-                if(productsToggle && productsContainer) {
+                if (productsToggle && productsContainer) {
                     productsToggle.classList.add('open', 'active');
                     productsContainer.classList.add('open');
                 }
-                
+
                 if (currentPath.includes('add-product.html')) {
                     const addItem = document.getElementById('nav-add-product');
-                    if(addItem) addItem.classList.add('active');
+                    if (addItem) addItem.classList.add('active');
                 } else {
                     const listItem = document.getElementById('nav-product-list');
-                    if(listItem) listItem.classList.add('active');
+                    if (listItem) listItem.classList.add('active');
                 }
             }
         });
     </script>
-<script src="/admin/js/auth-guard.js"></script>
+    <script src="/admin/js/auth-guard.js"></script>
 </body>
+
 </html>
-
-

@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonal Stationery | In-Store Rewards & Leaderboard</title>
+    
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --bg-primary: #fbf9f6;
+            --bg-secondary: #f2eee8;
+            --bg-white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #6e6b66;
+            --accent-sage: #9caf9f;
+            --accent-sage-dark: #829586;
+            --accent-gold: #c59b27;
+            --border-color: #e2dfd8;
+            --danger-color: #d9534f;
+            --success-color: #2e7d32;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header img {
+            height: 36px;
+            width: auto;
+        }
+
+        .sidebar-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            margin: 0 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .nav-item:hover {
+            background-color: var(--border-color);
+        }
+
+        .nav-item.active {
+            background-color: #efeadf;
+            color: var(--text-primary);
+            border: 1px solid #e1dbcf;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .logout-btn:hover {
+            color: var(--danger-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Header */
+        .top-header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            font-family: var(--font-heading);
+            font-size: 1.45rem;
+            color: var(--text-primary);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.15rem;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--text-primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: #1a1a1a;
+        }
+
+        .btn-outline {
+            background-color: var(--bg-white);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #c59b27, #dfb445);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(197, 155, 39, 0.25);
+        }
+
+        .btn-gold:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.82rem;
+            border-radius: 6px;
+        }
+
+        /* Dashboard Body */
+        .dashboard-body {
+            padding: 2rem;
+            flex: 1;
+        }
+
+        /* Overview Stats Cards */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-title {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .card-value {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-subtext {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.4rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            background: var(--bg-primary);
+            outline: none;
+        }
+
+        .search-input:focus {
+            background: var(--bg-white);
+            border-color: var(--accent-sage);
+        }
+
+        .toolbar-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Table Card */
+        .content-box {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        thead th {
+            background-color: var(--bg-primary);
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background-color: #faf8f5;
+        }
+
+        tbody td {
+            padding: 1rem 1.25rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        /* Rank Badges */
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 0.3px;
+        }
+
+        .rank-1 {
+            background: #fff8e1;
+            color: #b78103;
+            border: 1px solid #ffe082;
+            box-shadow: 0 2px 6px rgba(183, 129, 3, 0.15);
+        }
+
+        .rank-2 {
+            background: #eceff1;
+            color: #546e7a;
+            border: 1px solid #cfd8dc;
+        }
+
+        .rank-3 {
+            background: #efebe9;
+            color: #6d4c41;
+            border: 1px solid #d7ccc8;
+        }
+
+        .rank-default {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .visit-pill {
+            display: inline-block;
+            background: var(--bg-primary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(44, 44, 44, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.15);
+            animation: modalIn 0.25s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            background: var(--bg-primary);
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+
+        /* Purchase Modal Highlight */
+        .purchase-customer-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .amount-input-box {
+            position: relative;
+            margin: 1.25rem 0;
+        }
+
+        .amount-input-box span {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .amount-input-box input {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            font-size: 1.7rem;
+            font-weight: 700;
+            font-family: var(--font-body);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            outline: none;
+            color: var(--text-primary);
+        }
+
+        .amount-input-box input:focus {
+            border-color: var(--text-primary);
+        }
+
+        /* Displaced Customers Highlight (Upgrade 2 & 3) */
+        .displaced-section {
+            background: #fff8e7;
+            border: 1px solid #ffe1a0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .displaced-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #8c6100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .displaced-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #eed699;
+            font-size: 0.85rem;
+        }
+
+        .displaced-item:last-child {
+            border-bottom: none;
+        }
+
+        /* QR Standee Flyer Modal */
+        .flyer-preview {
+            border: 2px dashed var(--border-color);
+            border-radius: 14px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            background: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .flyer-logo {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .flyer-sub {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1.25rem;
+        }
+
+        .flyer-qr {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 1.25rem auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            background: #ffffff;
+        }
+
+        .flyer-tagline {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c2c2c;
+            margin-bottom: 4px;
+        }
+
+        .flyer-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        /* Placeholders helper pills */
+        .tag-pill {
+            display: inline-block;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        .tag-pill:hover {
+            background: var(--text-primary);
+            color: #fff;
+        }
+
+        /* Toast feedback */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #2c2c2c;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success { background: #1b5e20; }
+        .toast.error { background: #b71c1c; }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .dashboard-body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div id="sidebarOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99;"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../logo.png" alt="Sonal Stationery Logo">
+            <h2>Sonal<br>Stationery</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ph ph-squares-four"></i> Dashboard
+            </a>
+            <a href="store-rewards.html" class="nav-item active">
+                <i class="ph ph-trophy"></i> In-Store Rewards
+            </a>
+            <a href="categories.html" class="nav-item">
+                <i class="ph ph-list-dashes"></i> Categories
+            </a>
+            <a href="products.html" class="nav-item">
+                <i class="ph ph-package"></i> Products
+            </a>
+            <a href="orders.html" class="nav-item">
+                <i class="ph ph-shopping-cart"></i> Orders
+            </a>
+            <a href="users.html" class="nav-item">
+                <i class="ph ph-users"></i> Users
+            </a>
+            <a href="inventory.html" class="nav-item">
+                <i class="ph ph-archive-box"></i> Inventory
+            </a>
+            <a href="analytics.html" class="nav-item">
+                <i class="ph ph-chart-bar"></i> Analytics
+            </a>
+            <a href="activity.html" class="nav-item">
+                <i class="ph ph-clock-counter-clockwise"></i> Activity
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ph ph-gear"></i> Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/admin/login.html" class="logout-btn" id="logoutBtn">
+                <i class="ph ph-sign-out"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Sticky Header -->
+        <header class="top-header">
+            <div class="header-title">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ph ph-list"></i>
+                </button>
+                <h1>In-Store Loyalty & Leaderboard</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-gold" id="btnOpenQrModal">
+                    <i class="ph ph-qr-code"></i> Print In-Store QR Flyer
+                </button>
+                <button class="btn btn-outline" id="btnOpenTemplatesModal">
+                    <i class="ph ph-whatsapp-logo"></i> WhatsApp Templates
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Body -->
+        <div class="dashboard-body">
+            
+            <!-- Summary Metric Cards -->
+            <div class="overview-cards">
+                <div class="card">
+                    <div class="card-title">Total Loyalty Customers</div>
+                    <div class="card-value" id="statTotalCustomers">0</div>
+                    <div class="card-subtext">Registered in-store shoppers</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Total In-Store Spend</div>
+                    <div class="card-value" id="statTotalRevenue">₹0</div>
+                    <div class="card-subtext">Lifetime counter transactions</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Average Visits</div>
+                    <div class="card-value" id="statAvgVisits">0</div>
+                    <div class="card-subtext">Visits per registered customer</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Top Spender (Rank #1)</div>
+                    <div class="card-value" id="statTopSpender" style="font-size: 1.3rem;">-</div>
+                    <div class="card-subtext" id="statTopSpenderAmt">₹0 lifetime spend</div>
+                </div>
+            </div>
+
+            <!-- Toolbar: Search & Sort Filters -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <div class="search-box">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search customer by name, 10-digit WhatsApp, or email...">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <select id="sortSelect" class="toolbar-select">
+                        <option value="totalSpent_desc">Highest Spender First (Rank #1)</option>
+                        <option value="visits_desc">Most Visits</option>
+                        <option value="recent_purchase">Recently Purchased</option>
+                        <option value="newest">Recently Registered</option>
+                    </select>
+                    <button class="btn btn-outline" id="btnRefresh" title="Refresh Leaderboard">
+                        <i class="ph ph-arrow-counter-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Leaderboard Table Container -->
+            <div class="content-box">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 90px; text-align: center;">Live Rank</th>
+                                <th>Customer Name</th>
+                                <th>WhatsApp Mobile</th>
+                                <th>Email Address</th>
+                                <th style="text-align: right;">Lifetime Spent</th>
+                                <th style="text-align: center;">Visits</th>
+                                <th>Last Purchase</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardTbody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-secondary);">
+                                    <i class="ph ph-spinner ph-spin" style="font-size: 1.5rem; margin-bottom: 6px; display:block;"></i>
+                                    Loading live in-store leaderboard...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 1. Quick Purchase Entry Modal -->
+    <div class="modal-overlay" id="purchaseModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>+ Add In-Store Purchase</h3>
+                <button class="modal-close" data-close="purchaseModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="purchase-customer-card">
+                    <div>
+                        <strong id="purchaseModalCustName" style="font-size: 1.05rem;">Customer Name</strong>
+                        <div id="purchaseModalCustPhone" style="font-size: 0.85rem; color: var(--text-secondary);">+91 0000000000</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="rank-badge rank-1" id="purchaseModalCustRank">Rank #1</span>
+                        <div id="purchaseModalCustSpent" style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">Spent: ₹0</div>
+                    </div>
+                </div>
+
+                <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                    Purchase Amount (₹)
+                </label>
+                <div class="amount-input-box">
+                    <span>₹</span>
+                    <input type="number" id="purchaseAmountInput" placeholder="0" min="1" step="any" autofocus>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                        Optional Notes / Bill No
+                    </label>
+                    <input type="text" id="purchaseNotesInput" class="search-input" style="background:#fff; margin-top: 6px;" placeholder="e.g. Bill #1042 or 3x notebooks">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="purchaseModal">Cancel</button>
+                <button class="btn btn-primary" id="btnSavePurchase">
+                    <i class="ph ph-check"></i> Save Purchase
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. WhatsApp Post-Purchase & Displacement Dispatcher Modal -->
+    <div class="modal-overlay" id="whatsappModal">
+        <div class="modal-card" style="max-width: 580px;">
+            <div class="modal-header">
+                <h3><i class="ph ph-whatsapp-logo" style="color: #25D366;"></i> Send WhatsApp Update</h3>
+                <button class="modal-close" data-close="whatsappModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Rank Change Alert Pill -->
+                <div id="rankShiftAlert" style="background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 10px; padding: 0.9rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-trend-up" style="font-size: 1.5rem; color: #2e7d32;"></i>
+                    <div>
+                        <strong id="rankShiftText" style="color: #1b5e20;">Customer moved up to 1st place!</strong>
+                        <div id="purchaseLoggedText" style="font-size: 0.82rem; color: #388e3c;">Logged ₹1,000 purchase.</div>
+                    </div>
+                </div>
+
+                <!-- Template Selector -->
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display:block; margin-bottom: 6px;">
+                        Select WhatsApp Template
+                    </label>
+                    <select id="waTemplateSelect" class="toolbar-select" style="width: 100%; background:#fff;">
+                        <!-- Options injected dynamically -->
+                    </select>
+                </div>
+
+                <!-- Live Message Preview & Editable Box -->
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                            Message Preview (You can edit before sending)
+                        </label>
+                    </div>
+                    <textarea id="waMessageText" rows="4" style="width: 100%; border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem; font-family: var(--font-body); font-size: 0.92rem; outline: none; line-height: 1.5;"></textarea>
+                </div>
+
+                <!-- Primary Send to WhatsApp Button -->
+                <button class="btn btn-primary" id="btnLaunchWhatsApp" style="width: 100%; background: #25D366; justify-content: center; font-size: 1rem; padding: 0.85rem;">
+                    <i class="ph ph-whatsapp-logo" style="font-size: 1.25rem;"></i> Send to Customer on WhatsApp
+                </button>
+
+                <!-- Upgrade 2 & 3: Displaced Customers Section -->
+                <div class="displaced-section" id="displacedSection" style="display: none;">
+                    <div class="displaced-title">
+                        <i class="ph ph-warning"></i> Leaderboard Alert: Customers Displaced Down by 1 Rank
+                    </div>
+                    <p style="font-size: 0.8rem; color: #8c6100; margin-bottom: 8px;">
+                        The latest purchase shifted these customers down. Nudge them to visit and reclaim their top rank:
+                    </p>
+                    <div id="displacedList">
+                        <!-- Displaced items dynamically added here -->
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="whatsappModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. In-Store QR Standee Flyer Modal -->
+    <div class="modal-overlay" id="qrModal">
+        <div class="modal-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>In-Store QR Code Flyer</h3>
+                <button class="modal-close" data-close="qrModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="flyer-preview" id="flyerPrintArea">
+                    <div class="flyer-logo">SONAL STATIONERY</div>
+                    <div class="flyer-sub">Gifts • Fine Stationery • Toys</div>
+                    <img id="storeQrImg" class="flyer-qr" alt="In-Store QR Code">
+                    <div class="flyer-tagline">Scan to Join Our In-Store Rewards!</div>
+                    <div class="flyer-desc">
+                        Register in 30 seconds to track your purchases, climb our customer leaderboard, and unlock VIP gifts & surprises!
+                    </div>
+                    <div style="font-size: 0.72rem; color: #aaa; margin-top: 1rem;">
+                        https://sonalstationary.in/store-rewards.html
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="qrModal">Close</button>
+                <a id="btnDownloadQr" class="btn btn-outline" download="Sonal-Stationery-Rewards-QR.png">
+                    <i class="ph ph-download-simple"></i> Download QR Image
+                </a>
+                <button class="btn btn-primary" id="btnPrintFlyer">
+                    <i class="ph ph-printer"></i> Print Standee Flyer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Template Manager Modal -->
+    <div class="modal-overlay" id="templatesModal">
+        <div class="modal-card" style="max-width: 620px;">
+            <div class="modal-header">
+                <h3>Manage WhatsApp Message Templates</h3>
+                <button class="modal-close" data-close="templatesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Create / Edit Form -->
+                <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;" id="tplFormHeading">Add New Template</h4>
+                    <input type="hidden" id="tplEditId">
+                    <div style="margin-bottom: 0.75rem;">
+                        <input type="text" id="tplTitleInput" class="search-input" style="background:#fff;" placeholder="Template Title (e.g. Festival Special Offer)">
+                    </div>
+                    <div style="margin-bottom: 0.5rem;">
+                        <textarea id="tplBodyInput" rows="3" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; font-family: var(--font-body); font-size: 0.88rem; outline: none;" placeholder="Message text with placeholders..."></textarea>
+                    </div>
+                    <div style="margin-bottom: 0.75rem;">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;">Click to insert:</span>
+                        <span class="tag-pill" data-insert="{name}">{name}</span>
+                        <span class="tag-pill" data-insert="{amount}">₹{amount}</span>
+                        <span class="tag-pill" data-insert="{total}">₹{total}</span>
+                        <span class="tag-pill" data-insert="{rank}">{rank}</span>
+                        <span class="tag-pill" data-insert="{visits}">{visits}</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-outline btn-sm" id="btnCancelTplEdit" style="display:none;">Cancel</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="btnSaveTemplate">
+                            <i class="ph ph-floppy-disk"></i> Save Template
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Existing Templates List -->
+                <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                    Existing Templates in Database
+                </h4>
+                <div id="templatesListContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Templates rendered dynamically -->
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="templatesModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Purchase History Modal -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="ph ph-receipt"></i> Purchase History</h3>
+                <button class="modal-close" data-close="historyModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 1rem;">
+                    <strong id="historyCustName" style="font-size: 1.1rem;">Customer Name</strong>
+                    <div id="historyCustPhone" style="font-size: 0.85rem; color: var(--text-secondary);">+91 0000000000</div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th style="text-align: right;">Amount (₹)</th>
+                                <th>Notes</th>
+                                <th>Recorded By</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTbody">
+                            <!-- Injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-close="historyModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toastBox">
+        <i class="ph ph-check-circle" id="toastIcon"></i>
+        <span id="toastMsg">Operation successful</span>
+    </div>
+
+    <!-- Client Script -->
+    <script src="js/admin-store-rewards.js?v=1.0"></script>
+    <script src="/admin/js/auth-guard.js"></script>
+</body>
+</html>
+

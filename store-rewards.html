@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sonal Stationery | In-Store Rewards & Leaderboard</title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --bg-primary: #fbf9f6;
+            --bg-secondary: #f2eee8;
+            --bg-white: #ffffff;
+            --text-primary: #2c2c2c;
+            --text-secondary: #6e6b66;
+            --accent-sage: #9caf9f;
+            --accent-sage-dark: #6f8273;
+            --accent-gold: #c59b27;
+            --border-color: #e2dfd8;
+            --danger-color: #d9534f;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --shadow-sm: 0 2px 8px rgba(44, 44, 44, 0.04);
+            --shadow-md: 0 8px 24px rgba(44, 44, 44, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+
+        /* Top Brand Header */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .brand-logo {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: #2c2c2c;
+            color: #fbf9f6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .brand-header h1 {
+            font-family: var(--font-heading);
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-header p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+        }
+
+        /* Card Container */
+        .card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.75rem 1.5rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-sage), #c59b27, var(--accent-sage));
+        }
+
+        /* Progress Steps */
+        .step-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            width: 24px;
+            background: var(--accent-sage);
+        }
+
+        /* Titles */
+        .step-title {
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .step-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            line-height: 1.45;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.15rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.45rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            pointer-events: none;
+        }
+
+        .phone-prefix {
+            position: absolute;
+            left: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            pointer-events: none;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem 0.85rem 2.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-control.phone-input {
+            padding-left: 3.4rem;
+            letter-spacing: 1px;
+        }
+
+        .form-control:focus {
+            background: var(--bg-white);
+            border-color: var(--accent-sage);
+            box-shadow: 0 0 0 3px rgba(156, 175, 159, 0.2);
+        }
+
+        /* Primary Button */
+        .btn-submit {
+            width: 100%;
+            background: #2c2c2c;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 0.95rem;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: #1a1a1a;
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* OTP Screen */
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .otp-box {
+            width: 15%;
+            height: 52px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .otp-box:focus {
+            border-color: var(--accent-sage);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(156, 175, 159, 0.25);
+        }
+
+        .otp-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: var(--accent-sage-dark);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: underline;
+            padding: 0;
+        }
+
+        .resend-btn:disabled {
+            color: #aaa;
+            text-decoration: none;
+            cursor: not-allowed;
+        }
+
+        .edit-info-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* Step 3: Success Card */
+        .success-badge-wrapper {
+            position: relative;
+            text-align: center;
+            margin: 1rem 0 1.5rem 0;
+        }
+
+        .rank-crown {
+            font-size: 2.2rem;
+            color: var(--accent-gold);
+            margin-bottom: -10px;
+        }
+
+        .rank-circle {
+            width: 104px;
+            height: 104px;
+            border-radius: 52px;
+            background: linear-gradient(135deg, #f2eee8, #fbf9f6);
+            border: 3px solid var(--accent-gold);
+            box-shadow: 0 8px 20px rgba(197, 155, 39, 0.25);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .rank-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .rank-number {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 1.25rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-card-val {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .tip-banner {
+            background: #f7f9f7;
+            border: 1px solid #d5dfd6;
+            border-radius: 10px;
+            padding: 0.9rem;
+            font-size: 0.85rem;
+            color: #3b503f;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 1rem;
+        }
+
+        .tip-banner i {
+            font-size: 1.2rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Error / Toast */
+        .alert-error {
+            background: #fff5f5;
+            border: 1px solid #ffd1d1;
+            color: var(--danger-color);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Footer */
+        .footer-note {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 1.5rem;
+            line-height: 1.5;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Brand Header -->
+        <header class="brand-header">
+            <div class="brand-logo">
+                <i class="ph ph-crown"></i>
+            </div>
+            <h1>Sonal Stationery</h1>
+            <p>In-Store Loyalty & Leaderboard</p>
+        </header>
+
+        <!-- Main Card -->
+        <div class="card">
+            
+            <!-- Step Progress Dots -->
+            <div class="step-progress">
+                <div class="step-dot active" id="dot1"></div>
+                <div class="step-dot" id="dot2"></div>
+                <div class="step-dot" id="dot3"></div>
+            </div>
+
+            <!-- Global Error Banner -->
+            <div class="alert-error" id="errorBanner">
+                <i class="ph ph-warning-circle"></i>
+                <span id="errorMessage">Something went wrong</span>
+            </div>
+
+            <!-- STEP 1: Registration Form -->
+            <div id="step1View" class="fade-in">
+                <h2 class="step-title">Join In-Store Rewards</h2>
+                <p class="step-subtitle">Earn points, climb the leaderboard, and unlock VIP surprises every time you shop with us.</p>
+
+                <form id="detailsForm">
+                    <div class="form-group">
+                        <label for="custName">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-user input-icon"></i>
+                            <input type="text" id="custName" class="form-control" placeholder="e.g. Mahender Patel" required autocomplete="name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="custPhone">WhatsApp Number</label>
+                        <div class="input-wrapper">
+                            <span class="phone-prefix">+91</span>
+                            <input type="tel" id="custPhone" class="form-control phone-input" placeholder="98765 43210" maxlength="10" required autocomplete="tel">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="custEmail">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-envelope-simple input-icon"></i>
+                            <input type="email" id="custEmail" class="form-control" placeholder="name@example.com" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnSendOtp">
+                        <span>Get Verification Code</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- STEP 2: Email OTP Verification -->
+            <div id="step2View" class="fade-in" style="display: none;">
+                <h2 class="step-title">Enter Security Code</h2>
+                <p class="step-subtitle">
+                    We sent a 6-digit code to <strong id="sentEmailDisplay">your email</strong>.
+                </p>
+
+                <div class="otp-container">
+                    <input type="tel" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="one-time-code" autofocus>
+                    <input type="tel" maxlength="1" class="otp-box" inputmode="numeric">
+                    <input type="tel" maxlength="1" class="otp-box" inputmode="numeric">
+                    <input type="tel" maxlength="1" class="otp-box" inputmode="numeric">
+                    <input type="tel" maxlength="1" class="otp-box" inputmode="numeric">
+                    <input type="tel" maxlength="1" class="otp-box" inputmode="numeric">
+                </div>
+
+                <div class="otp-meta">
+                    <span>Didn't get code?</span>
+                    <button type="button" class="resend-btn" id="btnResendOtp" disabled>
+                        Resend Code in <span id="cooldownSeconds">45</span>s
+                    </button>
+                </div>
+
+                <button type="button" class="btn-submit" id="btnVerifyOtp">
+                    <span>Verify & Claim Rank</span>
+                    <i class="ph ph-check-circle"></i>
+                </button>
+
+                <div style="text-align: center;">
+                    <button type="button" class="edit-info-btn" id="btnBackToStep1">
+                        <i class="ph ph-arrow-left"></i> Change email or phone
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Success Confirmation & Live Rank Badge -->
+            <div id="step3View" class="fade-in" style="display: none;">
+                
+                <div class="success-badge-wrapper">
+                    <div class="rank-crown">
+                        <i class="ph ph-crown"></i>
+                    </div>
+                    <div class="rank-circle">
+                        <span class="rank-label">Live Rank</span>
+                        <span class="rank-number" id="confirmedRank">#1</span>
+                    </div>
+                </div>
+
+                <h2 class="step-title" id="welcomeHeading">Welcome, Customer!</h2>
+                <p class="step-subtitle" id="welcomeSubtext">You're officially on the Sonal Stationery Leaderboard.</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-label">Lifetime Spend</div>
+                        <div class="stat-card-val" id="confirmedSpent">₹0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-label">Total Visits</div>
+                        <div class="stat-card-val" id="confirmedVisits">0</div>
+                    </div>
+                </div>
+
+                <div class="tip-banner">
+                    <i class="ph ph-sparkle"></i>
+                    <div>
+                        <strong>Pro Tip:</strong> Quote your mobile number <strong id="registeredPhoneDisplay">+91 0000000000</strong> at the store counter whenever you shop to climb the ranks!
+                    </div>
+                </div>
+
+                <button type="button" class="btn-submit" style="margin-top: 1.25rem;" onclick="window.location.reload();">
+                    <i class="ph ph-arrow-counter-clockwise"></i>
+                    <span>Check Again / Refresh</span>
+                </button>
+            </div>
+
+        </div>
+
+        <p class="footer-note">
+            Shop No. 12-14, Sonal Arcade, Varachha Road, Surat<br>
+            © Sonal Stationery • Thoughtful Gifts & Fine Stationery
+        </p>
+
+    </div>
+
+    <script>
+        // State variables
+        let customerData = {
+            name: '',
+            phone: '',
+            email: ''
+        };
+        let resendTimer = null;
+        let cooldownSec = 45;
+
+        // DOM elements
+        const step1View = document.getElementById('step1View');
+        const step2View = document.getElementById('step2View');
+        const step3View = document.getElementById('step3View');
+        const dot1 = document.getElementById('dot1');
+        const dot2 = document.getElementById('dot2');
+        const dot3 = document.getElementById('dot3');
+        const errorBanner = document.getElementById('errorBanner');
+        const errorMessage = document.getElementById('errorMessage');
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorBanner.style.display = 'flex';
+        }
+
+        function clearError() {
+            errorBanner.style.display = 'none';
+        }
+
+        function setStep(step) {
+            clearError();
+            step1View.style.display = step === 1 ? 'block' : 'none';
+            step2View.style.display = step === 2 ? 'block' : 'none';
+            step3View.style.display = step === 3 ? 'block' : 'none';
+
+            dot1.className = 'step-dot' + (step >= 1 ? (step === 1 ? ' active' : '') : '');
+            dot2.className = 'step-dot' + (step === 2 ? ' active' : '');
+            dot3.className = 'step-dot' + (step === 3 ? ' active' : '');
+        }
+
+        // Clean phone input
+        const phoneInput = document.getElementById('custPhone');
+        phoneInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+        });
+
+        // 1. Details Form Submission
+        document.getElementById('detailsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearError();
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const email = document.getElementById('custEmail').value.trim();
+
+            if (!name || phone.length !== 10 || !email) {
+                showError('Please fill out all fields with a valid 10-digit mobile number.');
+                return;
+            }
+
+            customerData = { name, phone, email };
+
+            const btn = document.getElementById('btnSendOtp');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Sending Code...';
+
+            try {
+                const res = await fetch('/api/store-rewards/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(customerData)
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    showError(data.message || 'Could not send verification code.');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    return;
+                }
+
+                document.getElementById('sentEmailDisplay').textContent = email;
+                setStep(2);
+                startCooldown(45);
+                setupOtpBoxes();
+            } catch (err) {
+                showError('Network error. Please check your connection and try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+
+        // 2. OTP Box Handling
+        function setupOtpBoxes() {
+            const boxes = document.querySelectorAll('.otp-box');
+            boxes.forEach((box, i) => {
+                box.value = '';
+                box.addEventListener('input', (e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    e.target.value = val;
+                    if (val && i < boxes.length - 1) {
+                        boxes[i + 1].focus();
+                    }
+                    checkAutoSubmit();
+                });
+
+                box.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && i > 0) {
+                        boxes[i - 1].focus();
+                    }
+                });
+
+                box.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+                    for (let j = 0; j < text.length; j++) {
+                        if (boxes[j]) boxes[j].value = text[j];
+                    }
+                    if (text.length >= 6) {
+                        boxes[5].focus();
+                        checkAutoSubmit();
+                    }
+                });
+            });
+            boxes[0].focus();
+        }
+
+        function getEnteredOtp() {
+            const boxes = document.querySelectorAll('.otp-box');
+            let otp = '';
+            boxes.forEach(b => otp += b.value);
+            return otp;
+        }
+
+        function checkAutoSubmit() {
+            if (getEnteredOtp().length === 6) {
+                verifyOtp();
+            }
+        }
+
+        // 3. Verify OTP
+        async function verifyOtp() {
+            clearError();
+            const otp = getEnteredOtp();
+            if (otp.length !== 6) {
+                showError('Please enter all 6 digits of the code.');
+                return;
+            }
+
+            const btn = document.getElementById('btnVerifyOtp');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Verifying...';
+
+            try {
+                const res = await fetch('/api/store-rewards/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: customerData.email, otp })
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    showError(data.message || 'Invalid or expired code.');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    return;
+                }
+
+                // Render Step 3
+                renderSuccess(data);
+                setStep(3);
+            } catch (err) {
+                showError('Network error during verification. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        document.getElementById('btnVerifyOtp').addEventListener('click', verifyOtp);
+
+        // 4. Resend Timer
+        function startCooldown(sec) {
+            cooldownSec = sec;
+            const resendBtn = document.getElementById('btnResendOtp');
+            const cooldownEl = document.getElementById('cooldownSeconds');
+            resendBtn.disabled = true;
+
+            clearInterval(resendTimer);
+            resendTimer = setInterval(() => {
+                cooldownSec--;
+                if (cooldownSec <= 0) {
+                    clearInterval(resendTimer);
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Resend Code';
+                } else {
+                    resendBtn.innerHTML = `Resend Code in <span id="cooldownSeconds">${cooldownSec}</span>s`;
+                }
+            }, 1000);
+        }
+
+        document.getElementById('btnResendOtp').addEventListener('click', async () => {
+            clearError();
+            try {
+                const res = await fetch('/api/store-rewards/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(customerData)
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    showError(data.message || 'Could not resend code.');
+                    return;
+                }
+                startCooldown(45);
+            } catch (e) {
+                showError('Failed to resend code.');
+            }
+        });
+
+        document.getElementById('btnBackToStep1').addEventListener('click', () => {
+            setStep(1);
+        });
+
+        // 5. Render Confirmation Screen
+        function renderSuccess(data) {
+            const customer = data.customer;
+            document.getElementById('confirmedRank').textContent = data.rankOrdinal || `#${data.rank}`;
+            document.getElementById('confirmedSpent').textContent = `₹${Number(customer.totalSpent || 0).toLocaleString('en-IN')}`;
+            document.getElementById('confirmedVisits').textContent = customer.visitCount || 0;
+            document.getElementById('registeredPhoneDisplay').textContent = `+91 ${customer.phone}`;
+
+            if (data.isNew) {
+                document.getElementById('welcomeHeading').textContent = `Welcome, ${customer.name}!`;
+                document.getElementById('welcomeSubtext').textContent = `You're officially on the Sonal Stationery Leaderboard at rank ${data.rankOrdinal || ('#' + data.rank)}.`;
+            } else {
+                document.getElementById('welcomeHeading').textContent = `Welcome Back, ${customer.name}!`;
+                document.getElementById('welcomeSubtext').textContent = `You currently hold the ${data.rankOrdinal || ('#' + data.rank)} rank on our leaderboard.`;
+            }
+        }
+    </script>
+</body>
+</html>
+

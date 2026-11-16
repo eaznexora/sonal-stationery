@@ -42,11 +42,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             'users': ['/admin/users.html'],
             'inventory': ['/admin/inventory.html'],
             'analytics': ['/admin/analytics.html'],
-            'settings': ['/admin/settings.html']
+            'settings': ['/admin/settings.html'],
+            'store-rewards': ['/admin/store-rewards.html']
         };
 
         const sidebarMap = {
             'dashboard': 'a[href="dashboard.html"]',
+            'store-rewards': 'a[href="store-rewards.html"]',
             'categories': 'a[href="categories.html"]',
             'orders': 'a[href="orders.html"]',
             'users': 'a[href="users.html"]',

@@ -2,6 +2,7 @@ const StoreCustomer = require('../models/StoreCustomer');
 const StoreCustomerOtp = require('../models/StoreCustomerOtp');
 const StoreProTip = require('../models/StoreProTip');
 const { Resend } = require('resend');
+const { OAuth2Client } = require('google-auth-library');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -302,5 +303,139 @@ exports.getPublicProTips = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to fetch pro tips.' });
   }
 };
+
+/**
+ * Public Google Client ID Config
+ * GET /api/store-rewards/google-config
+ */
+exports.getGoogleConfig = async (req, res) => {
+  try {
+    const clientId = process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_OAUTH_CLIENT_ID || '';
+    return res.json({
+      success: true,
+      clientId
+    });
+  } catch (error) {
+    console.error('[Google Config Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to retrieve configuration.' });
+  }
+};
+
+/**
+ * Google Sign-In & Customer Registration with Mandatory 10-Digit Mobile Number
+ * POST /api/store-rewards/google-auth
+ */
+exports.googleAuth = async (req, res) => {
+  try {
+    const { credential, phone } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ success: false, message: 'Google credential is required.' });
+    }
+
+    if (!phone || !String(phone).trim()) {
+      return res.status(400).json({ success: false, message: 'WhatsApp mobile number is required.' });
+    }
+
+    const cleanPhone = cleanPhoneNumber(phone);
+    if (cleanPhone.length !== 10) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid 10-digit mobile number.' });
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_OAUTH_CLIENT_ID;
+    if (!clientId) {
+      return res.status(500).json({ success: false, message: 'Google authentication is not configured on the server.' });
+    }
+
+    const googleClient = new OAuth2Client(clientId);
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: clientId
+      });
+      payload = ticket.getPayload();
+    } catch (verifyError) {
+      console.error('[Google Verify Token Error]', verifyError.message || verifyError);
+      return res.status(401).json({ success: false, message: 'Google authentication token verification failed. Please try again.' });
+    }
+
+    if (!payload || !payload.email) {
+      return res.status(400).json({ success: false, message: 'Unable to extract email from Google account.' });
+    }
+
+    const cleanEmail = payload.email.toLowerCase().trim();
+    const cleanName = (payload.name || payload.given_name || 'Valued Customer').trim();
+
+    // Prevent duplicate profiles across either phone OR email
+    let customer = await StoreCustomer.findOne({
+      $or: [{ email: cleanEmail }, { phone: cleanPhone }]
+    });
+
+    let isNew = false;
+
+    if (customer) {
+      // Returning customer: keep existing spend/visits/joinedAt, update name/phone/email
+      if (cleanName && (!customer.name || customer.name === 'Valued Customer')) {
+        customer.name = cleanName;
+      }
+      if (cleanPhone && customer.phone !== cleanPhone) {
+        const phoneOwner = await StoreCustomer.findOne({ phone: cleanPhone });
+        if (!phoneOwner || phoneOwner._id.equals(customer._id)) {
+          customer.phone = cleanPhone;
+        }
+      }
+      if (cleanEmail && customer.email !== cleanEmail) {
+        const emailOwner = await StoreCustomer.findOne({ email: cleanEmail });
+        if (!emailOwner || emailOwner._id.equals(customer._id)) {
+          customer.email = cleanEmail;
+        }
+      }
+      await customer.save();
+    } else {
+      // New customer: create fresh record
+      customer = new StoreCustomer({
+        name: cleanName,
+        phone: cleanPhone,
+        email: cleanEmail,
+        totalSpent: 0,
+        visitCount: 0,
+        joinedAt: new Date()
+      });
+      await customer.save();
+      isNew = true;
+    }
+
+    // Compute live rank
+    const liveRank = await calculateCustomerRank(customer);
+    const rankOrdinal = formatOrdinal(liveRank);
+    const totalCustomers = await StoreCustomer.countDocuments();
+
+    return res.json({
+      success: true,
+      isNew,
+      rank: liveRank,
+      rankOrdinal,
+      totalCustomers,
+      customer: {
+        id: customer._id,
+        name: customer.name,
+        phone: customer.phone,
+        email: customer.email,
+        totalSpent: customer.totalSpent,
+        visitCount: customer.visitCount,
+        lastPurchaseDate: customer.lastPurchaseDate,
+        joinedAt: customer.joinedAt
+      },
+      message: isNew
+        ? `Welcome to Sonal Stationery Rewards, ${customer.name}!`
+        : `Welcome back, ${customer.name}! You hold rank #${liveRank}.`
+    });
+  } catch (error) {
+    console.error('[Google Auth Error]', error);
+    return res.status(500).json({ success: false, message: 'Authentication failed. Please try again.' });
+  }
+};
+
 
 

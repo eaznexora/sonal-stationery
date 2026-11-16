@@ -40,6 +40,7 @@ app.use('/api/auth/customer', require('./routes/customerAuthRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/store-rewards', require('./routes/storeRewardsRoutes'));
 app.use('/api/admin/store-rewards', require('./routes/adminStoreRewardsRoutes'));
+app.use('/api/gst', require('./routes/gstRoutes'));
 
 // Admin static route protection
 app.use('/admin', (req, res, next) => {

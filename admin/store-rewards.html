@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sonal Stationery | In-Store Rewards & Leaderboard</title>
-    
+
     <!-- Favicons -->
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap"
+        rel="stylesheet">
+
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
@@ -263,7 +266,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 1.25rem 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
             position: relative;
             overflow: hidden;
         }
@@ -359,7 +362,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
 
         .table-responsive {
@@ -482,13 +485,20 @@
             max-width: 520px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 12px 36px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
             animation: modalIn 0.25s ease;
         }
 
         @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.96); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .modal-header {
@@ -683,7 +693,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
             z-index: 2000;
             opacity: 0;
             transform: translateY(10px);
@@ -696,32 +706,43 @@
             transform: translateY(0);
         }
 
-        .toast.success { background: #1b5e20; }
-        .toast.error { background: #b71c1c; }
+        .toast.success {
+            background: #1b5e20;
+        }
+
+        .toast.error {
+            background: #b71c1c;
+        }
 
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
             }
+
             .sidebar.open {
                 transform: translateX(0);
             }
+
             .main-content {
                 margin-left: 0;
             }
+
             .menu-toggle {
                 display: block;
             }
+
             .dashboard-body {
                 padding: 1rem;
             }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Sidebar Overlay for Mobile -->
-    <div id="sidebarOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99;"></div>
+    <div id="sidebarOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99;">
+    </div>
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
@@ -779,13 +800,13 @@
                 <h1>In-Store Loyalty & Leaderboard</h1>
             </div>
             <div class="header-actions">
-                <button class="btn btn-gold" id="btnOpenQrModal">
+                <button type="button" class="btn btn-gold" id="btnOpenQrModal">
                     <i class="ph ph-qr-code"></i> Print In-Store QR Flyer
                 </button>
-                <button class="btn btn-outline" id="btnOpenProTipsModal">
+                <button type="button" class="btn btn-outline" id="btnOpenProTipsModal">
                     <i class="ph ph-sparkle"></i> Manage Pro Tips
                 </button>
-                <button class="btn btn-outline" id="btnOpenTemplatesModal">
+                <button type="button" class="btn btn-outline" id="btnOpenTemplatesModal">
                     <i class="ph ph-whatsapp-logo"></i> WhatsApp Templates
                 </button>
             </div>
@@ -793,7 +814,7 @@
 
         <!-- Dashboard Body -->
         <div class="dashboard-body">
-            
+
             <!-- Summary Metric Cards -->
             <div class="overview-cards">
                 <div class="card">
@@ -823,7 +844,8 @@
                 <div class="toolbar-left">
                     <div class="search-box">
                         <i class="ph ph-magnifying-glass"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Search customer by name, 10-digit WhatsApp, or email...">
+                        <input type="text" id="searchInput" class="search-input"
+                            placeholder="Search customer by name, 10-digit WhatsApp, or email...">
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px;">
@@ -857,8 +879,10 @@
                         </thead>
                         <tbody id="leaderboardTbody">
                             <tr>
-                                <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-secondary);">
-                                    <i class="ph ph-spinner ph-spin" style="font-size: 1.5rem; margin-bottom: 6px; display:block;"></i>
+                                <td colspan="8"
+                                    style="text-align: center; padding: 2.5rem; color: var(--text-secondary);">
+                                    <i class="ph ph-spinner ph-spin"
+                                        style="font-size: 1.5rem; margin-bottom: 6px; display:block;"></i>
                                     Loading live in-store leaderboard...
                                 </td>
                             </tr>
@@ -881,15 +905,18 @@
                 <div class="purchase-customer-card">
                     <div>
                         <strong id="purchaseModalCustName" style="font-size: 1.05rem;">Customer Name</strong>
-                        <div id="purchaseModalCustPhone" style="font-size: 0.85rem; color: var(--text-secondary);">+91 0000000000</div>
+                        <div id="purchaseModalCustPhone" style="font-size: 0.85rem; color: var(--text-secondary);">+91
+                            0000000000</div>
                     </div>
                     <div style="text-align: right;">
                         <span class="rank-badge rank-1" id="purchaseModalCustRank">Rank #1</span>
-                        <div id="purchaseModalCustSpent" style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">Spent: ₹0</div>
+                        <div id="purchaseModalCustSpent"
+                            style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">Spent: ₹0</div>
                     </div>
                 </div>
 
-                <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                <label
+                    style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
                     Purchase Amount (₹)
                 </label>
                 <div class="amount-input-box">
@@ -898,10 +925,12 @@
                 </div>
 
                 <div style="margin-top: 1rem;">
-                    <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                    <label
+                        style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
                         Optional Notes / Bill No
                     </label>
-                    <input type="text" id="purchaseNotesInput" class="search-input" style="background:#fff; margin-top: 6px;" placeholder="e.g. Bill #1042 or 3x notebooks">
+                    <input type="text" id="purchaseNotesInput" class="search-input"
+                        style="background:#fff; margin-top: 6px;" placeholder="e.g. Bill #1042 or 3x notebooks">
                 </div>
             </div>
             <div class="modal-footer">
@@ -921,19 +950,22 @@
                 <button class="modal-close" data-close="whatsappModal">&times;</button>
             </div>
             <div class="modal-body">
-                
+
                 <!-- Rank Change Alert Pill -->
-                <div id="rankShiftAlert" style="background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 10px; padding: 0.9rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px;">
+                <div id="rankShiftAlert"
+                    style="background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 10px; padding: 0.9rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px;">
                     <i class="ph ph-trend-up" style="font-size: 1.5rem; color: #2e7d32;"></i>
                     <div>
                         <strong id="rankShiftText" style="color: #1b5e20;">Customer moved up to 1st place!</strong>
-                        <div id="purchaseLoggedText" style="font-size: 0.82rem; color: #388e3c;">Logged ₹1,000 purchase.</div>
+                        <div id="purchaseLoggedText" style="font-size: 0.82rem; color: #388e3c;">Logged ₹1,000 purchase.
+                        </div>
                     </div>
                 </div>
 
                 <!-- Template Selector -->
                 <div style="margin-bottom: 1rem;">
-                    <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display:block; margin-bottom: 6px;">
+                    <label
+                        style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display:block; margin-bottom: 6px;">
                         Select WhatsApp Template
                     </label>
                     <select id="waTemplateSelect" class="toolbar-select" style="width: 100%; background:#fff;">
@@ -943,16 +975,20 @@
 
                 <!-- Live Message Preview & Editable Box -->
                 <div style="margin-bottom: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label
+                            style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
                             Message Preview (You can edit before sending)
                         </label>
                     </div>
-                    <textarea id="waMessageText" rows="4" style="width: 100%; border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem; font-family: var(--font-body); font-size: 0.92rem; outline: none; line-height: 1.5;"></textarea>
+                    <textarea id="waMessageText" rows="4"
+                        style="width: 100%; border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem; font-family: var(--font-body); font-size: 0.92rem; outline: none; line-height: 1.5;"></textarea>
                 </div>
 
                 <!-- Primary Send to WhatsApp Button -->
-                <button class="btn btn-primary" id="btnLaunchWhatsApp" style="width: 100%; background: #25D366; justify-content: center; font-size: 1rem; padding: 0.85rem;">
+                <button class="btn btn-primary" id="btnLaunchWhatsApp"
+                    style="width: 100%; background: #25D366; justify-content: center; font-size: 1rem; padding: 0.85rem;">
                     <i class="ph ph-whatsapp-logo" style="font-size: 1.25rem;"></i> Send to Customer on WhatsApp
                 </button>
 
@@ -962,7 +998,8 @@
                         <i class="ph ph-warning"></i> Leaderboard Alert: Customers Displaced Down by 1 Rank
                     </div>
                     <p style="font-size: 0.8rem; color: #8c6100; margin-bottom: 8px;">
-                        The latest purchase shifted these customers down. Nudge them to visit and reclaim their top rank:
+                        The latest purchase shifted these customers down. Nudge them to visit and reclaim their top
+                        rank:
                     </p>
                     <div id="displacedList">
                         <!-- Displaced items dynamically added here -->
@@ -990,7 +1027,8 @@
                     <img id="storeQrImg" class="flyer-qr" alt="In-Store QR Code">
                     <div class="flyer-tagline">Scan to Join Our In-Store Rewards!</div>
                     <div class="flyer-desc">
-                        Register in 30 seconds to track your purchases, climb our customer leaderboard, and unlock VIP gifts & surprises!
+                        Register in 30 seconds to track your purchases, climb our customer leaderboard, and unlock VIP
+                        gifts & surprises!
                     </div>
                     <div style="font-size: 0.72rem; color: #aaa; margin-top: 1rem;">
                         https://sonalstationary.in/store-rewards.html
@@ -1017,19 +1055,24 @@
                 <button class="modal-close" data-close="templatesModal">&times;</button>
             </div>
             <div class="modal-body">
-                
+
                 <!-- Create / Edit Form -->
-                <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;">
+                <div
+                    style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;">
                     <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;" id="tplFormHeading">Add New Template</h4>
                     <input type="hidden" id="tplEditId">
                     <div style="margin-bottom: 0.75rem;">
-                        <input type="text" id="tplTitleInput" class="search-input" style="background:#fff;" placeholder="Template Title (e.g. Festival Special Offer)">
+                        <input type="text" id="tplTitleInput" class="search-input" style="background:#fff;"
+                            placeholder="Template Title (e.g. Festival Special Offer)">
                     </div>
                     <div style="margin-bottom: 0.5rem;">
-                        <textarea id="tplBodyInput" rows="3" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; font-family: var(--font-body); font-size: 0.88rem; outline: none;" placeholder="Message text with placeholders..."></textarea>
+                        <textarea id="tplBodyInput" rows="3"
+                            style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; font-family: var(--font-body); font-size: 0.88rem; outline: none;"
+                            placeholder="Message text with placeholders..."></textarea>
                     </div>
                     <div style="margin-bottom: 0.75rem;">
-                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;">Click to insert:</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;">Click to
+                            insert:</span>
                         <span class="tag-pill" data-insert="{name}">{name}</span>
                         <span class="tag-pill" data-insert="{amount}">₹{amount}</span>
                         <span class="tag-pill" data-insert="{total}">₹{total}</span>
@@ -1037,7 +1080,8 @@
                         <span class="tag-pill" data-insert="{visits}">{visits}</span>
                     </div>
                     <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                        <button type="button" class="btn btn-outline btn-sm" id="btnCancelTplEdit" style="display:none;">Cancel</button>
+                        <button type="button" class="btn btn-outline btn-sm" id="btnCancelTplEdit"
+                            style="display:none;">Cancel</button>
                         <button type="button" class="btn btn-primary btn-sm" id="btnSaveTemplate">
                             <i class="ph ph-floppy-disk"></i> Save Template
                         </button>
@@ -1045,7 +1089,8 @@
                 </div>
 
                 <!-- Existing Templates List -->
-                <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                <h4
+                    style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.75rem;">
                     Existing Templates in Database
                 </h4>
                 <div id="templatesListContainer" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1064,34 +1109,44 @@
         <div class="modal-card" style="max-width: 620px;">
             <div class="modal-header">
                 <h3><i class="ph ph-sparkle" style="color: var(--accent-sage-dark);"></i> Manage In-Store Pro Tips</h3>
-                <button class="modal-close" data-close="proTipsModal">&times;</button>
+                <button type="button" class="modal-close" data-close="proTipsModal">&times;</button>
             </div>
             <div class="modal-body">
-                
+
                 <!-- Add / Edit Pro Tip Form -->
-                <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;">
+                <div
+                    style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;">
                     <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;" id="tipFormHeading">Add New Pro Tip</h4>
                     <input type="hidden" id="tipEditId">
                     <div style="margin-bottom: 0.5rem;">
-                        <textarea id="tipTextInput" rows="3" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; font-family: var(--font-body); font-size: 0.88rem; outline: none; line-height: 1.4;" placeholder="Tip text... Use {phone} to insert customer's mobile number"></textarea>
+                        <textarea id="tipTextInput" rows="3"
+                            style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; font-family: var(--font-body); font-size: 0.88rem; outline: none; line-height: 1.4;"
+                            placeholder="Tip text... Use {phone} to insert customer's mobile number"></textarea>
                     </div>
                     <div style="margin-bottom: 0.75rem;">
-                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;">Click to insert:</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;">Click to
+                            insert:</span>
                         <span class="tag-pill" id="btnInsertPhone" data-insert-tip="{phone}">{phone}</span>
                     </div>
-                    <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <div
+                        style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
                         <div style="display: flex; gap: 12px; align-items: center;">
-                            <label style="font-size: 0.82rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                            <label
+                                style="font-size: 0.82rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
                                 Order:
-                                <input type="number" id="tipOrderInput" value="1" min="0" style="width: 60px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem;">
+                                <input type="number" id="tipOrderInput" value="1" min="0"
+                                    style="width: 60px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem;">
                             </label>
-                            <label style="font-size: 0.82rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" id="tipActiveInput" checked style="accent-color: var(--accent-sage-dark);">
+                            <label
+                                style="font-size: 0.82rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                <input type="checkbox" id="tipActiveInput" checked
+                                    style="accent-color: var(--accent-sage-dark);">
                                 Active in Carousel
                             </label>
                         </div>
                         <div style="display: flex; gap: 8px;">
-                            <button type="button" class="btn btn-outline btn-sm" id="btnCancelTipEdit" style="display:none;">Cancel</button>
+                            <button type="button" class="btn btn-outline btn-sm" id="btnCancelTipEdit"
+                                style="display:none;">Cancel</button>
                             <button type="button" class="btn btn-primary btn-sm" id="btnSaveTip">
                                 <i class="ph ph-floppy-disk"></i> Save Tip
                             </button>
@@ -1100,7 +1155,8 @@
                 </div>
 
                 <!-- Existing Pro Tips List -->
-                <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                <h4
+                    style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.75rem;">
                     In-Store Carousel Pro Tips
                 </h4>
                 <div id="proTipsListContainer" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1109,7 +1165,7 @@
 
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" data-close="proTipsModal">Close</button>
+                <button type="button" class="btn btn-outline" data-close="proTipsModal">Close</button>
             </div>
         </div>
     </div>
@@ -1124,7 +1180,8 @@
             <div class="modal-body">
                 <div style="margin-bottom: 1rem;">
                     <strong id="historyCustName" style="font-size: 1.1rem;">Customer Name</strong>
-                    <div id="historyCustPhone" style="font-size: 0.85rem; color: var(--text-secondary);">+91 0000000000</div>
+                    <div id="historyCustPhone" style="font-size: 0.85rem; color: var(--text-secondary);">+91 0000000000
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -1155,8 +1212,8 @@
     </div>
 
     <!-- Client Script -->
-    <script src="js/admin-store-rewards.js?v=1.0"></script>
+    <script src="js/admin-store-rewards.js?v=2.0"></script>
     <script src="/admin/js/auth-guard.js"></script>
 </body>
-</html>
 
+</html>

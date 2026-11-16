@@ -17,97 +17,88 @@
     let currentSort = 'totalSpent_desc';
     let searchQuery = '';
 
-    // Elements
-    const elements = {
-        // Stats
-        statTotalCustomers: document.getElementById('statTotalCustomers'),
-        statTotalRevenue: document.getElementById('statTotalRevenue'),
-        statAvgVisits: document.getElementById('statAvgVisits'),
-        statTopSpender: document.getElementById('statTopSpender'),
-        statTopSpenderAmt: document.getElementById('statTopSpenderAmt'),
+    // Elements Cache
+    const elements = {};
 
-        // Toolbar
-        searchInput: document.getElementById('searchInput'),
-        sortSelect: document.getElementById('sortSelect'),
-        btnRefresh: document.getElementById('btnRefresh'),
+    function refreshElementReferences() {
+        elements.statTotalCustomers = document.getElementById('statTotalCustomers');
+        elements.statTotalRevenue = document.getElementById('statTotalRevenue');
+        elements.statAvgVisits = document.getElementById('statAvgVisits');
+        elements.statTopSpender = document.getElementById('statTopSpender');
+        elements.statTopSpenderAmt = document.getElementById('statTopSpenderAmt');
 
-        // Table
-        leaderboardTbody: document.getElementById('leaderboardTbody'),
+        elements.searchInput = document.getElementById('searchInput');
+        elements.sortSelect = document.getElementById('sortSelect');
+        elements.btnRefresh = document.getElementById('btnRefresh');
+        elements.leaderboardTbody = document.getElementById('leaderboardTbody');
 
-        // Modals
-        purchaseModal: document.getElementById('purchaseModal'),
-        whatsappModal: document.getElementById('whatsappModal'),
-        qrModal: document.getElementById('qrModal'),
-        templatesModal: document.getElementById('templatesModal'),
-        historyModal: document.getElementById('historyModal'),
+        elements.purchaseModal = document.getElementById('purchaseModal');
+        elements.whatsappModal = document.getElementById('whatsappModal');
+        elements.qrModal = document.getElementById('qrModal');
+        elements.templatesModal = document.getElementById('templatesModal');
+        elements.proTipsModal = document.getElementById('proTipsModal');
+        elements.historyModal = document.getElementById('historyModal');
 
-        // Purchase Modal Elements
-        purchaseCustomerName: document.getElementById('purchaseModalCustName'),
-        purchaseCustomerPhone: document.getElementById('purchaseModalCustPhone'),
-        purchaseCustomerRank: document.getElementById('purchaseModalCustRank'),
-        purchaseCustomerSpent: document.getElementById('purchaseModalCustSpent'),
-        purchaseAmountInput: document.getElementById('purchaseAmountInput'),
-        purchaseNotesInput: document.getElementById('purchaseNotesInput'),
-        btnSavePurchase: document.getElementById('btnSavePurchase'),
+        elements.purchaseCustomerName = document.getElementById('purchaseModalCustName');
+        elements.purchaseCustomerPhone = document.getElementById('purchaseModalCustPhone');
+        elements.purchaseCustomerRank = document.getElementById('purchaseModalCustRank');
+        elements.purchaseCustomerSpent = document.getElementById('purchaseModalCustSpent');
+        elements.purchaseAmountInput = document.getElementById('purchaseAmountInput');
+        elements.purchaseNotesInput = document.getElementById('purchaseNotesInput');
+        elements.btnSavePurchase = document.getElementById('btnSavePurchase');
 
-        // WhatsApp Modal Elements
-        rankShiftAlert: document.getElementById('rankShiftAlert'),
-        rankShiftText: document.getElementById('rankShiftText'),
-        purchaseLoggedText: document.getElementById('purchaseLoggedText'),
-        waTemplateSelect: document.getElementById('waTemplateSelect'),
-        waMessageText: document.getElementById('waMessageText'),
-        btnLaunchWhatsApp: document.getElementById('btnLaunchWhatsApp'),
-        displacedSection: document.getElementById('displacedSection'),
-        displacedList: document.getElementById('displacedList'),
+        elements.rankShiftAlert = document.getElementById('rankShiftAlert');
+        elements.rankShiftText = document.getElementById('rankShiftText');
+        elements.purchaseLoggedText = document.getElementById('purchaseLoggedText');
+        elements.waTemplateSelect = document.getElementById('waTemplateSelect');
+        elements.waMessageText = document.getElementById('waMessageText');
+        elements.btnLaunchWhatsApp = document.getElementById('btnLaunchWhatsApp');
+        elements.displacedSection = document.getElementById('displacedSection');
+        elements.displacedList = document.getElementById('displacedList');
 
-        // QR Modal Elements
-        btnOpenQrModal: document.getElementById('btnOpenQrModal'),
-        storeQrImg: document.getElementById('storeQrImg'),
-        btnDownloadQr: document.getElementById('btnDownloadQr'),
-        btnPrintFlyer: document.getElementById('btnPrintFlyer'),
-        flyerPrintArea: document.getElementById('flyerPrintArea'),
+        elements.btnOpenQrModal = document.getElementById('btnOpenQrModal');
+        elements.storeQrImg = document.getElementById('storeQrImg');
+        elements.btnDownloadQr = document.getElementById('btnDownloadQr');
+        elements.btnPrintFlyer = document.getElementById('btnPrintFlyer');
+        elements.flyerPrintArea = document.getElementById('flyerPrintArea');
 
-        // Template Modal Elements
-        btnOpenTemplatesModal: document.getElementById('btnOpenTemplatesModal'),
-        tplFormHeading: document.getElementById('tplFormHeading'),
-        tplEditId: document.getElementById('tplEditId'),
-        tplTitleInput: document.getElementById('tplTitleInput'),
-        tplBodyInput: document.getElementById('tplBodyInput'),
-        btnSaveTemplate: document.getElementById('btnSaveTemplate'),
-        btnCancelTplEdit: document.getElementById('btnCancelTplEdit'),
-        templatesListContainer: document.getElementById('templatesListContainer'),
+        elements.btnOpenTemplatesModal = document.getElementById('btnOpenTemplatesModal');
+        elements.tplFormHeading = document.getElementById('tplFormHeading');
+        elements.tplEditId = document.getElementById('tplEditId');
+        elements.tplTitleInput = document.getElementById('tplTitleInput');
+        elements.tplBodyInput = document.getElementById('tplBodyInput');
+        elements.btnSaveTemplate = document.getElementById('btnSaveTemplate');
+        elements.btnCancelTplEdit = document.getElementById('btnCancelTplEdit');
+        elements.templatesListContainer = document.getElementById('templatesListContainer');
 
-        // Pro Tips Modal Elements
-        btnOpenProTipsModal: document.getElementById('btnOpenProTipsModal'),
-        proTipsModal: document.getElementById('proTipsModal'),
-        tipFormHeading: document.getElementById('tipFormHeading'),
-        tipEditId: document.getElementById('tipEditId'),
-        tipTextInput: document.getElementById('tipTextInput'),
-        tipOrderInput: document.getElementById('tipOrderInput'),
-        tipActiveInput: document.getElementById('tipActiveInput'),
-        btnSaveTip: document.getElementById('btnSaveTip'),
-        btnCancelTipEdit: document.getElementById('btnCancelTipEdit'),
-        proTipsListContainer: document.getElementById('proTipsListContainer'),
-        btnInsertPhone: document.getElementById('btnInsertPhone'),
+        elements.btnOpenProTipsModal = document.getElementById('btnOpenProTipsModal');
+        elements.tipFormHeading = document.getElementById('tipFormHeading');
+        elements.tipEditId = document.getElementById('tipEditId');
+        elements.tipTextInput = document.getElementById('tipTextInput');
+        elements.tipOrderInput = document.getElementById('tipOrderInput');
+        elements.tipActiveInput = document.getElementById('tipActiveInput');
+        elements.btnSaveTip = document.getElementById('btnSaveTip');
+        elements.btnCancelTipEdit = document.getElementById('btnCancelTipEdit');
+        elements.proTipsListContainer = document.getElementById('proTipsListContainer');
+        elements.btnInsertPhone = document.getElementById('btnInsertPhone');
 
-        // History Modal Elements
-        historyCustName: document.getElementById('historyCustName'),
-        historyCustPhone: document.getElementById('historyCustPhone'),
-        historyTbody: document.getElementById('historyTbody'),
+        elements.historyCustName = document.getElementById('historyCustName');
+        elements.historyCustPhone = document.getElementById('historyCustPhone');
+        elements.historyTbody = document.getElementById('historyTbody');
 
-        // Mobile Nav & Toast
-        menuToggle: document.getElementById('menuToggle'),
-        sidebar: document.getElementById('sidebar'),
-        sidebarOverlay: document.getElementById('sidebarOverlay'),
-        toastBox: document.getElementById('toastBox'),
-        toastMsg: document.getElementById('toastMsg'),
-        toastIcon: document.getElementById('toastIcon')
-    };
+        elements.menuToggle = document.getElementById('menuToggle');
+        elements.sidebar = document.getElementById('sidebar');
+        elements.sidebarOverlay = document.getElementById('sidebarOverlay');
+        elements.toastBox = document.getElementById('toastBox');
+        elements.toastMsg = document.getElementById('toastMsg');
+        elements.toastIcon = document.getElementById('toastIcon');
+    }
 
     // ==========================================
     // INITIALIZATION
     // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
+        refreshElementReferences();
         initMobileNav();
         initModalCloseHandlers();
         initToolbarListeners();
@@ -143,22 +134,29 @@
 
     // Modal Generic Controls
     function openModal(modalEl) {
-        if (!modalEl) return;
+        if (!modalEl) {
+            console.error('[Store Rewards] openModal called with invalid/null element');
+            return;
+        }
         modalEl.classList.add('open');
+        modalEl.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 
     function closeModal(modalEl) {
         if (!modalEl) return;
         modalEl.classList.remove('open');
+        modalEl.style.display = 'none';
         document.body.style.overflow = '';
     }
 
     function initModalCloseHandlers() {
         document.querySelectorAll('[data-close]').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
                 const targetId = btn.getAttribute('data-close');
-                closeModal(document.getElementById(targetId));
+                const targetModal = document.getElementById(targetId);
+                closeModal(targetModal);
             });
         });
 
@@ -684,20 +682,22 @@
         const qrTargetUrl = 'https://sonalstationary.in/store-rewards.html';
         const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(qrTargetUrl)}&color=2c2c2c&bgcolor=ffffff&margin=1`;
 
-        if (elements.btnOpenQrModal) {
-            elements.btnOpenQrModal.addEventListener('click', () => {
-                if (elements.storeQrImg) {
-                    elements.storeQrImg.src = qrApiUrl;
-                }
-                if (elements.btnDownloadQr) {
-                    elements.btnDownloadQr.href = qrApiUrl;
-                }
-                openModal(elements.qrModal);
+        const btnOpen = document.getElementById('btnOpenQrModal') || elements.btnOpenQrModal;
+        if (btnOpen) {
+            btnOpen.addEventListener('click', (e) => {
+                e.preventDefault();
+                const img = document.getElementById('storeQrImg') || elements.storeQrImg;
+                const dl = document.getElementById('btnDownloadQr') || elements.btnDownloadQr;
+                if (img) img.src = qrApiUrl;
+                if (dl) dl.href = qrApiUrl;
+                openModal(document.getElementById('qrModal') || elements.qrModal);
             });
         }
 
-        if (elements.btnPrintFlyer) {
-            elements.btnPrintFlyer.addEventListener('click', () => {
+        const btnPrint = document.getElementById('btnPrintFlyer') || elements.btnPrintFlyer;
+        if (btnPrint) {
+            btnPrint.addEventListener('click', (e) => {
+                e.preventDefault();
                 printFlyer();
             });
         }
@@ -896,26 +896,32 @@
     }
 
     function initTemplateManagerListeners() {
-        if (elements.btnOpenTemplatesModal) {
-            elements.btnOpenTemplatesModal.addEventListener('click', () => {
+        const btnOpen = document.getElementById('btnOpenTemplatesModal') || elements.btnOpenTemplatesModal;
+        if (btnOpen) {
+            btnOpen.addEventListener('click', (e) => {
+                e.preventDefault();
                 resetTemplateForm();
-                openModal(elements.templatesModal);
+                loadTemplates();
+                openModal(document.getElementById('templatesModal') || elements.templatesModal);
             });
         }
 
-        if (elements.btnSaveTemplate) {
-            elements.btnSaveTemplate.addEventListener('click', handleSaveTemplate);
+        const btnSave = document.getElementById('btnSaveTemplate') || elements.btnSaveTemplate;
+        if (btnSave) {
+            btnSave.addEventListener('click', handleSaveTemplate);
         }
 
-        if (elements.btnCancelTplEdit) {
-            elements.btnCancelTplEdit.addEventListener('click', resetTemplateForm);
+        const btnCancel = document.getElementById('btnCancelTplEdit') || elements.btnCancelTplEdit;
+        if (btnCancel) {
+            btnCancel.addEventListener('click', resetTemplateForm);
         }
 
         // Tag Pills to insert placeholders
         document.querySelectorAll('.tag-pill[data-insert]').forEach(pill => {
             pill.addEventListener('click', () => {
                 const token = pill.getAttribute('data-insert');
-                insertAtCursor(elements.tplBodyInput, token);
+                const textarea = document.getElementById('tplBodyInput') || elements.tplBodyInput;
+                insertAtCursor(textarea, token);
             });
         });
     }
@@ -1080,27 +1086,39 @@
     // 7. PRO TIPS MANAGER (CRUD)
     // ==========================================
     async function loadProTips() {
+        const container = document.getElementById('proTipsListContainer') || elements.proTipsListContainer;
+        if (container) {
+            container.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.85rem;"><i class="ph ph-spinner ph-spin"></i> Loading tips...</div>';
+        }
         try {
             const res = await fetch('/api/admin/store-rewards/pro-tips');
             const data = await res.json();
             if (res.ok && data.success) {
                 proTips = data.tips || [];
                 renderProTipsList(proTips);
+            } else {
+                if (container) {
+                    container.innerHTML = `<div style="color: var(--danger-color); font-size: 0.85rem;">Error: ${escapeHtml(data.message || 'Server error')}</div>`;
+                }
             }
         } catch (err) {
             console.error('Failed to load pro tips:', err);
+            if (container) {
+                container.innerHTML = '<div style="color: var(--danger-color); font-size: 0.85rem;">Network error loading tips.</div>';
+            }
         }
     }
 
     function renderProTipsList(list) {
-        if (!elements.proTipsListContainer) return;
+        const container = document.getElementById('proTipsListContainer') || elements.proTipsListContainer;
+        if (!container) return;
 
         if (!list || list.length === 0) {
-            elements.proTipsListContainer.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.85rem;">No pro tips found. Add one above!</div>';
+            container.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.85rem;">No pro tips found. Add one above!</div>';
             return;
         }
 
-        elements.proTipsListContainer.innerHTML = list.map(tip => `
+        container.innerHTML = list.map(tip => `
             <div style="background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
@@ -1130,7 +1148,7 @@
         `).join('');
 
         // Attach listeners
-        elements.proTipsListContainer.querySelectorAll('.btn-edit-tip').forEach(btn => {
+        container.querySelectorAll('.btn-edit-tip').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
                 const tip = proTips.find(t => t._id === id);
@@ -1138,7 +1156,7 @@
             });
         });
 
-        elements.proTipsListContainer.querySelectorAll('.btn-toggle-tip').forEach(btn => {
+        container.querySelectorAll('.btn-toggle-tip').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
                 const currActive = btn.getAttribute('data-active') === 'true';
@@ -1146,7 +1164,7 @@
             });
         });
 
-        elements.proTipsListContainer.querySelectorAll('.btn-del-tip').forEach(btn => {
+        container.querySelectorAll('.btn-del-tip').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
                 deleteTip(id);
@@ -1155,56 +1173,81 @@
     }
 
     function initProTipsManagerListeners() {
-        if (elements.btnOpenProTipsModal) {
-            elements.btnOpenProTipsModal.addEventListener('click', () => {
+        const btnOpen = document.getElementById('btnOpenProTipsModal') || elements.btnOpenProTipsModal;
+        if (btnOpen) {
+            btnOpen.addEventListener('click', (e) => {
+                e.preventDefault();
                 resetTipForm();
-                openModal(elements.proTipsModal);
+                loadProTips();
+                const modal = document.getElementById('proTipsModal') || elements.proTipsModal;
+                openModal(modal);
             });
         }
 
-        if (elements.btnSaveTip) {
-            elements.btnSaveTip.addEventListener('click', handleSaveTip);
+        const btnSave = document.getElementById('btnSaveTip') || elements.btnSaveTip;
+        if (btnSave) {
+            btnSave.addEventListener('click', handleSaveTip);
         }
 
-        if (elements.btnCancelTipEdit) {
-            elements.btnCancelTipEdit.addEventListener('click', resetTipForm);
+        const btnCancel = document.getElementById('btnCancelTipEdit') || elements.btnCancelTipEdit;
+        if (btnCancel) {
+            btnCancel.addEventListener('click', resetTipForm);
         }
 
-        const insertPhoneBtn = document.getElementById('btnInsertPhone');
-        if (insertPhoneBtn && elements.tipTextInput) {
+        const insertPhoneBtn = document.getElementById('btnInsertPhone') || elements.btnInsertPhone;
+        if (insertPhoneBtn) {
             insertPhoneBtn.addEventListener('click', () => {
-                insertAtCursor(elements.tipTextInput, '{phone}');
+                const textarea = document.getElementById('tipTextInput') || elements.tipTextInput;
+                insertAtCursor(textarea, '{phone}');
             });
         }
     }
 
     function startEditTip(tip) {
-        if (!elements.tipFormHeading || !elements.tipTextInput) return;
+        const heading = document.getElementById('tipFormHeading') || elements.tipFormHeading;
+        const textInput = document.getElementById('tipTextInput') || elements.tipTextInput;
+        const editId = document.getElementById('tipEditId') || elements.tipEditId;
+        const orderInput = document.getElementById('tipOrderInput') || elements.tipOrderInput;
+        const activeInput = document.getElementById('tipActiveInput') || elements.tipActiveInput;
+        const cancelBtn = document.getElementById('btnCancelTipEdit') || elements.btnCancelTipEdit;
 
-        elements.tipFormHeading.textContent = 'Edit Pro Tip';
-        elements.tipEditId.value = tip._id;
-        elements.tipTextInput.value = tip.text;
-        if (elements.tipOrderInput) elements.tipOrderInput.value = tip.order || 0;
-        if (elements.tipActiveInput) elements.tipActiveInput.checked = Boolean(tip.isActive);
+        if (heading) heading.textContent = 'Edit Pro Tip';
+        if (editId) editId.value = tip._id;
+        if (textInput) textInput.value = tip.text;
+        if (orderInput) orderInput.value = tip.order || 0;
+        if (activeInput) activeInput.checked = Boolean(tip.isActive);
 
-        if (elements.btnCancelTipEdit) elements.btnCancelTipEdit.style.display = 'inline-block';
-        elements.tipTextInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        if (textInput) textInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function resetTipForm() {
-        if (elements.tipFormHeading) elements.tipFormHeading.textContent = 'Add New Pro Tip';
-        if (elements.tipEditId) elements.tipEditId.value = '';
-        if (elements.tipTextInput) elements.tipTextInput.value = '';
-        if (elements.tipOrderInput) elements.tipOrderInput.value = (proTips.length + 1);
-        if (elements.tipActiveInput) elements.tipActiveInput.checked = true;
-        if (elements.btnCancelTipEdit) elements.btnCancelTipEdit.style.display = 'none';
+        const heading = document.getElementById('tipFormHeading') || elements.tipFormHeading;
+        const editId = document.getElementById('tipEditId') || elements.tipEditId;
+        const textInput = document.getElementById('tipTextInput') || elements.tipTextInput;
+        const orderInput = document.getElementById('tipOrderInput') || elements.tipOrderInput;
+        const activeInput = document.getElementById('tipActiveInput') || elements.tipActiveInput;
+        const cancelBtn = document.getElementById('btnCancelTipEdit') || elements.btnCancelTipEdit;
+
+        if (heading) heading.textContent = 'Add New Pro Tip';
+        if (editId) editId.value = '';
+        if (textInput) textInput.value = '';
+        if (orderInput) orderInput.value = (proTips.length + 1);
+        if (activeInput) activeInput.checked = true;
+        if (cancelBtn) cancelBtn.style.display = 'none';
     }
 
     async function handleSaveTip() {
-        const text = elements.tipTextInput?.value.trim();
-        const editId = elements.tipEditId?.value.trim();
-        const order = parseInt(elements.tipOrderInput?.value, 10) || 0;
-        const isActive = elements.tipActiveInput ? elements.tipActiveInput.checked : true;
+        const textInput = document.getElementById('tipTextInput') || elements.tipTextInput;
+        const editIdInput = document.getElementById('tipEditId') || elements.tipEditId;
+        const orderInput = document.getElementById('tipOrderInput') || elements.tipOrderInput;
+        const activeInput = document.getElementById('tipActiveInput') || elements.tipActiveInput;
+        const btnSave = document.getElementById('btnSaveTip') || elements.btnSaveTip;
+
+        const text = textInput?.value.trim();
+        const editId = editIdInput?.value.trim();
+        const order = parseInt(orderInput?.value, 10) || 0;
+        const isActive = activeInput ? activeInput.checked : true;
 
         if (!text) {
             showToast('Please enter pro tip text', 'error');
@@ -1212,8 +1255,10 @@
         }
 
         try {
-            elements.btnSaveTip.disabled = true;
-            elements.btnSaveTip.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Saving...';
+            if (btnSave) {
+                btnSave.disabled = true;
+                btnSave.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Saving...';
+            }
 
             let res;
             if (editId) {
@@ -1244,9 +1289,9 @@
             console.error('Pro tip save error:', err);
             showToast(err.message, 'error');
         } finally {
-            if (elements.btnSaveTip) {
-                elements.btnSaveTip.disabled = false;
-                elements.btnSaveTip.innerHTML = '<i class="ph ph-floppy-disk"></i> Save Tip';
+            if (btnSave) {
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<i class="ph ph-floppy-disk"></i> Save Tip';
             }
         }
     }

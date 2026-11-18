@@ -106,6 +106,7 @@ async function ensureDefaultTemplates() {
  */
 exports.getLeaderboard = async (req, res) => {
   try {
+    const { search = '', page = 1, limit = 50 } = req.query;
     const rawSort = req.query.sortBy || req.query.sort || 'totalSpent_desc';
     const sortBy = String(rawSort).trim();
 

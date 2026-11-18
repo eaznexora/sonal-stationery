@@ -22,11 +22,13 @@ function formatOrdinal(n) {
 // Helper: Live rank calculation (totalSpent desc, tie-broken by visitCount desc, then createdAt/joinedAt asc)
 async function calculateCustomerRank(customer) {
   if (!customer) return 1;
+  const customerId = customer._id || customer.id;
   const spent = Number(customer.totalSpent || 0);
   const visits = Number(customer.visitCount || 0);
   const createdDate = customer.createdAt || customer.joinedAt || new Date();
 
   const higherSpendersCount = await StoreCustomer.countDocuments({
+    ...(customerId ? { _id: { $ne: customerId } } : {}),
     $or: [
       { totalSpent: { $gt: spent } },
       { totalSpent: spent, visitCount: { $gt: visits } },

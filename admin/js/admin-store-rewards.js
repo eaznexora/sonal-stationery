@@ -237,18 +237,31 @@
 
         // Client-side fallback ranking:
         // Rank based on totalSpent descending, tie-broken by visitCount descending, then createdAt/joinedAt ascending
+        // Strictly excludes the customer themselves (_id / id) so aheadCount + 1 correctly starts at 1
         if (Array.isArray(allCustomers) && allCustomers.length > 0) {
-            const sorted = [...allCustomers].sort((a, b) => {
-                const spendDiff = (Number(b.totalSpent || 0)) - (Number(a.totalSpent || 0));
-                if (spendDiff !== 0) return spendDiff;
-                const visitDiff = (Number(b.visitCount || 0)) - (Number(a.visitCount || 0));
-                if (visitDiff !== 0) return visitDiff;
-                const dateA = new Date(a.createdAt || a.joinedAt || 0).getTime();
-                const dateB = new Date(b.createdAt || b.joinedAt || 0).getTime();
-                return dateA - dateB;
-            });
-            const idx = sorted.findIndex(item => String(item._id || item.id) === String(c._id || c.id));
-            if (idx !== -1) return idx + 1;
+            const currentId = String(c._id || c.id || '');
+            const currentSpent = Number(c.totalSpent || 0);
+            const currentVisits = Number(c.visitCount || 0);
+            const currentDate = new Date(c.createdAt || c.joinedAt || 0).getTime();
+
+            let aheadCount = 0;
+            for (const other of allCustomers) {
+                const otherId = String(other._id || other.id || '');
+                if (currentId && otherId && currentId === otherId) continue; // Exclude customer themselves
+
+                const otherSpent = Number(other.totalSpent || 0);
+                const otherVisits = Number(other.visitCount || 0);
+                const otherDate = new Date(other.createdAt || other.joinedAt || 0).getTime();
+
+                if (otherSpent > currentSpent) {
+                    aheadCount++;
+                } else if (otherSpent === currentSpent && otherVisits > currentVisits) {
+                    aheadCount++;
+                } else if (otherSpent === currentSpent && otherVisits === currentVisits && otherDate < currentDate) {
+                    aheadCount++;
+                }
+            }
+            return aheadCount + 1;
         }
         return 1;
     }

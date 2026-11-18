@@ -17,6 +17,14 @@
     let currentSort = 'totalSpent_desc';
     let searchQuery = '';
 
+    // Active Check-In Alerts & Audio State
+    let checkinPollTimer = null;
+    let activeCheckins = [];
+    let recentActiveCustomers = [];
+    let knownAlertIds = new Set();
+    let isSoundEnabled = localStorage.getItem('sonal_checkin_chime') !== 'false';
+    let audioCtx = null;
+
     // Elements Cache
     const elements = {};
 
@@ -92,6 +100,16 @@
         elements.toastBox = document.getElementById('toastBox');
         elements.toastMsg = document.getElementById('toastMsg');
         elements.toastIcon = document.getElementById('toastIcon');
+
+        // Check-In Alerts & Active Strip Elements
+        elements.checkinAlertContainer = document.getElementById('checkinAlertContainer');
+        elements.recentlyActiveStripWrapper = document.getElementById('recentlyActiveStripWrapper');
+        elements.recentlyActivePillsList = document.getElementById('recentlyActivePillsList');
+        elements.activeCountBadge = document.getElementById('activeCountBadge');
+        elements.btnToggleAudio = document.getElementById('btnToggleAudio');
+        elements.soundIcon = document.getElementById('soundIcon');
+        elements.soundLabel = document.getElementById('soundLabel');
+        elements.btnDismissAllAlerts = document.getElementById('btnDismissAllAlerts');
     }
 
     // ==========================================
@@ -107,6 +125,7 @@
         initQrModalListeners();
         initTemplateManagerListeners();
         initProTipsManagerListeners();
+        initCheckinAlerts();
 
         // Initial data fetches
         loadLeaderboard();
@@ -1325,6 +1344,345 @@
             await loadProTips();
         } catch (err) {
             showToast(err.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // 7. LIVE ACTIVE CHECK-IN ALERTS & AUDIO CHIME
+    // ==========================================
+
+    function initCheckinAlerts() {
+        updateAudioButtonUI();
+
+        if (elements.btnToggleAudio) {
+            elements.btnToggleAudio.addEventListener('click', toggleAudio);
+        }
+
+        if (elements.btnDismissAllAlerts) {
+            elements.btnDismissAllAlerts.addEventListener('click', () => {
+                dismissCheckinAlert('all', true);
+            });
+        }
+
+        // Live timer tick every 1 second to update elapsed seconds/minutes in place
+        setInterval(updateElapsedTimes, 1000);
+
+        // Immediate first poll, then continuous polling every 3 seconds
+        pollActiveCheckins();
+        clearInterval(checkinPollTimer);
+        checkinPollTimer = setInterval(pollActiveCheckins, 3000);
+    }
+
+    function toggleAudio() {
+        isSoundEnabled = !isSoundEnabled;
+        localStorage.setItem('sonal_checkin_chime', isSoundEnabled ? 'true' : 'false');
+        updateAudioButtonUI();
+        if (isSoundEnabled) {
+            playCheckinChime();
+            showToast('Check-in chime enabled');
+        } else {
+            showToast('Check-in chime muted');
+        }
+    }
+
+    function updateAudioButtonUI() {
+        if (!elements.btnToggleAudio) return;
+        if (isSoundEnabled) {
+            elements.btnToggleAudio.classList.remove('muted');
+            if (elements.soundIcon) elements.soundIcon.className = 'ph ph-speaker-high';
+            if (elements.soundLabel) elements.soundLabel.textContent = 'Chime On';
+        } else {
+            elements.btnToggleAudio.classList.add('muted');
+            if (elements.soundIcon) elements.soundIcon.className = 'ph ph-speaker-slash';
+            if (elements.soundLabel) elements.soundLabel.textContent = 'Muted';
+        }
+    }
+
+    function playCheckinChime() {
+        if (!isSoundEnabled) return;
+        try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) return;
+            if (!audioCtx) {
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            // Warm harmonic chord: C5 (523.25Hz) -> E5 (659.25Hz) -> G5 (783.99Hz)
+            const notes = [
+                { freq: 523.25, time: now },
+                { freq: 659.25, time: now + 0.11 },
+                { freq: 783.99, time: now + 0.22 }
+            ];
+
+            notes.forEach(({ freq, time }) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, time);
+
+                gain.gain.setValueAtTime(0.0001, time);
+                gain.gain.exponentialRampToValueAtTime(0.18, time + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.55);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(time);
+                osc.stop(time + 0.6);
+            });
+        } catch (e) {
+            console.warn('[Audio Chime]', e);
+        }
+    }
+
+    async function pollActiveCheckins() {
+        try {
+            const res = await fetch('/api/admin/store-rewards/active-checkins');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!data.success) return;
+
+            const unacknowledged = data.unacknowledged || [];
+            const recentActive = data.recentActive || [];
+
+            // Detect new arrivals to chime
+            let hasNewArrival = false;
+            unacknowledged.forEach(item => {
+                const id = String(item._id || item.id);
+                if (!knownAlertIds.has(id)) {
+                    knownAlertIds.add(id);
+                    hasNewArrival = true;
+                }
+            });
+
+            if (hasNewArrival && knownAlertIds.size > 0) {
+                playCheckinChime();
+            }
+
+            activeCheckins = unacknowledged;
+            recentActiveCustomers = recentActive;
+
+            renderCheckinAlerts(activeCheckins);
+            renderRecentlyActiveStrip(recentActiveCustomers);
+        } catch (err) {
+            // Silently suppress transient polling errors
+        }
+    }
+
+    function formatTimeAgoShort(dateStr) {
+        if (!dateStr) return 'Just now';
+        const sec = Math.max(0, Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000));
+        if (sec < 5) return 'Just now';
+        if (sec < 60) return `${sec}s ago`;
+        const min = Math.floor(sec / 60);
+        if (min < 60) return `${min}m ago`;
+        const hrs = Math.floor(min / 60);
+        return `${hrs}h ago`;
+    }
+
+    function updateElapsedTimes() {
+        const timeBadges = document.querySelectorAll('.checkin-time-tag[data-time]');
+        timeBadges.forEach(el => {
+            const timeStr = el.getAttribute('data-time');
+            if (timeStr) {
+                const formatted = formatTimeAgoShort(timeStr);
+                el.innerHTML = `<i class="ph ph-clock"></i> Scanned ${formatted}`;
+            }
+        });
+
+        const pillTimes = document.querySelectorAll('.active-pill-time[data-time]');
+        pillTimes.forEach(el => {
+            const timeStr = el.getAttribute('data-time');
+            if (timeStr) {
+                el.textContent = formatTimeAgoShort(timeStr);
+            }
+        });
+    }
+
+    function renderCheckinAlerts(list) {
+        if (!elements.checkinAlertContainer) return;
+
+        if (!list || list.length === 0) {
+            elements.checkinAlertContainer.style.display = 'none';
+            elements.checkinAlertContainer.innerHTML = '';
+            if (elements.btnDismissAllAlerts) elements.btnDismissAllAlerts.style.display = 'none';
+            return;
+        }
+
+        elements.checkinAlertContainer.style.display = 'flex';
+        if (elements.btnDismissAllAlerts) {
+            elements.btnDismissAllAlerts.style.display = list.length > 1 ? 'inline-flex' : 'none';
+        }
+
+        elements.checkinAlertContainer.innerHTML = list.map(c => {
+            const id = c._id || c.id;
+            const rank = c.rank || 1;
+            const rankOrdinal = c.rankOrdinal || `#${rank}`;
+            const spentFormatted = `₹${Number(c.totalSpend || 0).toLocaleString('en-IN')}`;
+            const visits = c.visitCount || 0;
+            const phoneDisplay = displayPhone(c.phone);
+            const timeAgo = formatTimeAgoShort(c.checkedInAt);
+
+            return `
+                <div class="checkin-alert-card" data-checkin-id="${id}">
+                    <div class="checkin-alert-left">
+                        <div class="checkin-alert-avatar">
+                            <i class="ph ph-user"></i>
+                        </div>
+                        <div class="checkin-alert-details">
+                            <div class="checkin-badge-row">
+                                <span class="checkin-live-tag">
+                                    <i class="ph ph-lightning"></i> Active In Store
+                                </span>
+                                <span class="rank-badge ${rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : 'rank-default'))}">
+                                    Rank ${rankOrdinal}
+                                </span>
+                                <span class="checkin-time-tag" data-time="${c.checkedInAt}">
+                                    <i class="ph ph-clock"></i> Scanned ${timeAgo}
+                                </span>
+                            </div>
+                            <div class="checkin-alert-name">${escapeHtml(c.name)}</div>
+                            <div class="checkin-alert-meta">
+                                <span class="checkin-meta-item">
+                                    <i class="ph ph-phone"></i> ${phoneDisplay}
+                                </span>
+                                <span class="checkin-meta-item">
+                                    <i class="ph ph-wallet"></i> Lifetime: <strong>${spentFormatted}</strong>
+                                </span>
+                                <span class="checkin-meta-item">
+                                    <i class="ph ph-shopping-bag"></i> <strong>${visits}</strong> visits
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkin-alert-actions">
+                        <button type="button" class="btn-checkin-bill" data-checkin-id="${id}">
+                            <i class="ph ph-plus-circle"></i> + Add Bill / Points
+                        </button>
+                        <button type="button" class="btn-checkin-dismiss" data-checkin-id="${id}" title="Dismiss alert">
+                            <i class="ph ph-x"></i> Dismiss
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Wire "+ Add Bill / Points" and "Dismiss" buttons
+        elements.checkinAlertContainer.querySelectorAll('.btn-checkin-bill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-checkin-id');
+                const checkin = activeCheckins.find(c => String(c._id || c.id) === String(id));
+                if (checkin) handleCheckinAddBill(checkin);
+            });
+        });
+
+        elements.checkinAlertContainer.querySelectorAll('.btn-checkin-dismiss').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-checkin-id');
+                if (id) dismissCheckinAlert(id, true);
+            });
+        });
+    }
+
+    function renderRecentlyActiveStrip(list) {
+        if (!elements.recentlyActiveStripWrapper || !elements.recentlyActivePillsList) return;
+
+        if (!list || list.length === 0) {
+            elements.recentlyActiveStripWrapper.style.display = 'none';
+            elements.recentlyActivePillsList.innerHTML = '';
+            if (elements.activeCountBadge) elements.activeCountBadge.textContent = '0 Active';
+            return;
+        }
+
+        elements.recentlyActiveStripWrapper.style.display = 'block';
+        if (elements.activeCountBadge) {
+            elements.activeCountBadge.textContent = `${list.length} In Store`;
+        }
+
+        elements.recentlyActivePillsList.innerHTML = list.map(c => {
+            const id = c.customerId || c._id || c.id;
+            const timeAgo = formatTimeAgoShort(c.checkedInAt);
+            const rankOrdinal = c.rankOrdinal || `#${c.rank || 1}`;
+
+            return `
+                <div class="active-customer-pill" data-cust-id="${id}" title="Click to log purchase for ${escapeHtml(c.name)}">
+                    <span class="active-pill-dot"></span>
+                    <span class="active-pill-name">${escapeHtml(c.name)}</span>
+                    <span class="active-pill-rank">${rankOrdinal}</span>
+                    <span class="active-pill-time" data-time="${c.checkedInAt}">${timeAgo}</span>
+                    <i class="ph ph-plus-circle active-pill-add"></i>
+                </div>
+            `;
+        }).join('');
+
+        // Wire pill click to quick purchase modal
+        elements.recentlyActivePillsList.querySelectorAll('.active-customer-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                const custId = pill.getAttribute('data-cust-id');
+                const activeCust = recentActiveCustomers.find(c => String(c.customerId || c._id || c.id) === String(custId));
+                if (activeCust) {
+                    handleActivePillClick(activeCust);
+                }
+            });
+        });
+    }
+
+    function handleCheckinAddBill(checkin) {
+        const custId = checkin.customerId || checkin._id;
+        const customerObj = customers.find(c => String(c._id) === String(custId)) || {
+            _id: custId,
+            name: checkin.name,
+            phone: checkin.phone,
+            rank: checkin.rank || 1,
+            totalSpent: checkin.totalSpend || 0,
+            visitCount: checkin.visitCount || 0
+        };
+
+        // Pre-fill and open quick purchase modal
+        openQuickPurchaseModal(customerObj);
+
+        // Auto-dismiss the checkin alert so it doesn't linger
+        const checkinId = checkin._id || checkin.id;
+        dismissCheckinAlert(checkinId, false);
+    }
+
+    function handleActivePillClick(activeCust) {
+        const custId = activeCust.customerId || activeCust._id;
+        const customerObj = customers.find(c => String(c._id) === String(custId)) || {
+            _id: custId,
+            name: activeCust.name,
+            phone: activeCust.phone,
+            rank: activeCust.rank || 1,
+            totalSpent: activeCust.totalSpend || 0,
+            visitCount: activeCust.visitCount || 0
+        };
+        openQuickPurchaseModal(customerObj);
+    }
+
+    async function dismissCheckinAlert(id, showFeedback = true) {
+        try {
+            // Optimistic UI update: remove card instantly
+            if (id === 'all') {
+                activeCheckins = [];
+            } else {
+                activeCheckins = activeCheckins.filter(c => String(c._id || c.id) !== String(id));
+            }
+            renderCheckinAlerts(activeCheckins);
+
+            await fetch(`/api/admin/store-rewards/active-checkins/${id}/dismiss`, {
+                method: 'POST'
+            });
+
+            if (showFeedback) {
+                showToast(id === 'all' ? 'All check-ins dismissed' : 'Check-in alert dismissed');
+            }
+        } catch (err) {
+            console.warn('[Dismiss Check-In Error]', err);
         }
     }
 

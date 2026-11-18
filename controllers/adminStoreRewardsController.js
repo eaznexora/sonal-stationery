@@ -1,6 +1,7 @@
 const StoreCustomer = require('../models/StoreCustomer');
 const WhatsappTemplate = require('../models/WhatsappTemplate');
 const StoreProTip = require('../models/StoreProTip');
+const CustomerCheckin = require('../models/CustomerCheckin');
 
 // Helper: Normalize to clean 10-digit Indian mobile number
 function cleanPhoneNumber(phone) {
@@ -527,5 +528,101 @@ exports.deleteProTip = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to delete pro tip.' });
   }
 };
+
+/**
+ * Get Active & Unacknowledged Check-Ins for Admin Live Feed
+ * GET /api/admin/store-rewards/active-checkins (or /api/admin/rewards/active-checkins)
+ * Protected by adminAuth
+ */
+exports.getActiveCheckins = async (req, res) => {
+  try {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+
+    // 1. Unacknowledged check-ins from the last 30 minutes, newest first
+    const unacknowledged = await CustomerCheckin.find({
+      acknowledgedByAdmin: false,
+      checkedInAt: { $gte: thirtyMinutesAgo }
+    })
+      .sort({ checkedInAt: -1 })
+      .limit(20)
+      .lean();
+
+    // Attach ordinal rank to unacknowledged
+    const enrichedUnacknowledged = unacknowledged.map(c => ({
+      ...c,
+      rankOrdinal: formatOrdinal(c.rank || 1),
+      cleanPhone: cleanPhoneNumber(c.phone)
+    }));
+
+    // 2. All active customers seen in the last 15 minutes
+    const recentCheckinsRaw = await CustomerCheckin.find({
+      checkedInAt: { $gte: fifteenMinutesAgo }
+    })
+      .sort({ checkedInAt: -1 })
+      .limit(50)
+      .lean();
+
+    // Deduplicate by customerId / phone so each active customer appears once with their latest scan
+    const seenCustomers = new Set();
+    const recentActive = [];
+    for (const c of recentCheckinsRaw) {
+      const key = String(c.customerId || c.phone);
+      if (!seenCustomers.has(key)) {
+        seenCustomers.add(key);
+        recentActive.push({
+          ...c,
+          rankOrdinal: formatOrdinal(c.rank || 1),
+          cleanPhone: cleanPhoneNumber(c.phone)
+        });
+      }
+    }
+
+    return res.json({
+      success: true,
+      unacknowledged: enrichedUnacknowledged,
+      recentActive,
+      serverTime: new Date()
+    });
+  } catch (error) {
+    console.error('[Get Active Check-Ins Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to retrieve active check-ins.' });
+  }
+};
+
+/**
+ * Dismiss / Acknowledge a Check-In Alert
+ * POST /api/admin/store-rewards/active-checkins/:id/dismiss (or /api/admin/rewards/active-checkins/:id/dismiss)
+ * Protected by adminAuth
+ */
+exports.dismissCheckin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (id === 'all') {
+      await CustomerCheckin.updateMany(
+        { acknowledgedByAdmin: false },
+        { $set: { acknowledgedByAdmin: true } }
+      );
+      return res.json({ success: true, message: 'All check-in alerts dismissed.' });
+    }
+
+    const checkin = await CustomerCheckin.findByIdAndUpdate(
+      id,
+      { $set: { acknowledgedByAdmin: true } },
+      { new: true }
+    );
+
+    if (!checkin) {
+      return res.status(404).json({ success: false, message: 'Check-in record not found.' });
+    }
+
+    return res.json({ success: true, message: 'Check-in dismissed.', checkin });
+  } catch (error) {
+    console.error('[Dismiss Check-In Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to dismiss check-in.' });
+  }
+};
+
 
 

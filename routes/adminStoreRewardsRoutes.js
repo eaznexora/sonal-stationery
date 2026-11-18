@@ -10,6 +10,10 @@ router.use(adminAuth);
 router.get('/leaderboard', adminStoreRewardsController.getLeaderboard);
 router.post('/customer/:id/purchase', adminStoreRewardsController.addPurchase);
 
+// Active Customer In-Store Check-In Alerts
+router.get('/active-checkins', adminStoreRewardsController.getActiveCheckins);
+router.post('/active-checkins/:id/dismiss', adminStoreRewardsController.dismissCheckin);
+
 // WhatsApp Templates Management
 router.get('/templates', adminStoreRewardsController.getTemplates);
 router.post('/templates', adminStoreRewardsController.createTemplate);

@@ -39,7 +39,9 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/auth/customer', require('./routes/customerAuthRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/store-rewards', require('./routes/storeRewardsRoutes'));
+app.use('/api/rewards', require('./routes/storeRewardsRoutes'));
 app.use('/api/admin/store-rewards', require('./routes/adminStoreRewardsRoutes'));
+app.use('/api/admin/rewards', require('./routes/adminStoreRewardsRoutes'));
 app.use('/api/gst', require('./routes/gstRoutes'));
 
 // Admin static route protection

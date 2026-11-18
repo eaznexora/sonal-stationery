@@ -1,6 +1,7 @@
 const StoreCustomer = require('../models/StoreCustomer');
 const StoreCustomerOtp = require('../models/StoreCustomerOtp');
 const StoreProTip = require('../models/StoreProTip');
+const CustomerCheckin = require('../models/CustomerCheckin');
 const { Resend } = require('resend');
 const { OAuth2Client } = require('google-auth-library');
 
@@ -436,6 +437,112 @@ exports.googleAuth = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Authentication failed. Please try again.' });
   }
 };
+
+/**
+ * Customer Check-In from In-Store QR scan or App Visit
+ * POST /api/store-rewards/checkin (or /api/rewards/checkin)
+ * Public, rate-limited / anti-spam cooldown
+ */
+exports.recordCheckin = async (req, res) => {
+  try {
+    const { customerId, phone, email } = req.body;
+
+    if (!customerId && !phone && !email) {
+      return res.status(400).json({ success: false, message: 'Customer identifier (ID, phone, or email) is required.' });
+    }
+
+    const cleanPhone = phone ? cleanPhoneNumber(phone) : '';
+    const cleanEmail = email ? String(email).toLowerCase().trim() : '';
+
+    const queryConditions = [];
+    if (customerId) {
+      try {
+        queryConditions.push({ _id: customerId });
+      } catch (e) {}
+    }
+    if (cleanPhone) queryConditions.push({ phone: cleanPhone });
+    if (cleanEmail) queryConditions.push({ email: cleanEmail });
+
+    if (queryConditions.length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid customer identifier.' });
+    }
+
+    const customer = await StoreCustomer.findOne({ $or: queryConditions });
+    if (!customer) {
+      return res.status(404).json({ success: false, message: 'Loyalty account not found.' });
+    }
+
+    // Compute current live rank
+    const currentRank = await calculateCustomerRank(customer);
+    const rankOrdinal = formatOrdinal(currentRank);
+
+    // Anti-Spam Cooldown: 3 minutes (180,000 ms)
+    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+    const recentCheckin = await CustomerCheckin.findOne({
+      customerId: customer._id,
+      checkedInAt: { $gte: threeMinutesAgo }
+    }).sort({ checkedInAt: -1 });
+
+    if (recentCheckin) {
+      return res.json({
+        success: true,
+        deduplicated: true,
+        message: 'Check-in already logged recently.',
+        checkin: {
+          id: recentCheckin._id,
+          customerId: recentCheckin.customerId,
+          name: recentCheckin.name,
+          phone: recentCheckin.phone,
+          email: recentCheckin.email,
+          totalSpend: recentCheckin.totalSpend,
+          visitCount: recentCheckin.visitCount,
+          rank: recentCheckin.rank,
+          rankOrdinal,
+          checkedInAt: recentCheckin.checkedInAt
+        }
+      });
+    }
+
+    // Create new check-in record
+    const checkin = new CustomerCheckin({
+      customerId: customer._id,
+      name: customer.name,
+      phone: customer.phone,
+      email: customer.email || '',
+      totalSpend: customer.totalSpent || 0,
+      visitCount: customer.visitCount || 0,
+      rank: currentRank,
+      checkedInAt: new Date(),
+      acknowledgedByAdmin: false
+    });
+
+    await checkin.save();
+
+    console.log(`[STORE CHECK-IN] "${customer.name}" (${customer.phone}) checked in at Sonal Stationery. Rank: #${currentRank}`);
+
+    return res.json({
+      success: true,
+      deduplicated: false,
+      message: 'Check-in recorded successfully.',
+      checkin: {
+        id: checkin._id,
+        customerId: checkin.customerId,
+        name: checkin.name,
+        phone: checkin.phone,
+        email: checkin.email,
+        totalSpend: checkin.totalSpend,
+        visitCount: checkin.visitCount,
+        rank: checkin.rank,
+        rankOrdinal,
+        checkedInAt: checkin.checkedInAt
+      }
+    });
+  } catch (error) {
+    console.error('[Customer Check-In Error]', error);
+    return res.status(500).json({ success: false, message: 'Failed to record check-in.' });
+  }
+};
+
 
 
 

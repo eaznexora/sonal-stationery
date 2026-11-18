@@ -397,6 +397,48 @@
             color: var(--text-primary);
         }
 
+        /* Subtle In-Store Check-In Confirmation Pill */
+        .checkin-status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin: 0.75rem auto 1.25rem auto;
+            padding: 8px 16px;
+            background: rgba(156, 175, 159, 0.16);
+            border: 1px solid var(--accent-sage);
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--accent-sage-dark);
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .checkin-pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2e7d32;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% {
+                box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(46, 125, 50, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(46, 125, 50, 0);
+            }
+        }
+
         .tip-banner {
             background: #f7f9f7;
             border: 1px solid #d5dfd6;
@@ -816,6 +858,12 @@
                 <h2 class="step-title" id="welcomeHeading">Welcome, Customer!</h2>
                 <p class="step-subtitle" id="welcomeSubtext">You're officially on the Sonal Stationery Leaderboard.</p>
 
+                <!-- Subtle In-Store Check-In Confirmation Pill -->
+                <div class="checkin-status-pill" id="checkinStatusPill">
+                    <span class="checkin-pulse-dot"></span>
+                    <span>Checked in at Sonal Stationery &bull; Ready for billing</span>
+                </div>
+
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-card-label">Lifetime Spend</div>
@@ -1095,6 +1143,7 @@
                 setStep(3);
                 renderProTipsCarousel();
                 showMiniToast('Signed in successfully!');
+                sendActiveCheckin(data.customer);
             } catch (err) {
                 console.error('Google Auth Network Error:', err);
                 showError('Network error during Google sign-in. Please try again.');
@@ -1257,6 +1306,7 @@
                 renderSuccess(data);
                 setStep(3);
                 renderProTipsCarousel();
+                sendActiveCheckin(data.customer);
             } catch (err) {
                 showError('Network error during verification. Please try again.');
             } finally {
@@ -1372,12 +1422,14 @@
 
         document.getElementById('btnRefreshRank').addEventListener('click', () => {
             refreshRankInPlace(true);
+            sendActiveCheckin(customerData);
         });
 
         // 7. Switch Account / Logout (Update 1)
         document.getElementById('btnLogoutCustomer').addEventListener('click', () => {
             try {
                 localStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem('last_checkin_ping');
             } catch (e) {}
 
             customerData = { name: '', phone: '', email: '' };
@@ -1416,6 +1468,7 @@
                     const ok = await refreshRankInPlace(false);
                     if (ok) {
                         setStep(3);
+                        sendActiveCheckin(customerData);
                     } else {
                         // If record doesn't exist anymore on server, clear storage
                         localStorage.removeItem(STORAGE_KEY);
@@ -1423,6 +1476,37 @@
                 }
             } catch (e) {
                 try { localStorage.removeItem(STORAGE_KEY); } catch (err) {}
+            }
+        }
+
+        // Live In-Store Active Check-In Ping
+        async function sendActiveCheckin(cust) {
+            const user = cust || customerData;
+            if (!user || (!user.phone && !user.email && !user.id && !user._id)) return;
+
+            // Anti-Spam Client Cooldown: 3 minutes (180,000 ms) via sessionStorage
+            const lastPing = sessionStorage.getItem('last_checkin_ping');
+            const now = Date.now();
+            if (lastPing && (now - Number(lastPing)) < 180000) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/store-rewards/checkin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerId: user._id || user.id,
+                        phone: user.phone,
+                        email: user.email
+                    })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    sessionStorage.setItem('last_checkin_ping', String(now));
+                }
+            } catch (err) {
+                console.warn('[Check-In Ping]', err);
             }
         }
 

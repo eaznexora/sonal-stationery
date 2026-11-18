@@ -9,6 +9,7 @@ router.post('/send-otp', storeRewardsController.sendOtp);
 router.post('/verify-otp', storeRewardsController.verifyOtp);
 router.get('/my-rank', storeRewardsController.getMyRank);
 router.get('/pro-tips', storeRewardsController.getPublicProTips);
+router.post('/checkin', storeRewardsController.recordCheckin);
 
 module.exports = router;
 

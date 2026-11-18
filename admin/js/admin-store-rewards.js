@@ -226,6 +226,33 @@
         return `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`;
     }
 
+    // Resolve true customer rank based on backend liveRank/rank or totalSpent tiebreaker
+    function resolveCustomerRank(c, allCustomers) {
+        if (c.rank !== undefined && c.rank !== null && !isNaN(c.rank) && Number(c.rank) > 0) {
+            return parseInt(c.rank, 10);
+        }
+        if (c.liveRank !== undefined && c.liveRank !== null && !isNaN(c.liveRank) && Number(c.liveRank) > 0) {
+            return parseInt(c.liveRank, 10);
+        }
+
+        // Client-side fallback ranking:
+        // Rank based on totalSpent descending, tie-broken by visitCount descending, then createdAt/joinedAt ascending
+        if (Array.isArray(allCustomers) && allCustomers.length > 0) {
+            const sorted = [...allCustomers].sort((a, b) => {
+                const spendDiff = (Number(b.totalSpent || 0)) - (Number(a.totalSpent || 0));
+                if (spendDiff !== 0) return spendDiff;
+                const visitDiff = (Number(b.visitCount || 0)) - (Number(a.visitCount || 0));
+                if (visitDiff !== 0) return visitDiff;
+                const dateA = new Date(a.createdAt || a.joinedAt || 0).getTime();
+                const dateB = new Date(b.createdAt || b.joinedAt || 0).getTime();
+                return dateA - dateB;
+            });
+            const idx = sorted.findIndex(item => String(item._id || item.id) === String(c._id || c.id));
+            if (idx !== -1) return idx + 1;
+        }
+        return 1;
+    }
+
     // ==========================================
     // 1. LEADERBOARD & METRICS
     // ==========================================
@@ -244,6 +271,7 @@
 
             const params = new URLSearchParams({
                 search: searchQuery,
+                sortBy: currentSort,
                 sort: currentSort,
                 limit: 100
             });
@@ -315,7 +343,8 @@
         }
 
         elements.leaderboardTbody.innerHTML = list.map(c => {
-            const rank = c.rank || 1;
+            const rank = resolveCustomerRank(c, list);
+            c.rank = rank;
             let rankClass = 'rank-default';
             let trophyIcon = '';
 
@@ -440,8 +469,10 @@
         if (elements.purchaseCustomerName) elements.purchaseCustomerName.textContent = customer.name;
         if (elements.purchaseCustomerPhone) elements.purchaseCustomerPhone.textContent = displayPhone(customer.phone);
         if (elements.purchaseCustomerRank) {
-            elements.purchaseCustomerRank.textContent = `Rank #${customer.rank || 1}`;
-            elements.purchaseCustomerRank.className = `rank-badge ${customer.rank === 1 ? 'rank-1' : (customer.rank === 2 ? 'rank-2' : (customer.rank === 3 ? 'rank-3' : 'rank-default'))}`;
+            const rank = resolveCustomerRank(customer, customers);
+            customer.rank = rank;
+            elements.purchaseCustomerRank.textContent = `Rank #${rank}`;
+            elements.purchaseCustomerRank.className = `rank-badge ${rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : 'rank-default'))}`;
         }
         if (elements.purchaseCustomerSpent) {
             elements.purchaseCustomerSpent.textContent = `Spent: ₹${Number(customer.totalSpent || 0).toLocaleString('en-IN')}`;
@@ -575,7 +606,7 @@
         `).join('');
 
         // Smart Auto-selection (Expanded ready-to-use template library)
-        const rank = purchaseData?.newRank || customer.rank || 1;
+        const rank = purchaseData?.newRank || resolveCustomerRank(customer, customers);
         const visitCount = customer.visitCount || (customer.purchaseHistory ? customer.purchaseHistory.length : 1);
         let targetCode = 'repeat_purchase';
 
@@ -607,7 +638,7 @@
         if (!tpl) return;
 
         const purchaseAmt = purchaseData?.purchase?.amount || customer.lastPurchaseAmount || 0;
-        const rank = purchaseData?.newRank || customer.rank || 1;
+        const rank = purchaseData?.newRank || resolveCustomerRank(customer, customers);
         const ordinalRank = formatOrdinal(rank);
         const totalSpent = customer.totalSpent || 0;
         const visits = customer.visitCount || 1;
@@ -1634,11 +1665,12 @@
 
     function handleCheckinAddBill(checkin) {
         const custId = checkin.customerId || checkin._id;
+        const rank = resolveCustomerRank(checkin, customers);
         const customerObj = customers.find(c => String(c._id) === String(custId)) || {
             _id: custId,
             name: checkin.name,
             phone: checkin.phone,
-            rank: checkin.rank || 1,
+            rank: rank,
             totalSpent: checkin.totalSpend || 0,
             visitCount: checkin.visitCount || 0
         };
@@ -1653,11 +1685,12 @@
 
     function handleActivePillClick(activeCust) {
         const custId = activeCust.customerId || activeCust._id;
+        const rank = resolveCustomerRank(activeCust, customers);
         const customerObj = customers.find(c => String(c._id) === String(custId)) || {
             _id: custId,
             name: activeCust.name,
             phone: activeCust.phone,
-            rank: activeCust.rank || 1,
+            rank: rank,
             totalSpent: activeCust.totalSpend || 0,
             visitCount: activeCust.visitCount || 0
         };

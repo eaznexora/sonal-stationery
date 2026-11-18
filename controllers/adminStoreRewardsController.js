@@ -19,13 +19,25 @@ function formatOrdinal(n) {
   return num + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-// Helper: Live rank calculation (totalSpent desc, joinedAt asc)
+// Helper: Live rank calculation (totalSpent desc, tie-broken by visitCount desc, then createdAt/joinedAt asc)
 async function calculateCustomerRank(customer) {
   if (!customer) return 1;
+  const spent = Number(customer.totalSpent || 0);
+  const visits = Number(customer.visitCount || 0);
+  const createdDate = customer.createdAt || customer.joinedAt || new Date();
+
   const higherSpendersCount = await StoreCustomer.countDocuments({
     $or: [
-      { totalSpent: { $gt: customer.totalSpent } },
-      { totalSpent: customer.totalSpent, joinedAt: { $lt: customer.joinedAt } }
+      { totalSpent: { $gt: spent } },
+      { totalSpent: spent, visitCount: { $gt: visits } },
+      {
+        totalSpent: spent,
+        visitCount: visits,
+        $or: [
+          { createdAt: { $lt: createdDate } },
+          { joinedAt: { $lt: createdDate } }
+        ]
+      }
     ]
   });
   return higherSpendersCount + 1;
@@ -94,7 +106,8 @@ async function ensureDefaultTemplates() {
  */
 exports.getLeaderboard = async (req, res) => {
   try {
-    const { search = '', sortBy = 'totalSpent_desc', page = 1, limit = 50 } = req.query;
+    const rawSort = req.query.sortBy || req.query.sort || 'totalSpent_desc';
+    const sortBy = String(rawSort).trim();
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 50));
@@ -115,12 +128,12 @@ exports.getLeaderboard = async (req, res) => {
       }
     }
 
-    // Sort definition
-    let sortOptions = { totalSpent: -1, joinedAt: 1 };
+    // Sort definition (tie-broken by visitCount desc, then createdAt/joinedAt asc)
+    let sortOptions = { totalSpent: -1, visitCount: -1, createdAt: 1, joinedAt: 1 };
     if (sortBy === 'visits_desc') {
-      sortOptions = { visitCount: -1, totalSpent: -1 };
+      sortOptions = { visitCount: -1, totalSpent: -1, createdAt: 1 };
     } else if (sortBy === 'newest') {
-      sortOptions = { joinedAt: -1 };
+      sortOptions = { createdAt: -1, joinedAt: -1, totalSpent: -1 };
     } else if (sortBy === 'recent_purchase') {
       sortOptions = { lastPurchaseDate: -1, totalSpent: -1 };
     }
@@ -141,6 +154,7 @@ exports.getLeaderboard = async (req, res) => {
         return {
           ...c,
           cleanPhone: cleanPhoneNumber(c.phone),
+          rank: liveRank,
           liveRank,
           rankOrdinal: formatOrdinal(liveRank)
         };
@@ -266,6 +280,7 @@ exports.addPurchase = async (req, res) => {
       message: `Purchase of ₹${numericAmount} logged successfully!`,
       customer: {
         id: customer._id,
+        _id: customer._id,
         name: customer.name,
         phone: customer.phone,
         cleanPhone: cleanPhoneNumber(customer.phone),
@@ -273,7 +288,10 @@ exports.addPurchase = async (req, res) => {
         totalSpent: customer.totalSpent,
         visitCount: customer.visitCount,
         lastPurchaseAmount: customer.lastPurchaseAmount,
-        lastPurchaseDate: customer.lastPurchaseDate
+        lastPurchaseDate: customer.lastPurchaseDate,
+        rank: newRank,
+        liveRank: newRank,
+        rankOrdinal: newRankOrdinal
       },
       purchaseAmount: numericAmount,
       oldRank,

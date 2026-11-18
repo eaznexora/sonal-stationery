@@ -23,13 +23,25 @@ function formatOrdinal(n) {
   return num + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-// Helper: Live rank calculation based on totalSpent descending (with joinedAt tiebreaker)
+// Helper: Live rank calculation based on totalSpent descending (tie-broken by visitCount descending / createdAt ascending)
 async function calculateCustomerRank(customer) {
   if (!customer) return 1;
+  const spent = Number(customer.totalSpent || 0);
+  const visits = Number(customer.visitCount || 0);
+  const createdDate = customer.createdAt || customer.joinedAt || new Date();
+
   const higherSpendersCount = await StoreCustomer.countDocuments({
     $or: [
-      { totalSpent: { $gt: customer.totalSpent } },
-      { totalSpent: customer.totalSpent, joinedAt: { $lt: customer.joinedAt } }
+      { totalSpent: { $gt: spent } },
+      { totalSpent: spent, visitCount: { $gt: visits } },
+      {
+        totalSpent: spent,
+        visitCount: visits,
+        $or: [
+          { createdAt: { $lt: createdDate } },
+          { joinedAt: { $lt: createdDate } }
+        ]
+      }
     ]
   });
   return higherSpendersCount + 1;

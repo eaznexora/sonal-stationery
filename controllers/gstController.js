@@ -64,7 +64,7 @@ const PAN_CONSTITUTION_MAP = {
   'L': 'Local Authority'
 };
 
-// Browser simulation headers
+// Browser simulation headers for public scrapers
 const BROWSER_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
   'Accept': 'application/json, text/plain, */*',
@@ -108,7 +108,8 @@ function flattenGstAddress(addrObj) {
   if (!addrObj) return '';
   if (typeof addrObj === 'string') return addrObj.trim();
 
-  const a = addrObj.addr || addrObj;
+  // Support direct addr, pradr.addr, or raw taxpayer object
+  const a = addrObj.pradr?.addr || addrObj.pradr || addrObj.addr || addrObj;
   if (typeof a === 'string') return a.trim();
 
   const parts = [];
@@ -127,13 +128,14 @@ function flattenGstAddress(addrObj) {
   add(a.landmark);
   add(a.city || a.dst || a.district);
   add(a.stcd || a.state);
-  add(a.pncd || a.pincode || a.zip);
+  add(a.pncd || a.pincode || a.zip || a.pin);
 
   return parts.join(', ');
 }
 
 /**
  * Extract and normalize business details from public JSON responses
+ * Seamlessly supports both snake_case (gstinapi.in) and camelCase (GST portal)
  */
 function parsePublicApiResponse(raw) {
   if (!raw) return null;
@@ -165,13 +167,17 @@ function parsePublicApiResponse(raw) {
     if (data?.data && typeof data.data === 'object') {
       data = Array.isArray(data.data) ? (data.data[0] || data.data) : data.data;
     }
+    if (data?.taxpayerDetails && typeof data.taxpayerDetails === 'object') {
+      data = data.taxpayerDetails;
+    }
 
     if (!data || typeof data !== 'object') return null;
 
+    // 1. Legal Name (supports both snake_case: legal_name and camelCase: lgnm / legalName)
     const legalName = String(
-      data.lgnm ||
       data.legal_name ||
       data.legalName ||
+      data.lgnm ||
       data.LegalName ||
       data.name ||
       data.taxpayer_name ||
@@ -179,11 +185,13 @@ function parsePublicApiResponse(raw) {
       ''
     ).trim();
 
+    // 2. Trade Name (supports both snake_case: trade_name, business_name and camelCase: tradeNam / tradeName)
     const tradeName = String(
-      data.tradeNam ||
       data.trade_name ||
       data.tradeName ||
+      data.tradeNam ||
       data.TradeName ||
+      data.tradename ||
       data.business_name ||
       data.businessName ||
       data.company_name ||
@@ -191,19 +199,44 @@ function parsePublicApiResponse(raw) {
       ''
     ).trim();
 
-    const address = flattenGstAddress(data.pradr || data.address || data.principal_address || data);
-    const status = String(data.sts || data.status || data.gstin_status || 'Active').trim();
-    const taxpayerType = String(data.dty || data.taxpayer_type || data.taxpayerType || 'Regular').trim();
-    const constitution = String(data.ctb || data.constitution || '').trim();
-    const registrationDate = String(data.rgdt || data.registration_date || data.registrationDate || '').trim();
+    // 3. Address (supports direct string address + pincode, or nested pradr.addr object)
+    let address = '';
+    if (typeof data.address === 'string' && data.address.trim()) {
+      address = data.address.trim();
+    } else if (typeof data.principal_address === 'string' && data.principal_address.trim()) {
+      address = data.principal_address.trim();
+    } else {
+      address = flattenGstAddress(data.pradr || data.address || data.principal_address || data);
+    }
 
+    // Append pincode if present and not already inside the address string
+    const pincode = String(data.pincode || data.pncd || data.pin || data.zip || '').trim();
+    if (pincode && address && !address.includes(pincode)) {
+      address = `${address}, ${pincode}`;
+    }
+
+    // 4. Status (supports both snake_case: status / gstin_status and camelCase: sts)
+    const status = String(data.status || data.sts || data.gstin_status || 'Active').trim();
+
+    // 5. Taxpayer Type (supports both snake_case: taxpayer_type and camelCase: dty / taxpayerType)
+    const taxpayerType = String(data.taxpayer_type || data.taxpayerType || data.dty || 'Regular').trim();
+
+    // 6. Business Constitution (supports both snake_case: business_constitution and camelCase: constitution / ctb)
+    const constitution = String(data.business_constitution || data.constitution || data.ctb || '').trim();
+
+    // 7. Registration Date (supports both snake_case: registration_date and camelCase: rgdt / registrationDate)
+    const registrationDate = String(data.registration_date || data.registrationDate || data.rgdt || '').trim();
+
+    // 8. Nature of Business (supports both snake_case: nature_of_business and camelCase: nba)
     let natureOfBusiness = [];
-    if (Array.isArray(data.nba)) {
-      natureOfBusiness = data.nba.map(n => String(n).trim()).filter(Boolean);
-    } else if (typeof data.nba === 'string') {
-      natureOfBusiness = [data.nba.trim()];
-    } else if (typeof data.nature_of_business === 'string') {
-      natureOfBusiness = [data.nature_of_business.trim()];
+    const rawNba = data.nature_of_business !== undefined && data.nature_of_business !== null 
+      ? data.nature_of_business 
+      : data.nba;
+
+    if (Array.isArray(rawNba)) {
+      natureOfBusiness = rawNba.map(n => String(n).trim()).filter(Boolean);
+    } else if (typeof rawNba === 'string' && rawNba.trim()) {
+      natureOfBusiness = rawNba.split(',').map(s => s.trim()).filter(Boolean);
     }
 
     if (legalName || tradeName || address) {
@@ -224,7 +257,7 @@ function parsePublicApiResponse(raw) {
 }
 
 /**
- * Fetch a single URL with 6-second timeout and browser headers
+ * Fetch a single URL with timeout and browser headers
  */
 async function fetchWithTimeout(url, headers = {}, timeoutMs = 6000) {
   const controller = new AbortController();
@@ -245,11 +278,37 @@ async function fetchWithTimeout(url, headers = {}, timeoutMs = 6000) {
 }
 
 /**
- * Query public non-CAPTCHA GST endpoints in parallel
+ * Query GST Taxpayer Endpoints
+ * Priority 1: Instant direct query to gstinapi.in when GSTIN_API_KEY is configured (<1s response)
+ * Priority 2 (Fallback): Parallel non-CAPTCHA public endpoints only if GSTIN_API_KEY fails or is absent
  */
 async function queryPublicGstEndpoints(gstin) {
   const clean = encodeURIComponent(gstin);
 
+  // Priority 1: High-Speed Direct gstinapi.in Lookup
+  if (process.env.GSTIN_API_KEY) {
+    try {
+      const apiKeyUrl = `https://www.gstinapi.in/v1/gstin/${clean}`;
+      const rawApiKey = await fetchWithTimeout(apiKeyUrl, {
+        'Authorization': `Bearer ${process.env.GSTIN_API_KEY}`,
+        'x-api-key': process.env.GSTIN_API_KEY,
+        'apikey': process.env.GSTIN_API_KEY,
+        'Accept': 'application/json'
+      }, 5000);
+
+      if (rawApiKey) {
+        const parsedApiKey = parsePublicApiResponse(rawApiKey);
+        if (parsedApiKey && (parsedApiKey.displayName || parsedApiKey.address)) {
+          parsedApiKey.source = 'gstinapi';
+          return parsedApiKey;
+        }
+      }
+    } catch (apiKeyErr) {
+      console.warn('[GSTIN_API_KEY Error, falling back to public endpoints]', apiKeyErr.message);
+    }
+  }
+
+  // Priority 2: Fallback to public non-CAPTCHA endpoints
   const publicEndpoints = [
     `https://sheet.gstincheck.co.in/check/${clean}`,
     `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://sheet.gstincheck.co.in/check/${clean}`)}`,
@@ -271,24 +330,6 @@ async function queryPublicGstEndpoints(gstin) {
   try {
     return await Promise.any(queries);
   } catch (err) {
-    // If public endpoints fail, check if GSTIN_API_KEY fallback is configured
-    if (process.env.GSTIN_API_KEY) {
-      try {
-        const apiKeyUrl = `https://www.gstinapi.in/v1/gstin/${clean}`;
-        const rawApiKey = await fetchWithTimeout(apiKeyUrl, {
-          'apikey': process.env.GSTIN_API_KEY,
-          'Authorization': `Bearer ${process.env.GSTIN_API_KEY}`
-        }, 6000);
-        if (rawApiKey) {
-          const parsedApiKey = parsePublicApiResponse(rawApiKey);
-          if (parsedApiKey && (parsedApiKey.displayName || parsedApiKey.address)) {
-            return parsedApiKey;
-          }
-        }
-      } catch (apiKeyErr) {
-        console.warn('[GSTIN_API_KEY Fallback Notice]', apiKeyErr.message);
-      }
-    }
     return null;
   }
 }
@@ -350,7 +391,7 @@ exports.lookupGstin = async (req, res) => {
       console.warn('[GstCache Find Warning]', cacheErr.message);
     }
 
-    // Tier 2: Public Non-CAPTCHA Endpoints (6s Timeout)
+    // Tier 2: Live Taxpayer Lookup (Priority: gstinapi.in -> Fallback: public non-CAPTCHA endpoints)
     let liveData = null;
     try {
       liveData = await queryPublicGstEndpoints(cleanGstin);
@@ -368,6 +409,7 @@ exports.lookupGstin = async (req, res) => {
       const constitution = liveData.constitution || derivedConstitution;
       const registrationDate = liveData.registrationDate || '';
       const natureOfBusiness = liveData.natureOfBusiness || [];
+      const source = liveData.source || 'api';
 
       // Save to MongoDB GstCache (60-day TTL auto-managed)
       try {
@@ -387,7 +429,7 @@ exports.lookupGstin = async (req, res) => {
             constitution,
             registrationDate,
             natureOfBusiness,
-            source: 'public_api',
+            source,
             updatedAt: new Date()
           },
           { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -398,7 +440,7 @@ exports.lookupGstin = async (req, res) => {
 
       return res.json({
         success: true,
-        source: 'api',
+        source,
         data: {
           gstin: cleanGstin,
           legalName,
@@ -413,7 +455,7 @@ exports.lookupGstin = async (req, res) => {
           constitution,
           registrationDate,
           natureOfBusiness,
-          source: 'api'
+          source
         }
       });
     }
@@ -456,4 +498,3 @@ exports.lookupGstin = async (req, res) => {
     });
   }
 };
-
